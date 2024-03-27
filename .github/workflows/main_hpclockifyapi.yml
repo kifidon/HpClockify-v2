@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: 'HpClockifyAPI'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_35061D09F6BD409CBC5E18279C5DF9B5 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_66B8405728934E33A60E4BB2869E84B4 }}
