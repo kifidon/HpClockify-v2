@@ -93,6 +93,15 @@ def rowToJson(row):
 
     return json_data
 
+def errorToJson(exc):
+    json_data = {
+        "error_class": str(exc.__class__),
+        "filename": exc.__traceback__.tb_frame.f_code.co_filename,
+        "function_name": exc.__traceback__.tb_frame.f_code.co_name,
+        "line_number": exc.__traceback__.tb_lineno,
+        "error_message": str(exc)
+    }
+    return json_data
 app = FastAPI()
 
 @app.post('/timesheetUpdate')
@@ -126,8 +135,7 @@ async def updateApproval(ApprovalR: Request):
        result = cursor.fetchone()
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        print(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        return f"Operation failed. Changes rolled back. Contact administer of problem persists"
+        return errorToJson(exc)
     else:
         conn.commit()
         print("Committing changes...")  # Commit changes if no exceptions occurred                     
