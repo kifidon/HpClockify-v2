@@ -1,7 +1,7 @@
 import requests
 import pyodbc
 import pytz
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from fastapi import FastAPI, Request
 import json
 
@@ -106,9 +106,9 @@ app = FastAPI()
 
 @app.post('/timesheetUpdate')
 async def updateApproval(ApprovalR: Request):
-    approve = await ApprovalR.json()
+    approve = await ApprovalR.json() # wait until request is sent 
     wkSpaceID = approve['workspaceId']
-    aID = approve['id']
+    aID = approve['id'] 
     userID = approve['owner']['userId']
     status = approve['status']['state']
     
@@ -137,7 +137,7 @@ async def updateApproval(ApprovalR: Request):
         conn.rollback()  # Roll back changes if an exception occurs
         return errorToJson(exc)
     else:
-        conn.commit()
+        conn.commit() 
         print("Committing changes...")  # Commit changes if no exceptions occurred                     
         return(rowToJson(result))
 
