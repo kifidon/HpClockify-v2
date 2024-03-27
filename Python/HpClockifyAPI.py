@@ -3,7 +3,15 @@ import pyodbc
 import pytz
 from datetime import datetime
 from fastapi import FastAPI, Request
+import logging
 import json
+
+# Configure logging
+logging.basicConfig(
+    level=logging.ERROR,  # Set the logging level to ERROR
+    filename='HpClockifyAPI.log',   # Set the file name for logging
+    format='%(asctime)s - %(levelname)s - %(message)s'  # Set the log message format
+)
 
 def sqlConnect():
     """
@@ -121,24 +129,34 @@ async def updateApproval(ApprovalR: Request):
                 UPDATE TimeSheet
                 SET emp_id = ?,
                     start_time = ?,
-                    end_time = ?,
+                    end_dfsdtime = ?,
                     status = ?
                 WHERE id = ? and workspace_id = ?;    
                 ''', (userID, startDateO, endDateO, status, aID, wkSpaceID)
             )
-       cursor.execute(
+    
+    except Exception as  exc :
+        cursor.execute(
            '''
             select * From TimeSheet
             where id = ? and workspace_id = ?
             ''', (aID, wkSpaceID)
-       )
-       result = cursor.fetchone()
-    except Exception as  exc :
+        )
+        result = cursor.fetchone()
         conn.rollback()  # Roll back changes if an exception occurs
+        logging.error(f"An error occurred while updating timesheet: {json.dumps(errorToJson(exc), indent=4)}")
+        logging.error(f"{json.dumps(rowToJson(result), indent=4)}")
         return errorToJson(exc)
     else:
+        cursor.execute(
+           '''
+            select * From TimeSheet
+            where id = ? and workspace_id = ?
+            ''', (aID, wkSpaceID)
+        )
+        result = cursor.fetchone()
         conn.commit() 
-        print("Committing changes...")  # Commit changes if no exceptions occurred                     
+        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                     
         return(rowToJson(result))
 
 
