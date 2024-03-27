@@ -16,7 +16,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      - name: Install Microsoft Visual C++ Build Tools
+        if: runner.os == 'Windows'
+        run: |
+              choco install visualcpp-build-tools -y
       - name: Set up Python version
         uses: actions/setup-python@v1
         with:
