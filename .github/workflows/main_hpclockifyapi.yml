@@ -17,10 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Microsoft Visual C++ Build Tools
+        if: runner.os == 'Windows'
+        run: |
+          choco install visualcpp-build-tools -y
+
       - name: Set up Python version
         uses: actions/setup-python@v1
         with:
-          python-version: '3.12'
+          python-version: '3.8'
 
       - name: Create and start virtual environment
         run: |
@@ -28,7 +33,9 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install --upgrade pip
+          pip install -r ./.github/workflows/requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -66,4 +73,4 @@ jobs:
         with:
           app-name: 'HpClockifyAPI'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D60062DF42B944A09A42C3511284D6B7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EA48F7C62FC04DC4ADC9729F49E0EBFA }}
