@@ -4,13 +4,14 @@ import json
 import func
 import services
 from fastapi.openapi.utils import get_openapi
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
 
 #from fastapi.middleware.swagger import SwaggerUI
 
 # Configure logging
 logging.basicConfig(
-    level=logging.ERROR,  # Set the logging level to ERROR
+    level=logging.INFO,  # Set the logging level to ERROR
     filename='HpClockifyAPI.log',   # Set the file name for logging
     format='%(asctime)s - %(levelname)s - %(message)s'  # Set the log message format
 )
@@ -42,7 +43,7 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
                 UPDATE TimeSheet
                 SET emp_id = ?,
                     start_time = ?,
-                    end_dfsdtime = ?,
+                    end_time = ?,
                     status = ?
                 WHERE id = ? and workspace_id = ?;    
                 ''', (userID, startDateO, endDateO, status, aID, wkSpaceID)
@@ -69,7 +70,7 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
         )
         result = cursor.fetchone()
         conn.commit() 
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                     
+        logging.info(f"Committing changes:\n{json.dumps(func.rowToJson(result), indent=4)}")  # Commit changes if no exceptions occurred                     
         return(func.rowToJson(result))
 
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-
+from fastapi import Request
 class Creator(BaseModel):
     userId: str
     userName: str
@@ -23,7 +23,7 @@ class DateRange(BaseModel):
     start: str
     end: str
 
-class ApprovalRequest(BaseModel):
+class ApprovalRequest(Request):
     id: str
     workspaceId: str
     dateRange: DateRange
