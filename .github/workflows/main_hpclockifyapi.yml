@@ -74,3 +74,5 @@ jobs:
           app-name: 'HpClockifyAPI'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EA48F7C62FC04DC4ADC9729F49E0EBFA }}
+          package: ./Python
+      
