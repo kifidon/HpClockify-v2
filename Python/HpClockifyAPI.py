@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import logging
 import json
 import func
@@ -6,8 +6,6 @@ import services
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
-
-#from fastapi.middleware.swagger import SwaggerUI
 
 # Configure logging
 logging.basicConfig(
@@ -71,5 +69,3 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
         logging.info(f"Committing changes:\n{json.dumps(func.rowToJson(result), indent=4)}")  # Commit changes if no exceptions occurred                     
         return(func.rowToJson(result))
 
-
-    

@@ -6,20 +6,20 @@ class Creator(BaseModel):
     userName: str
     userEmail: str
 
-class Status(BaseModel):
+class Status(Request):
     state: str
     updatedBy: str
     updatedByUserName: str
     updatedAt: str
     note: Optional[str] = ""
 
-class Owner(BaseModel):
+class Owner(Request):
     userId: str
     userName: str
     timeZone: str
     startOfWeek: str
 
-class DateRange(BaseModel):
+class DateRange(Request):
     start: str
     end: str
 
