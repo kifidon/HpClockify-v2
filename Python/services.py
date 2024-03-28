@@ -6,24 +6,24 @@ class Creator(BaseModel):
     userName: str
     userEmail: str
 
-class Status(Request):
+class Status(BaseModel):
     state: str
     updatedBy: str
     updatedByUserName: str
     updatedAt: str
     note: Optional[str] = ""
 
-class Owner(Request):
+class Owner(BaseModel):
     userId: str
     userName: str
     timeZone: str
     startOfWeek: str
 
-class DateRange(Request):
+class DateRange(BaseModel):
     start: str
     end: str
 
-class ApprovalRequest(Request):
+class ApprovalRequest(BaseModel):
     id: str
     workspaceId: str
     dateRange: DateRange

@@ -20,13 +20,14 @@ app = FastAPI()
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="Docs")
 
+
 @app.get("/openapi.json", include_in_schema=False)
 async def get_open_api_endpoint():
     return JSONResponse(get_openapi(title="HpCLockifyAPI", version="1.0.0", routes=app.routes))
 
 @app.post('/timesheetUpdate')
 async def updateApproval(ApprovalR: services.ApprovalRequest):
-    approve = await ApprovalR.json() # wait until request is sent 
+    approve = await ApprovalR.model_dump_json() # wait until request is sent 
     wkSpaceID = approve['workspaceId']
     aID = approve['id'] 
     userID = approve['owner']['userId']
@@ -68,4 +69,3 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
         conn.commit() 
         logging.info(f"Committing changes:\n{json.dumps(func.rowToJson(result), indent=4)}")  # Commit changes if no exceptions occurred                     
         return(func.rowToJson(result))
-
