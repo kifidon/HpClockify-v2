@@ -33,7 +33,6 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
     aID = approve['id'] 
     userID = approve['owner']['userId']
     status = approve['status']['state']
-    
     startDateO = func.timeZoneConvert(approve['dateRange']['start'])
     endDateO = func.timeZoneConvert(approve['dateRange']['end'])
     try:
@@ -47,8 +46,7 @@ async def updateApproval(ApprovalR: services.ApprovalRequest):
                     status = ?
                 WHERE id = ? and workspace_id = ?;    
                 ''', (userID, startDateO, endDateO, status, aID, wkSpaceID)
-            )
-    
+            )   
     except Exception as  exc :
         cursor.execute(
            '''
