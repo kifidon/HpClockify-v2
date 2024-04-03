@@ -1,0 +1,59 @@
+Metadata-Version: 2.1
+Name: clockify
+Version: 3.0.0
+Summary: Clockify is the only truly free time tracker and timesheet app for teams of all sizes. Unlike all the other time trackers, Clockify is available for an unlimited numbers of users for free
+Home-page: https://gitlab.com/integration_seon/libs/application/clockify
+Author: Paulo Sergio dos Santos Junior
+Author-email: paulossjunior@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Requires-Dist: requests
+Requires-Dist: factory-boy
+
+# Clockify
+
+## General Information
+* **Software**:clockify
+* **Author**:Paulo Sérgio dos Santos Júnior
+* **Author's e-mail**:paulossjunior@gmail.com
+* **Source Repository**: [https://gitlab.com/integration_seon/libs/application/clockify](https://gitlab.com/integration_seon/libs/application/clockify)  
+
+## Goal
+Clockify is the only truly free time tracker and timesheet app for teams of all sizes. Unlike all the other time trackers, Clockify is available for an unlimited numbers of users for free
+
+## Documentation
+
+The Documentation can be found in this [link](./docs/documentation.md)
+
+## Instalation
+
+To install clockify, run this command in your terminal:
+```bash
+pip install clockify
+```
+
+## Usage
+
+```python
+
+from clockify import factories
+from pprint import pprint
+
+api_key = "<personal _token>"
+workspace_services = factories.WorkspaceFactory(api_key=api_key)
+worspaces = workspace_services.get_all_workspaces()
+
+for workspace in worspaces:
+    pprint (workspace)
+```
+
+## Copyright
+This lib was PowerRight by [SEON Application Lib Generator](https://gitlab.com/mdd_seon/from_application_conceptual_data_model_2_lib_application)
+
+
+
+

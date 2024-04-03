@@ -33,7 +33,7 @@ class ApprovalRequest(BaseModel):
 
     # Specify example value for Swagger documentation
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": "66034527a9e0d922a6783603",
                 "workspaceId": "65c249bfedeea53ae19d7dad",
