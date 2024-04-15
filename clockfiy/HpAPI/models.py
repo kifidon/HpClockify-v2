@@ -7,7 +7,6 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
 class Workspace(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
     name = models.CharField(max_length=50, blank=True, null=True)
@@ -25,7 +24,6 @@ class Calendar(models.Model):
     class Meta:
         managed = False
         db_table = 'Calendar'
-
 
 class Client(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
@@ -52,7 +50,7 @@ class Employeeuser(models.Model):
 
 class Timesheet(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
-    emp = models.ForeignKey(Employeeuser, models.DO_NOTHING)
+    emp = models.CharField(max_length=50, db_column= 'emp_id', null=False)
     start_time = models.DateField(blank=True, null=True)
     end_time = models.DateField(blank=True, null=True)
     approved_time = models.FloatField(blank=True, null=True)
@@ -60,7 +58,7 @@ class Timesheet(models.Model):
     billable_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     cost_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     expense_total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
+    workspace = models.CharField(max_length=50, db_column='workspace_id')
     status = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
@@ -84,21 +82,21 @@ class Project(models.Model):
 
 class Entry(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
-    time_sheet = models.ForeignKey(Timesheet, models.DO_NOTHING)
+    time_sheet = models.CharField(max_length=50,db_column= 'time_sheet_id')
     duration = models.FloatField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     billable = models.BooleanField(blank=True, null=True)
-    project = models.ForeignKey(Project, models.DO_NOTHING, blank=True, null=True)
+    project = models.CharField(max_length=50, db_column= 'project_id')
     type = models.CharField(max_length=20, blank=True, null=True)
     rate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    start_time = models.DateTimeField(blank=True, null=True)
-    end_time = models.DateTimeField(blank=True, null=True)
-    workspace = models.ForeignKey(Workspace, models.DO_NOTHING, blank=True, null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField( )
+    workspace = models.CharField(max_length=50, db_column='workspace_id')
 
     class Meta:
         managed = False
         db_table = 'Entry'
-        unique_together = (('id', 'time_sheet'),)
+        unique_together = (('id', 'workspace', 'time_sheet'),)
 
 class Usergroups(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
@@ -136,9 +134,9 @@ class Holidays(models.Model):
 
 class Tagsfor(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
-    entryid = models.ForeignKey(Entry, models.DO_NOTHING, related_name= 'tag_entryID', db_column='entryID')  # Field name made lowercase.
-    timeid = models.ForeignKey(Entry, models.DO_NOTHING, db_column='timeID')  # Field name made lowercase.
-    workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
+    entryid = models.CharField(max_length=50,  db_column='entryID')  # Field name made lowercase.
+    timeid = models.CharField(max_length=50, db_column='timeID')  # Field name made lowercase.
+    workspace = models.CharField(max_length=50, db_column='workspace_id')
     name = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:

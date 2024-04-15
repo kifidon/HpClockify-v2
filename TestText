@@ -1,0 +1,54 @@
+New Timesheet
+{
+    "id": "66158a452e27e9007aaa38f3",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "PENDING",
+        "updatedBy": "65bd6a6077682a20767a6c0b",
+        "updatedByUserName": "Timmy Ifidon",
+        "updatedAt": "2024-04-09T18:34:45Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "userEmail": "timmy.ifidon@hillplain.com"
+    }
+}
+Update Approval
+{
+    "id": "66158a452e27e9007aaa38f3",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "WITHDRAWN_SUBMISSION",
+        "updatedBy": "65bd6a6077682a20767a6c0b",
+        "updatedByUserName": "Timmy Ifidon",
+        "updatedAt": "2024-04-10T22:42:31Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "userEmail": "timmy.ifidon@hillplain.com"
+    }
+}

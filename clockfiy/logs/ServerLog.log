@@ -1,0 +1,561 @@
+Watching for file changes with StatReloader
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/users HTTP/1.1" 200 None
+Loading..........2.0%
+Loading..........4.0%
+Loading..........6.0%
+Loading..........8.0%
+Loading..........10.0%
+Loading..........12.0%
+Loading..........15.0%
+Loading..........17.0%
+Loading..........19.0%
+Loading..........21.0%
+Loading..........23.0%
+Loading..........25.0%
+Loading..........27.0%
+Loading..........28.99%
+Loading..........31.0%
+Loading..........33.0%
+Loading..........35.0%
+Loading..........38.0%
+Loading..........40.0%
+Loading..........42.0%
+Loading..........44.0%
+Loading..........46.0%
+Loading..........48.0%
+Loading..........50.0%
+Loading..........52.0%
+Loading..........54.0%
+Loading..........56.00%
+Loading..........57.99%
+Loading..........60.0%
+Loading..........62.0%
+Loading..........65.0%
+Loading..........67.0%
+Loading..........69.0%
+Loading..........71.0%
+Loading..........73.0%
+Loading..........75.0%
+Loading..........77.0%
+Loading..........79.0%
+Loading..........81.0%
+Loading..........83.0%
+Loading..........85.0%
+Loading..........88.0%
+Loading..........90.0%
+Loading..........92.0%
+Loading..........94.0%
+Loading..........96.0%
+Loading..........98.0%
+Loading..........100.0%
+Committing changes...
+Operation Completed: EmployeeUser table has 0 new records and 48 unchanged. 0 records updated. 
+
+Internal Server Error: /quickBackup
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 505, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 465, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 476, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 502, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 48, in quickBackup
+    result = QuickBackup.UserEvent()
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\QuickBackup.py", line 11, in UserEvent
+    wid = ClockifyPush.getWID(wkSpaceName)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPush.py", line 48, in getWID
+    quickCursor.execute('''SELECT id FROM Workspace WHERE name = ? ''', wSpace_Name)
+pyodbc.ProgrammingError: ('42S02', "[42S02] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'Workspace'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces HTTP/1.1" 200 None
+Committing changes...
+Committing changes...
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/users HTTP/1.1" 200 None
+Adding Employee  information: Ahmad Tadbir (0)
+Adding Employee  information: Behrouz Ayaz (1)
+Adding Employee  information: Carla Stenvold (2)
+Adding Employee  information: Chelsea Stepien (3)
+Adding Employee  information: Cody C. Calliou (4)
+Adding Employee  information: None (5)
+Adding Employee  information: Daniel Murangira (6)
+Adding Employee  information: Dilwinder Singh (7)
+Adding Employee  information: Eric Scroggins (8)
+Adding Employee  information: Hilary Meng (9)
+Adding Employee  information: Janessa Batt (10)
+Adding Employee  information: Jarret Asham (11)
+Adding Employee  information: Jason Luo (12)
+Adding Employee  information: Jason Stanvick (13)
+Adding Employee  information: None (14)
+Adding Employee  information: Jax Chen (15)
+Adding Employee  information: Jeff McLeod (16)
+Adding Employee  information: Jonathan Letendre (17)
+Adding Employee  information: Kendal Cruz (18)
+Adding Employee  information: Keri Cardinal (19)
+Adding Employee  information: Kyle Applejohn (20)
+Adding Employee  information: Leah Reynolds (21)
+Adding Employee  information: Lucian Coltea (22)
+Adding Employee  information: Luke Dixon (23)
+Adding Employee  information: Margaretta Potts Petawaysin (24)
+Adding Employee  information: Matthew Dixon (25)
+Adding Employee  information: Mekha George (26)
+Adding Employee  information: Melissa Bryant (27)
+Adding Employee  information: Michelle Tost (28)
+Adding Employee  information: Misha Succurro (29)
+Adding Employee  information: Mohamad Potts (30)
+Adding Employee  information: Molar Soryal (31)
+Adding Employee  information: Rocia Luo (32)
+Adding Employee  information: Rodney Erickson-Fitl (33)
+Adding Employee  information: Saqleen Desai (34)
+Adding Employee  information: Sean Goodson (35)
+Adding Employee  information: Shawna Applejohn (36)
+Adding Employee  information: Shiven Walia (37)
+Adding Employee  information: Steaphan MacAulay (38)
+Adding Employee  information: Stephanie Alexis (39)
+Adding Employee  information: Steve Sharron (40)
+Adding Employee  information: Steven Parks (41)
+Adding Employee  information: Sunny Jinks (42)
+Adding Employee  information: Thomas Rain (43)
+Adding Employee  information: Thulani Gumpo (44)
+Adding Employee  information: Timmy Ifidon (45)
+Adding Employee  information: Tony Langille (46)
+Adding Employee  information: Tyler Radke (47)
+Committing changes...
+Operation Completed: EmployeeUser table has 48 new records and 0 unchanged. 0 records updated. 
+
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Bad Request: /
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Bad Request: /
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 505, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 465, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 476, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 502, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 197, in view_log
+    lines = file.readlines()[-1000:]
+NameError: name 'file' is not defined
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+POST
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+POST
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+POST
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+POST
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 425, in updateTimesheet
+    entryResponse = updateEntries(request, serializer)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 406, in updateEntries
+    entry = Entry.objects.get(id = entries[i]['id'], workspace = 'workspaceId')
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 505, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 465, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 476, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 502, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 434, in updateTimesheet
+    transaction.set_rollback(True)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\db\transaction.py", line 92, in set_rollback
+    return get_connection(using).set_rollback(rollback)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\db\backends\base\base.py", line 436, in set_rollback
+    "The rollback flag doesn't work outside of an 'atomic' block.")
+django.db.transaction.TransactionManagementError: The rollback flag doesn't work outside of an 'atomic' block.
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPull.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPull.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=200 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPull.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=4&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=5&page-size=50 HTTP/1.1" 200 None
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=4&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=5&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=4&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=5&page-size=50 HTTP/1.1" 200 None
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=4&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=5&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=4&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=5&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+POST
+POST
+Not Acceptable: /HpClockifyAPi/getTimeSheets
+POST
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+updateTags Function called
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Bad Request: /HpClockifyAPi/updateTimeSheets
+updateEntreis Function called
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+POST
+<Response status_code=400, "text/html; charset=utf-8">
+Bad Request: /HpClockifyAPi/getTimeSheets
+POST
+<Response status_code=304, "text/html; charset=utf-8">
+updateEntreis Function called
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=1&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=2&page-size=50 HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/approval-requests?status=APPROVED&page=3&page-size=50 HTTP/1.1" 200 None
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+updateTags Function called
+<Response status_code=202, "text/html; charset=utf-8">
+<Response status_code=202, "text/html; charset=utf-8">
+<Response status_code=202, "text/html; charset=utf-8">
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPull.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPull.py changed, reloading.
+Watching for file changes with StatReloader
