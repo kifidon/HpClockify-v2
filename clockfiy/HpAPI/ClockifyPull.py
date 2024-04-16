@@ -193,8 +193,8 @@ def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page = 1):
     headers = {
         'X-Api-Key': key
     }
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=50" 
-    logging.info(url)   
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=200" 
+    logging.info(f'INFO: {url}')   
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         while page < 5: 

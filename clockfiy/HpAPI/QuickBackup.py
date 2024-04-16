@@ -21,7 +21,7 @@ def UserEvent(wkSpaceName = 'Hill Plain'):
     logging.info(ClockifyPush.pushUsers(wid, conn, cursor))
 
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-    
+    return 1
 def ClientEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPush.getWID(wkSpaceName)
     cursor , conn = ClockifyPull.sqlConnect()
@@ -35,7 +35,7 @@ def ClientEvent(wkSpaceName = 'Hill Plain'):
         return 0
     logging.info(ClockifyPush.pushClients(wid, conn, cursor))
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-
+    return 1
 def ProjectEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPush.getWID(wkSpaceName)
     cursor , conn = ClockifyPull.sqlConnect()
@@ -49,7 +49,7 @@ def ProjectEvent(wkSpaceName = 'Hill Plain'):
         return 0
     logging.info(ClockifyPush.pushProjects(wid, conn, cursor))
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-    
+    return 1
 def PolicyEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPush.getWID(wkSpaceName)
     cursor , conn = ClockifyPull.sqlConnect()
@@ -63,7 +63,7 @@ def PolicyEvent(wkSpaceName = 'Hill Plain'):
         return 0
     logging.info(ClockifyPush.pushPolicies(wid, conn, cursor))
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-
+    return 1
 def TimesheetEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPush.getWID(wkSpaceName)
     cursor , conn = ClockifyPull.sqlConnect()
@@ -72,12 +72,12 @@ def TimesheetEvent(wkSpaceName = 'Hill Plain'):
         attempts += 1
         logging.info("Retrying.....Connecting to server")
         cursor , conn = ClockifyPull.sqlConnect()
-    status = [ 'APPROVED']
+    status = [ 'APPROVED', 'WITHDRAWN_APPROVAL']
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
     for stat in status:
-        logging.info(f"({stat})",ClockifyPush.pushApprovedTime(wid, conn, cursor, stat))
+        logging.info(f"({stat}) {ClockifyPush.pushApprovedTime(wid, conn, cursor, stat)}")
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
 
 def TimeOffEvent(wkSpaceName = 'Hill Plain'):
@@ -93,7 +93,7 @@ def TimeOffEvent(wkSpaceName = 'Hill Plain'):
         return 0
     logging.info(ClockifyPush.pushTimeOff(wid, conn, cursor))
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-
+    return 1
 def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPush.getWID(wkSpaceName)
     cursor , conn = ClockifyPull.sqlConnect()
@@ -107,7 +107,7 @@ def UserGroupEvent(wkSpaceName = 'Hill Plain'):
         return 0
     logging.info(ClockifyPush.pushUserGroups(wid, conn, cursor))
     ClockifyPull.cleanUp(conn=conn, cursor=cursor)
-
+    return 1
 def CreateTextFile():
     timezone = pytz.timezone('America/Denver')
     currentDateTimeObject = datetime.datetime.now(timezone)
@@ -118,9 +118,12 @@ def CreateTextFile():
         file.write("--------------------------------------------------------------------\n")
     file.close()
     logging.info(filePath, end="")
-        
-def monthlyBillable():
-    logging.info(sqlDataFormatter.MonthylyProjReport())
+         
+def monthlyBillable(start_date = None, end_date = None):
+    file_path = (sqlDataFormatter.MonthylyProjReport(start_date, end_date ))
+    logging.info(file_path)
+    return file_path
+    
 
 def main():
     UserEvent()
@@ -130,7 +133,7 @@ def main():
     TimesheetEvent()
     TimeOffEvent()
     UserGroupEvent()
-    return 'Opperation Complete. View Logging For errors '
+    return 'Opperation Complete. View Logging For errors @: https://hpclockifyapi.azurewebsites.net/'
 
 if __name__ == "__main__":
     main()

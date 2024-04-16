@@ -5,9 +5,9 @@ import csv
 import os
 import datetime
 import pandas as pd
-
+from . import settings 
 from types import MappingProxyType
-
+import logging
 # Define your dictionary
 original_dict = {
     'Jax Chen': 200, 
@@ -73,12 +73,12 @@ def MonthylyProjReport(startDate = None, endDate = None):
         )
         pIds = cursor.fetchall()
         for pId in pIds:
-            current_dir = r"C:\Users\TimmyIfidon\OneDrive - Hill Plain Construction Services LP\Billable Report (ACC) - Hill Plain Hub"
+            current_dir = settings.BASE_DIR
            # current_dir = r"C:\Users\TimmyIfidon\Desktop"
             folder_name = f"HP-IND-{year}-{month}"
             folder_path = os.path.join(current_dir, folder_name)
             if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+                os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
             df = []
             cursor.execute(
@@ -120,14 +120,18 @@ def MonthylyProjReport(startDate = None, endDate = None):
 
                 df.to_excel(file_path, index = False)
             # Combine the directory path with the file name
-        ClockifyPull.cleanUp(conn, cursor)   
-        return f"File stored at: {file_path}"     
+        ClockifyPull.cleanUp(conn, cursor) 
+        
+        return folder_path     
     except pyodbc.Error as e:
-        print( f"SQL Error: {str(e)}")
+        logging.error( f"SQL Error: {str(e)}")
+        return None
     except FileNotFoundError as e:
-        print(f"Error: {str(e)}")
+        logging.error(f"Error: {str(e)}")
+        return None
     except PermissionError as e:
-        print(f"Error: {str(e)}")
+        logging.error(f"Error: {str(e)}")
+        return None
 
 def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     cursor, conn = ClockifyPull.sqlConnect()
@@ -165,11 +169,11 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
                 writer.writerow([f"No data was found for period {startDate} - {endDate}"])
 
     except pyodbc.Error as e:
-        print( f"SQL Error: {str(e)}")
+        logging.error( f"SQL Error: {str(e)}")
     except FileNotFoundError as e:
-        print(f"Error: {str(e)}")
+        logging.error(f"Error: {str(e)}")
     except PermissionError as e:
-        print(f"Error: {str(e)}")
+        logging.error(f"Error: {str(e)}")
 
 
 def main():
