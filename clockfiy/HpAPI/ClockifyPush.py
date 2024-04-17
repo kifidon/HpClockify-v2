@@ -425,8 +425,16 @@ def timeDuration(duration_str):
         hours, duration_str = duration_str.split('H')
         hours = int(hours)
     if 'M' in duration_str:
-        minutes = int( (duration_str.split('M'))[0] )/60
-    return( hours + minutes)
+        minutes = int( (duration_str.split('M'))[0] )
+    total_minutes = hours * 60 + minutes
+
+    # Round to the nearest 15 minutes
+    rounded_minutes = round(total_minutes / 15) * 15
+
+    # Convert rounded minutes back to hours
+    rounded_hours = rounded_minutes / 60
+
+    return rounded_hours
 
 def timeZoneConvert(dateTime, format='%Y-%m-%dT%H:%M:%SZ'):
 

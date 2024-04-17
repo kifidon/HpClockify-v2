@@ -44,7 +44,7 @@ import logging
 from rest_framework.exceptions import ValidationError
 import shutil
 from django.views.decorators.csrf import csrf_exempt
-
+from . import  SqlClockPull
 @api_view(['GET'])
 def quickBackup(request: HttpRequest):
     result = QuickBackup.main()
@@ -198,6 +198,16 @@ def getEmployeeUsers(request: HttpRequest, format = None):
     # else:
     #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
         '''
+@api_view(['GET', 'POST'])
+def bankedHrs(request: HttpRequest):
+    logging.info(f'INFO: {request.method}: bankedHours ')
+    try:
+        SqlClockPull.main()
+        return Response(data='Operation Completed', status=status.HTTP_200_OK)
+    except Exception as e:
+        logging.error(f'ERROR: {str(e)}')
+        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
+
 
 @api_view(['GET'])
 def view_log(request):
@@ -207,7 +217,7 @@ def view_log(request):
             # Read all lines from the file
             lines = file.readlines()
             # Extract the last 1000 lines
-            last_1000_lines = lines[-1000:]
+            last_1000_lines = lines[-5000:]
             # Reverse the order of the lines
             reversed_lines = reversed(last_1000_lines)
             # Join the lines into a single string
@@ -289,11 +299,14 @@ def updateEntries(request, timeSerializer):
                 serializer = EntrySerializer(data=entries[i], context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
                 logging.warning(f'WARNING: Creating new Entry on timesheet {timeId}')
                 i += 1
+                # print(json.dumps(entries, indent=3))
             if serializer.is_valid():
                 serializer.save()
                 tagResponse = updateTags(serializer, request, timeId, workspaceId)
                 serializers.append(serializer.validated_data)
-            else: raise ValidationError(serializer.errors)
+            else: 
+                logging.error(serializer.error_messages)
+                raise ValidationError(serializer.error_messages)
         response = Response(data = {'entry': serializers}, status = status.HTTP_202_ACCEPTED)
         logging.info(f'INFO: UpdateEntries: {response}')
         return response
@@ -329,6 +342,7 @@ def updateTimesheet(request:HttpRequest):
     except Exception as e:
         transaction.rollback()
         response = Response(data= {'Message': str(e)}, status= status.HTTP_400_BAD_REQUEST)
+        logging.error(f'ERROR: {str(e)}')
         logging.error(f'ERROR:{json.dumps(request.data["id"])}\n{response.status_code}')
         return response
     
@@ -530,9 +544,10 @@ def getTimeSheets(request: HttpRequest, format = None):
 # else:
 #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
 '''
-'''
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getProjects(request: HttpRequest, format = None):
+        logging.info('INFO: POST: getProjects')
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -540,19 +555,34 @@ def getProjects(request: HttpRequest, format = None):
     # if hmac.compare_digest(auth, signature):   
         if request.method == 'POST':
             try:
-                serializer = ProjectSerializer(data = request.data)
+                try:
+                    project = Project.objects.get(pk=request.data['id'])
+                    serializer = ProjectSerializer(data=request.data, instance= project)
+                except Project.DoesNotExist:
+                    serializer = ProjectSerializer(data = request.data)
                 if serializer.is_valid():
                     # # print(serializer.data)
                     serializer.save()
                     response = Response(serializer.data, status = status.HTTP_201_CREATED)
-                response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST)
+                    logging.info(f'INFO: {response.data["id"]}, {response.status_code}')
+                    return response
+                response = Response(serializer.error_messages, status = status.HTTP_400_BAD_REQUEST)
+                logging.info(f'ERROR: {response.data}, {response.status_code}')
+                return response
             except utils.IntegrityError as e:
                 if 'PRIMARY KEY constraint' in str(e):
                     response = Response(serializer.data, status=status.HTTP_304_NOT_MODIFIED)
+                    logging.info(f'ERROR: {response.data}, {response.status_code}')
+                    return response
                 elif('FOREIGN KEY') in str(e):
                     response = Response(serializer.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+                    logging.info(f'ERROR: {response.data}, {response.status_code}')
+                    return response
                 else:
                     response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST)
+                    logging.info(f'ERROR: {response.data}, {response.status_code}')
+                    return response
+        '''
         elif request.method == 'PUT':
             try:
                 project = Project.objects.get(pk=request.data['id'])
@@ -584,7 +614,9 @@ def getProjects(request: HttpRequest, format = None):
             response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     # else:
     #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-   
+        '''
+
+'''   
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getEntries(request: HttpRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 

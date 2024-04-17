@@ -133,7 +133,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class EntrySerializer(serializers.Serializer): # missing update
     id = serializers.CharField()
-    description = serializers.CharField()
+    description = serializers.CharField(allow_blank = True)
     approvalRequestId = serializers.CharField(allow_null = True)
     billable = serializers.BooleanField()
     project = serializers.DictField()

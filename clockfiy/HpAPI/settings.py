@@ -46,7 +46,7 @@ SECRET_KEY = r'django-insecure-jrw8m%9dqqz2zu+1abxqhupad#1$h%fb%igx@1twnbkn6h5o3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hpclockifyapi.azurewebsites.net', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['hpclockifyapi.azurewebsites.net', '169.254.130.3:8000', 'localhost', '127.0.0.1']
 # ALLOWED_HOSTS = ["*"]
 
 
