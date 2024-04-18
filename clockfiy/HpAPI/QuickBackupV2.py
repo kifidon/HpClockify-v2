@@ -1,112 +1,110 @@
-from . import ClockifyPull
-from . import ClockifyPush
+from . import ClockifyPullV2
+from . import ClockifyPushV2
 from . import sqlDataFormatter
-import argparse
+
 import datetime
 import pytz
 import logging
 
 
 def UserEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect() 
+        cursor , conn = ClockifyPullV2.sqlConnect() 
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushUsers(wid, conn, cursor))
+    logging.info(ClockifyPushV2.pushUsers(wid, conn, cursor))
 
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
 def ClientEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushClients(wid, conn, cursor))
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(ClockifyPushV2.pushClients(wid, conn, cursor))
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
 def ProjectEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushProjects(wid, conn, cursor))
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(ClockifyPushV2.pushProjects(wid, conn, cursor))
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
 def PolicyEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushPolicies(wid, conn, cursor))
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(ClockifyPushV2.pushPolicies(wid, conn, cursor))
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
-def TimesheetEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
-    status = [ 'APPROVED', 'WITHDRAWN_APPROVAL']
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    for stat in status:
-        logging.info(f"({stat}) {ClockifyPush.pushApprovedTime(wid, conn, cursor, stat)}")
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(f"({status}) {ClockifyPushV2.pushApprovedTime(wid, conn, cursor, status)}")
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
 
 def TimeOffEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushTimeOff(wid, conn, cursor))
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(ClockifyPushV2.pushTimeOff(wid, conn, cursor))
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
 def UserGroupEvent(wkSpaceName = 'Hill Plain'):
-    wid = ClockifyPush.getWID(wkSpaceName)
-    cursor , conn = ClockifyPull.sqlConnect()
+    wid = ClockifyPushV2.getWID(wkSpaceName)
+    cursor , conn = ClockifyPullV2.sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
         logging.info("Retrying.....Connecting to server")
-        cursor , conn = ClockifyPull.sqlConnect()
+        cursor , conn = ClockifyPullV2.sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPush.pushUserGroups(wid, conn, cursor))
-    ClockifyPull.cleanUp(conn=conn, cursor=cursor)
+    logging.info(ClockifyPushV2.pushUserGroups(wid, conn, cursor))
+    ClockifyPullV2.cleanUp(conn=conn, cursor=cursor)
     return 1
 def CreateTextFile():
     timezone = pytz.timezone('America/Denver')

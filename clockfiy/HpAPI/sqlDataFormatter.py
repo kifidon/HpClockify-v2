@@ -1,5 +1,5 @@
-from . import ClockifyPull
-from . import ClockifyPush
+from . import ClockifyPullV2
+from . import ClockifyPushV2
 import pyodbc
 import csv
 import os
@@ -58,7 +58,7 @@ def MonthylyProjReport(startDate = None, endDate = None):
     else: 
         month = endDate[5:7]
         year = endDate[2:4]
-    cursor, conn = ClockifyPull.sqlConnect()
+    cursor, conn = ClockifyPullV2.sqlConnect()
     try:
         cursor.execute(
             f'''
@@ -120,7 +120,7 @@ def MonthylyProjReport(startDate = None, endDate = None):
 
                 df.to_excel(file_path, index = False)
             # Combine the directory path with the file name
-        ClockifyPull.cleanUp(conn, cursor) 
+        ClockifyPullV2.cleanUp(conn, cursor) 
         
         return folder_path     
     except pyodbc.Error as e:
@@ -134,7 +134,7 @@ def MonthylyProjReport(startDate = None, endDate = None):
         return None
 
 def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
-    cursor, conn = ClockifyPull.sqlConnect()
+    cursor, conn = ClockifyPullV2.sqlConnect()
     retried = True
     try:
         while True: 
@@ -147,9 +147,9 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
             )
             rows = cursor.fetchall()
             if len(rows) == 0 and retried:
-                wid = ClockifyPush.getWID('Hill Plain')
-                ClockifyPush.pushApprovedTime(wid, conn, cursor)
-                ClockifyPush.pushTimeOff
+                wid = ClockifyPushV2.getWID('Hill Plain')
+                ClockifyPushV2.pushApprovedTime(wid, conn, cursor)
+                ClockifyPushV2.pushTimeOff
                 retried = False
             else:
                 break

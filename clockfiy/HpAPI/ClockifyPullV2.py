@@ -145,7 +145,7 @@ def getWorkspaceUsers( workspaceId, key):
     headers = {
         'X-Api-Key': key
     }
-    url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/users'
+    url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/users?page-size=150'
     response = requests.get(url, headers= headers)
     if response.status_code == 200:
         users = response.json()
@@ -403,12 +403,12 @@ def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
     headers = {
         'X-Api-Key': key
     }
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=50"    
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=5"    
     response = requests.get(url, headers=headers)
     # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
     #     pass
     if response.status_code == 200:
-        output.extend(response.json())  # Append JSON data to the list
+        return response.json()  # Append JSON data to the list
     else:
             print(f"Error: {response.status_code}, {response.text}")
             output.append({})

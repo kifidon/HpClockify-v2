@@ -35,11 +35,11 @@ from .serializers import (
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from . import ClockifyPull
+from . import ClockifyPullV2
 from django.http import HttpResponse
 import os
 from . import settings
-from . import QuickBackup
+from . import QuickBackupV2
 import logging
 from rest_framework.exceptions import ValidationError
 import shutil
@@ -47,14 +47,22 @@ from django.views.decorators.csrf import csrf_exempt
 from . import  SqlClockPull
 @api_view(['GET'])
 def quickBackup(request: HttpRequest):
-    result = QuickBackup.main()
+    result = QuickBackupV2.main()
     response = Response(data = result, status=status.HTTP_200_OK)
     logging.info(f'INFO: Quickbackup:  {response.data}, {response.status_code}')
+
+    return response
+@api_view(['GET'])
+def timesheets(request: HttpRequest):
+    result = QuickBackupV2.TimesheetEvent(status='APPROVED')
+    response = Response(data = result, status=status.HTTP_200_OK)
+    logging.info(f'INFO: Quickbackup:  {response.data}, {response.status_code}')
+    
     return response
 
 @csrf_exempt
 def download_text_file(request, start_date = None, end_date= None):
-    folder_path = QuickBackup.monthlyBillable(start_date, end_date )
+    folder_path = QuickBackupV2.monthlyBillable(start_date, end_date )
     if folder_path:
         temp_dir = f'{folder_path}_tmp'
         os.makedirs(temp_dir, exist_ok=True)
@@ -130,7 +138,7 @@ def getClients(request: HttpRequest):
                     response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
         '''    
         if request.method == 'POST':
-            stat = QuickBackup.ClientEvent()
+            stat = QuickBackupV2.ClientEvent()
             logging.info('Client Event: Add Client')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
@@ -180,7 +188,7 @@ def getEmployeeUsers(request: HttpRequest, format = None):
                     response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
         '''
         if request.method == 'POST':
-            stat = QuickBackup.UserEvent()
+            stat = QuickBackupV2.UserEvent()
             logging.info('User Event: Add User')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
@@ -200,14 +208,13 @@ def getEmployeeUsers(request: HttpRequest, format = None):
         '''
 @api_view(['GET', 'POST'])
 def bankedHrs(request: HttpRequest):
-    logging.info(f'INFO: {request.method}: bankedHours ')
+    logging.info(f'\nINFO: {request.method}: bankedHours ')
     try:
         SqlClockPull.main()
         return Response(data='Operation Completed', status=status.HTTP_200_OK)
     except Exception as e:
         logging.error(f'ERROR: {str(e)}')
         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
-
 
 @api_view(['GET'])
 def view_log(request):
@@ -279,13 +286,13 @@ def updateTags(entrySerilizer: EntrySerializer, request, timeId, workspaceId):
 
 def updateEntries(request, timeSerializer):
     logging.info('INFO: updateEntries Function called')
-    key = ClockifyPull.getApiKey()
+    key = ClockifyPullV2.getApiKey()
     timeId = timeSerializer.validated_data['id']
     # print (timeId)
     workspaceId = timeSerializer.validated_data['workspaceId']
     stat = timeSerializer.validated_data['status']['state']
     if stat == 'APPROVED':
-        entries = ClockifyPull.getEntryForApproval(workspaceId, key, timeId, stat, 1)
+        entries = ClockifyPullV2.getEntryForApproval(workspaceId, key, timeId, stat, 1)
         # print(json.dumps(entries, indent = 4))
         i = 0
         serializers = []
@@ -317,7 +324,7 @@ def updateEntries(request, timeSerializer):
 
 @api_view(['POST'])
 def updateTimesheet(request:HttpRequest):
-    logging.info(f'INFO: {request.method}: updateTimesheet')
+    logging.info(f'\nINFO: {request.method}: updateTimesheet')
     try: 
         with transaction.atomic():
             try:
@@ -346,6 +353,7 @@ def updateTimesheet(request:HttpRequest):
         logging.error(f'ERROR:{json.dumps(request.data["id"])}\n{response.status_code}')
         return response
     
+# depreciated
 def loadTags(entrySerilizer: EntrySerializer, request: HttpRequest = None, timeId: str = None, workspaceId: str = None):
     serializers = []
     if request.method == 'POST': # called from Entry< Put >
@@ -402,13 +410,14 @@ def loadTags(entrySerilizer: EntrySerializer, request: HttpRequest = None, timeI
             logging.error(response)
             return response
 
+#depreciated 
 def loadEntries( request: HttpRequest, timeSerilizer: TimeSheetSerializer = None, ):
-    key = ClockifyPull.getApiKey()
+    key = ClockifyPullV2.getApiKey()
     timeId = timeSerilizer.validated_data['id']
     # print (timeId)
     workspaceId = timeSerilizer.validated_data['workspaceId']
     stat = timeSerilizer.validated_data['status']['state']
-    entries = ClockifyPull.getEntryForApproval(workspaceId, key, timeId, stat, 1)
+    entries = ClockifyPullV2.getEntryForApproval(workspaceId, key, timeId, stat, 1)
     if len(entries) >0:
         print (json.dumps(entries, indent=4))
         if request.method == 'POST':
@@ -434,8 +443,8 @@ def loadEntries( request: HttpRequest, timeSerilizer: TimeSheetSerializer = None
 
 @api_view([ 'POST'])
 def getTimeSheets(request: HttpRequest, format = None):
-        logging.info(request.method)
-        logging.info('INFO: getTimesheet')
+        logging.info(f'\n{request.method}')
+        logging.info(f'INFO: getTimesheet... {request.data["id"]}')
         '''
         # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
         # payload = request.body
@@ -521,16 +530,23 @@ def getTimeSheets(request: HttpRequest, format = None):
             except utils.IntegrityError as e:
                 if 'PRIMARY KEY constraint' in str(e): 
                     response = Response(data={'Constraint':  str(e)}, status=status.HTTP_304_NOT_MODIFIED)
+                    logging.error(f"ERROR: on timesheet {request.data['id']}")
                     logging.error(response)
                     return response
                 elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
                     response = Response(data=str(e), status=status.HTTP_406_NOT_ACCEPTABLE)
+                    logging.error(f"ERROR: on timesheet {request.data['id']}")
                     logging.error(response)
                     return response
                 else:
                     response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
+                    logging.error(f"ERROR: on timesheet {request.data['id']}")
                     logging.error(response)
                     return response
+            except Exception as e:
+                logging.error(f"ERROR: on timesheet {request.data['id']}")
+                response = Response(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
+                logging.error(f'{response}')
 '''
         elif request.method == 'DELETE':
         try:
@@ -733,7 +749,7 @@ def getTimeOffPolicies(request: HttpRequest, format = None):
     # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
     # if hmac.compare_digest(auth, signature):   
         if request.method == 'POST':
-            stat = QuickBackup.PolicyEvent()
+            stat = QuickBackupV2.PolicyEvent()
             logging.info('Policy Event: Add Policy')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
@@ -781,7 +797,7 @@ def getTimeOffRequests(request: HttpRequest, format = None):
     # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
     # if hmac.compare_digest(auth, signature):   
         if request.method == 'POST':
-            stat = QuickBackup.TimeOffEvent()
+            stat = QuickBackupV2.TimeOffEvent()
             logging.info('Time Off  Event: Add Time Off')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)

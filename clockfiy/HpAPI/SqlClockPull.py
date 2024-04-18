@@ -1,5 +1,5 @@
-from . import ClockifyPull
-from . import ClockifyPush
+from . import ClockifyPullV2
+from . import ClockifyPushV2
 import logging
 def getUsrBallances(conn, cursor):
     try:
@@ -25,12 +25,12 @@ def getUsrBallances(conn, cursor):
        
 def checkBalanceUpdate(usrBalances, polID, page):
     try:
-        wid = ClockifyPush.getWID('Hill Plain')
+        wid = ClockifyPushV2.getWID('Hill Plain')
         url = f"https://pto.api.clockify.me/v1/workspaces/{wid}/balance/policy/{polID}?page-size=100&page={page}"
         headers = {
-            'X-Api-Key': ClockifyPull.getApiKey()
+            'X-Api-Key': ClockifyPullV2.getApiKey()
         }
-        response = ClockifyPull.requests.get(url, headers=headers)
+        response = ClockifyPullV2.requests.get(url, headers=headers)
         if response.status_code == 200:
             updateBalances = dict()
             for balance in response.json()['balances']:
@@ -49,12 +49,12 @@ def checkBalanceUpdate(usrBalances, polID, page):
     
 def updateUsrBalances(updateBalances, polID):
     try:
-        wid = ClockifyPush.getWID('Hill Plain')
+        wid = ClockifyPushV2.getWID('Hill Plain')
         url = f"https://pto.api.clockify.me/v1/workspaces/{wid}/balance/policy/{polID}"
         for id in updateBalances.keys():
             value = updateBalances[id][0] - updateBalances[id][1]
             headers = {
-                "X-Api-Key": ClockifyPull.getApiKey(),
+                "X-Api-Key": ClockifyPullV2.getApiKey(),
                 'Content-Type': 'application/json',
             }
             request = {
@@ -62,7 +62,7 @@ def updateUsrBalances(updateBalances, polID):
                 "userIds": [id],
                 "value": value
             }
-            response = ClockifyPull.requests.patch(url, headers = headers, json= request)
+            response = ClockifyPullV2.requests.patch(url, headers = headers, json= request)
             if response.status_code != 204:
                 raise Exception(f"Failed to update balance for user {id}: {response.reason}")
     except Exception as  exc:
@@ -73,7 +73,7 @@ def updateUsrBalances(updateBalances, polID):
         pass
 
 def main():
-    cursor, conn =ClockifyPull.sqlConnect()
+    cursor, conn =ClockifyPullV2.sqlConnect()
     usrBalances, polID = getUsrBallances(conn, cursor)
     page = 1
     updateBalances= checkBalanceUpdate(usrBalances, polID, page)

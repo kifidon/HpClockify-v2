@@ -14,7 +14,7 @@ from .models import (
     Usergroups,
     Groupmembership,
 )
-from  . import ClockifyPull
+from  . import ClockifyPullV2
 
 class WorkspaceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,14 +54,14 @@ class TimeSheetSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Invalid data: Missing userId {obj}")
     def get_start_time(self, obj):
         if isinstance(obj, dict):
-            return ClockifyPull.timeZoneConvert(obj.get('dateRange').get('start'))
+            return ClockifyPullV2.timeZoneConvert(obj.get('dateRange').get('start'))
         if isinstance(obj, Timesheet):
             return obj.start_time
         else:
             raise serializers.ValidationError(f"Invalid data: Missing dateRange.start {obj}")
     def get_end_time(self, obj):
         if isinstance(obj, dict):
-            return ClockifyPull.timeZoneConvert(obj.get('dateRange').get('end'))
+            return ClockifyPullV2.timeZoneConvert(obj.get('dateRange').get('end'))
         if isinstance(obj, Timesheet):
             return obj.end_time
         else:
@@ -164,7 +164,7 @@ class EntrySerializer(serializers.Serializer): # missing update
     def get_time_sheet(self, obj):
         return self.context.get('approvalRequestId') if isinstance(obj, dict) else obj.time_sheet
     def get_duration(self, obj):
-        return ClockifyPull.timeDuration(obj.get('timeInterval').get('duration')) if isinstance(obj, dict) else obj.duration
+        return ClockifyPullV2.timeDuration(obj.get('timeInterval').get('duration')) if isinstance(obj, dict) else obj.duration
     def get_description(self, obj):
         return obj.get('description') if isinstance(obj, dict) else obj.description
     def get_billable(self, obj):
@@ -177,10 +177,10 @@ class EntrySerializer(serializers.Serializer): # missing update
         if isinstance(obj, Entry):
             return obj.rate
     def get_start_time(self, obj):
-        start = ClockifyPull.timeZoneConvert(obj.get('timeInterval').get('start')) if isinstance(obj, dict) else obj.start_time
+        start = ClockifyPullV2.timeZoneConvert(obj.get('timeInterval').get('start')) if isinstance(obj, dict) else obj.start_time
         return start
     def get_end_time(self, obj):
-        return ClockifyPull.timeZoneConvert(obj.get('timeInterval').get('end')) if isinstance(obj, dict) else obj.end_time
+        return ClockifyPullV2.timeZoneConvert(obj.get('timeInterval').get('end')) if isinstance(obj, dict) else obj.end_time
     def get_workspace(self, obj):
         return obj.workspace if isinstance(obj, Entry) else self.context.get('workspaceId')
 

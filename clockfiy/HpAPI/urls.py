@@ -31,6 +31,7 @@ urlpatterns = [
     path('HpClockifyAPi/getTimeSheets', views.getTimeSheets),
     path('HpClockifyAPi/updateTimeSheets', views.updateTimesheet),
     path('HpClockifyAPi/getProjects', views.getProjects),
+    path('timeSheets', views.timesheets),
     # path('HpClockifyAPi/getEntries', views.getEntries),
     # path('HpClockifyAPi/getTagsFor', views.getTagsFor),
     path('HpClockifyAPi/getTimeOffPolicies', views.getTimeOffPolicies),

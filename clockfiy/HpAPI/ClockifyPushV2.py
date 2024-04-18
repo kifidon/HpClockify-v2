@@ -1,5 +1,5 @@
 import pyodbc
-from . import ClockifyPull
+from . import ClockifyPullV2
 import copy
 import logging
 def pushWorkspaces(conn, cursor):
@@ -14,8 +14,8 @@ def pushWorkspaces(conn, cursor):
         str: Message indicating the operation status.
     """
     count = 0
-    key = ClockifyPull.getApiKey()
-    workspaces = ClockifyPull.getWorkspaces(key)
+    key = ClockifyPullV2.getApiKey()
+    workspaces = ClockifyPullV2.getWorkspaces(key)
     for key, value in workspaces.items():
         try:
             cursor.execute(
@@ -44,7 +44,7 @@ def pushWorkspaces(conn, cursor):
 def getWID(wSpace_Name):
     count = 0
     while True:
-        quickCursor, quickConn = ClockifyPull.sqlConnect()
+        quickCursor, quickConn = ClockifyPullV2.sqlConnect()
         quickCursor.execute('''SELECT id FROM Workspace WHERE name = ? ''', wSpace_Name)
         row = quickCursor.fetchone()
         if row is not None:
@@ -54,7 +54,7 @@ def getWID(wSpace_Name):
             pushWorkspaces(quickConn, quickCursor) 
         else: 
             break
-    check = ClockifyPull.cleanUp(quickConn, quickCursor)
+    check = ClockifyPullV2.cleanUp(quickConn, quickCursor)
     if check and row is not None:
         return row[0]
     elif check and row is None:
@@ -78,8 +78,8 @@ def pushUsers(wkSpaceID, conn, cursor):
     count = 0
     update = 0
     exists = 0
-    key = ClockifyPull.getApiKey()
-    users = ClockifyPull.getWorkspaceUsers(wkSpaceID, key)
+    key = ClockifyPullV2.getApiKey()
+    users = ClockifyPullV2.getWorkspaceUsers(wkSpaceID, key)
     try:
         for user in users:
             uName = user['name']
@@ -170,13 +170,13 @@ def deleteProjects(conn, cursor, wkSpaceID):
     deleted = 0
     newProj = []
     page = 1
-    key = ClockifyPull.getApiKey()
-    projects = ClockifyPull.getProjects(wkSpaceID, key, page)
+    key = ClockifyPullV2.getApiKey()
+    projects = ClockifyPullV2.getProjects(wkSpaceID, key, page)
     while len(projects) != 0:
         for proj in projects:
             newProj.append(proj["id"])
         page += 1
-        projects = ClockifyPull.getProjects(wkSpaceID, key, page)
+        projects = ClockifyPullV2.getProjects(wkSpaceID, key, page)
     try: 
         cursor.execute(
             '''
@@ -262,8 +262,8 @@ def pushProjects(wkSpaceID, conn, cursor):
     exists = 0
     update = 0
     count = 0
-    key = ClockifyPull.getApiKey()
-    projects = ClockifyPull.getProjects(wkSpaceID, key)
+    key = ClockifyPullV2.getApiKey()
+    projects = ClockifyPullV2.getProjects(wkSpaceID, key)
     deleted = deleteProjects(conn, cursor, wkSpaceID)
     try:
         while len(projects) >=1 and page != 10:
@@ -317,7 +317,7 @@ def pushProjects(wkSpaceID, conn, cursor):
                         else: 
                             raise
             page += 1
-            projects = ClockifyPull.getProjects(wkSpaceID, key, page)
+            projects = ClockifyPullV2.getProjects(wkSpaceID, key, page)
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
@@ -345,8 +345,8 @@ def pushClients(wkSpaceID, conn, cursor):
     update =0
     exists = 0
     
-    key = ClockifyPull.getApiKey()
-    clients = ClockifyPull.getClients(wkSpaceID, key)
+    key = ClockifyPullV2.getApiKey()
+    clients = ClockifyPullV2.getClients(wkSpaceID, key)
     try:
         for client in clients:
             cID = client['id']
@@ -438,10 +438,10 @@ def timeDuration(duration_str):
 
 def timeZoneConvert(dateTime, format='%Y-%m-%dT%H:%M:%SZ'):
 
-    utcTimezone = ClockifyPull.pytz.utc
-    localTimeZone = ClockifyPull.pytz.timezone('America/Denver')
+    utcTimezone = ClockifyPullV2.pytz.utc
+    localTimeZone = ClockifyPullV2.pytz.timezone('America/Denver')
     if isinstance(dateTime, str):
-        dateTime = ClockifyPull.datetime.strptime(dateTime, format)
+        dateTime = ClockifyPullV2.datetime.strptime(dateTime, format)
     output = utcTimezone.localize(dateTime).astimezone(localTimeZone)
     return  output.replace(tzinfo=None)
 
@@ -490,7 +490,6 @@ def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
         # logging.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
         return(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated.")
          
-
 def deleteEntries(conn, cursor, entries, aID):
     """
     Deletes entries for a given time sheet. Delete condition is "If still in database but not pullable from clockify"
@@ -536,6 +535,7 @@ def deleteEntries(conn, cursor, entries, aID):
         return(deleted)
 
 def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
+    logging.info('Push time Entries')
     """
     Pushes entries data to the database. 
 
@@ -556,18 +556,19 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
     deleteEntries(conn, cursor, entries, aID) # delete stale entries before inserting, as to minimize transactions
     try:
         for entry in entries:
+            approval = entry['approvalRequestId']
             eID = entry['id']
             duration = timeDuration(entry['timeInterval']['duration'])
             description = entry['description']
             billable = entry['billable']
             projectID = entry['project']['id']
             type = entry['type']
-
             # set default start time to 8am and end time to {duration} hours after
             startTime = timeZoneConvert(entry['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ')
             endTime = timeZoneConvert(entry['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ') 
             rate = entry['hourlyRate']['amount'] if entry['hourlyRate'] is not None else 0
             tags = entry['tags']
+            logging.info(f'\t{description}')
             while True:
                 try: # insert entry
                     cursor.execute( 
@@ -575,7 +576,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                         SELECT time_sheet_id, duration, description, billable, project_id, type, start_time, end_time, rate 
                         FROM Entry
                         WHERE id = ?  and time_sheet_id = ?  and workspace_id = ?
-                        ''', (eID, aID, wkSpaceID)
+                        ''', (eID, approval, wkSpaceID)
                     )
                     oldEntry = cursor.fetchone()
                     if(oldEntry is None): # insert new 
@@ -585,7 +586,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             ''',(
                                 eID, 
-                                aID, 
+                                approval, 
                                 duration, 
                                 description, 
                                 billable,
@@ -604,7 +605,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                             # if true then update 
                             if (oldEntry[6] != startTime or oldEntry[7] != endTime or round(oldEntry[1],2) != round(duration, 2) or 
                             oldEntry[4] != projectID or oldEntry[2] != description or round(float(oldEntry[8]),2) != round(float(rate), 2) or 
-                            oldEntry[3] != billable or oldEntry[0] != aID or oldEntry[5] != type):  
+                            oldEntry[3] != billable or oldEntry[0] != approval or oldEntry[5] != type):  
                                 cursor.execute(
                                     '''
                                     UPDATE Entry
@@ -619,7 +620,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                                         rate = ?
                                     WHERE id = ? and time_sheet_id = ? and workspace_id = ?
                                     ''',
-                                    (duration, description, billable, projectID, type, startTime, endTime, rate, eID, aID, wkSpaceID)
+                                    (duration, description, billable, projectID, type, startTime, endTime, rate, eID, approval, wkSpaceID)
                                 )
                                 logging.info(f"\tUpdating Entry information...({startTime})")
                                 update += 1
@@ -640,13 +641,13 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                             logging.info(pushProjects(wkSpaceID, conn, cursor) + "\tCalled from Entries Function. (Insert) \n")
                         else:
                             if (FK_ConstraintOnEntry ==2):
-                                logging.info(f"\tstaleEntry for TimeSheet{aID}- Project ({projectID}) No Longer Exists")
+                                logging.info(f"\tstaleEntry for TimeSheet{approval}- Project ({projectID}) No Longer Exists")
                             break
                         # Loop through this record again after adding reference 
                     else: # unkonwn error 
                         raise
             if len(tags)!= 0:
-                logging.info(pushTags(wkSpaceID, conn, cursor, tags, aID, enID=eID))            
+                logging.info(pushTags(wkSpaceID, conn, cursor, tags, approval, enID=eID))            
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
@@ -744,7 +745,7 @@ def updateApprovals(update, count, exists, cursor, aID, userID, startDateO, endD
             update += 1
         else:
             exists += 1
-            logging.info(f"\tTimeSheet Loading----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
+            logging.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% (updateAproval)")
         # regardless if update on Time Sheet, Check for update on entries
         if status != 'WITHDRAWN_APPROVAL':
             FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
@@ -770,8 +771,8 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
     Returns:
         str: A string indicating the status of the operation, including the number of new records added.
     """
-    key = ClockifyPull.getApiKey()
-    approved = ClockifyPull.getApprovedRequests(wkSpaceID, key, status= stat)
+    key = ClockifyPullV2.getApiKey()
+    approved = ClockifyPullV2.getApprovedRequests(wkSpaceID, key, status= stat)
     page = 1
     gCount = 0
     gUpdate = 0
@@ -781,7 +782,7 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
     exists = 0
     FK_ConstraintOnEntry = 0
     try:
-        while len(approved) != 0 and page <15:
+        while len(approved) != 0 and page <200:
             
             logging.info(f"Inserting Page: {page} of TimeSheets ({len(approved)} records)")
             for approve in approved:
@@ -797,15 +798,17 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                 billableAmount = approve['billableAmount']
                 costAmount = approve['costAmount']
                 expenseTotal = approve['expenseTotal']
-
+                logging.info(f'{aID}, {userID}, {status}, {startDateO},')
+                
+                # continue
                 while True:
                     try:   
                         #Check for the existance of this time sheet   
                         cursor.execute(
                             ''' 
-                            select id, workspace_id, status from Timesheet
-                            where id = ? and workspace_id = ?
-                            ''', (aID, wkSpaceID)
+                            select id, workspace_id, status, emp_id , start_time from Timesheet
+                            where id = ? and workspace_id = ? and emp_id=?
+                            ''', (aID, wkSpaceID, userID)
                         )
                         tsExists = cursor.fetchone()
                         if tsExists is None:
@@ -843,14 +846,16 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                                     wkSpaceID
                                     )
                             )
-                            logging.info(f"\tAdding TimeSheet information...({count})")
+                            logging.info(f"\tAdding TimeSheet information...{aID}({count})")
                             FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
                             logging.info("\tTime Entry Information Added\n")
                             # pushExpenses(approve, aID, conn, cursor)
                             count += 1
+                            logging.debug(f'{approvedTime}, {costAmount}, {str(startDateO)}')
                             break
                         # elif tsExists is not None:
                         elif tsExists is not None and (status == 'PENDING' or tsExists[2] != status):
+                            # logging.debug(f'DEBUG: Existing timeSheet "{aID}"')
                             '''
                             existing time sheet was Pending in status (possible update of entreis) or the status of the time sheet has 
                             changed from pending too approved or approved to Withdrawn approval 
@@ -867,7 +872,8 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                                 break
                         else:
                             exists += 1
-                            logging.info(f"\tTimeSheet Loading----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
+                            # logging.debug(f'{aID} {status}, {userID} {str(startDateO)}, {tsExists}')
+                            logging.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
                            # FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
                             break
                     except pyodbc.IntegrityError as e: 
@@ -882,11 +888,12 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                                 break
                         else:
                             raise # unknown integrity error on timesheet insert 
+            
             page += 1
             gCount += count;  count = 0 
             gUpdate += update; update = 0
             gExists += exists ; exists = 0
-            approved = ClockifyPull.getApprovedRequests(wkSpaceID, key, page, stat)
+            approved = ClockifyPullV2.getApprovedRequests(wkSpaceID, key, page, stat)
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
@@ -909,8 +916,8 @@ def pushPolicies(wkSpaceID, conn, cursor):
         str: Message indicating the operation status.
     """
     count = 0
-    key = ClockifyPull.getApiKey()
-    policies = ClockifyPull.getPolocies(wkSpaceID , key)
+    key = ClockifyPullV2.getApiKey()
+    policies = ClockifyPullV2.getPolocies(wkSpaceID , key)
     update = 0
     exists = 0
     try:
@@ -1076,7 +1083,7 @@ def pushUserGroups(wkSpaceID, conn, cursor):
     count = 0
     update = 0
     exists = 0
-    groups = ClockifyPull.getUserGroups(wkSpaceID)
+    groups = ClockifyPullV2.getUserGroups(wkSpaceID)
     try:
         for group in groups:
             groupID = group['id']
@@ -1181,7 +1188,7 @@ def pushHolidays(wkSpaceID, conn, cursor):
     count = 0
     update = 0
     exists = 0
-    holidays = ClockifyPull.getHolidays(wkSpaceID)
+    holidays = ClockifyPullV2.getHolidays(wkSpaceID)
     try:
         for day in holidays:
             holID = day['id']
@@ -1282,7 +1289,7 @@ def count_working_days(start_date, end_date, conn, cursor ):
         if current_date.weekday() in weekdays and current_date not in [holiday[0] for holiday in holidays]:
             working_days += 1
         # Move to the next day
-        current_date += ClockifyPull.timedelta(days=1)
+        current_date += ClockifyPullV2.timedelta(days=1)
     return working_days
 
 def deleteTimeOff(wkSpaceID, conn , cursor , timeOff):
@@ -1358,7 +1365,7 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
     update = 0
     exists = 0
     newRequests = [] # for deletions (ID's)
-    timeOff = ClockifyPull.getTimeOff(wkSpaceID, page, startRange, endRange)
+    timeOff = ClockifyPullV2.getTimeOff(wkSpaceID, page, startRange, endRange)
     try:
         while len(timeOff['requests']) != 0 and page < 10:
             gCount += count;  count = 0 
@@ -1416,8 +1423,8 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                                 startDateObject = copy.copy(startDate)
                                 endDateObject = copy.copy(endDate)
                                 # round datetime to nearest minute
-                                startDateObject += ClockifyPull.timedelta(seconds=30)
-                                endDateObject += ClockifyPull.timedelta(seconds=30)
+                                startDateObject += ClockifyPullV2.timedelta(seconds=30)
+                                endDateObject += ClockifyPullV2.timedelta(seconds=30)
                                 startDateObject = startDateObject.replace(second = 0, microsecond = 0)
                                 endDateObject = endDateObject.replace(second = 0, microsecond = 0) 
                                 if ( # check for an update 
@@ -1458,7 +1465,7 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                         else: # unknown error 
                             raise # Unkown integrity error on insert 
             page += 1
-            timeOff = ClockifyPull.getTimeOff(wkSpaceID, page, startRange, endRange) 
+            timeOff = ClockifyPullV2.getTimeOff(wkSpaceID, page, startRange, endRange) 
     except Exception as exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
