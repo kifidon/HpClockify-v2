@@ -3,7 +3,7 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `managed = True` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
@@ -12,7 +12,7 @@ class Workspace(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Workspace'
 
 class Calendar(models.Model):
@@ -22,20 +22,20 @@ class Calendar(models.Model):
     year = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Calendar'
 
-class Client(models.Model):
-    id = models.CharField(primary_key=True, max_length=50)
-    email = models.CharField(max_length=50, blank=True, null=True)
-    address = models.CharField(max_length=100, blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
+# class Client(models.Model):
+#     id = models.CharField(primary_key=True, max_length=50)
+#     email = models.CharField(max_length=50, blank=True, null=True)
+#     address = models.CharField(max_length=100, blank=True, null=True)
+#     name = models.CharField(max_length=255, blank=True, null=True)
+#     workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
 
-    class Meta:
-        managed = False
-        db_table = 'Client'
-        unique_together = (('id', 'workspace'),)
+#     class Meta:
+#         managed = True
+#         db_table = 'Client'
+#         unique_together = (('id', 'workspace'),)
 
 class Employeeuser(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
@@ -45,7 +45,7 @@ class Employeeuser(models.Model):
     baserate = models.DecimalField(db_column='baseRate', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'EmployeeUser'
 
 class Timesheet(models.Model):
@@ -62,10 +62,9 @@ class Timesheet(models.Model):
     status = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'TimeSheet'
         unique_together = (('id', 'workspace'),)
-
 
 class Project(models.Model):
     id = models.CharField(primary_key=True, max_length=50, db_column = 'id')
@@ -76,7 +75,7 @@ class Project(models.Model):
     workspaceId = models.CharField(max_length=50, db_column = 'workspace_id')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Project'
         unique_together = (('id', 'workspaceId'),)
 
@@ -94,7 +93,7 @@ class Entry(models.Model):
     workspace = models.CharField(max_length=50, db_column='workspace_id')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Entry'
         unique_together = (('id', 'workspace', 'time_sheet'),)
 
@@ -104,7 +103,7 @@ class Usergroups(models.Model):
     workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'UserGroups'
         unique_together = (('id', 'workspace'),)
 
@@ -114,7 +113,7 @@ class Groupmembership(models.Model):
     workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'GroupMembership'
         unique_together = (('user', 'group', 'workspace'),)
 
@@ -126,7 +125,7 @@ class Holidays(models.Model):
     workspace = models.ForeignKey(Workspace, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Holidays'
         unique_together = (('holidayid', 'workspace'),)
 
@@ -140,7 +139,7 @@ class Tagsfor(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'TagsFor'
         unique_together = (('id', 'entryid', 'timeid', 'workspace'),)
 
@@ -155,7 +154,7 @@ class Timeoffpolicies(models.Model):
     wid = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='wID')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'TimeOffPolicies'
         unique_together = (('id', 'wid'),)
 
@@ -173,78 +172,75 @@ class Timeoffrequests(models.Model):
     workspace = models.ForeignKey(Workspace, models.DO_NOTHING, related_name = 'timeOff_workspace')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'TimeOffRequests'
         unique_together = (('id', 'workspace', 'workspace'),)
 
 
+# class AuthGroup(models.Model):
+#     name = models.CharField(unique=True, max_length=80)
+
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_group'
 
 
+# class AuthGroupPermissions(models.Model):
+#     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+#     permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=80)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group'
-
-
-class AuthGroupPermissions(models.Model):
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_group_permissions'
+#         unique_together = (('group', 'permission'),)
 
 
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
+# class AuthPermission(models.Model):
+#     name = models.CharField(max_length=255)
+#     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+#     codename = models.CharField(max_length=100)
 
-    class Meta:
-        managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
-
-
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField()
-    date_joined = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_permission'
+#         unique_together = (('content_type', 'codename'),)
 
 
-class AuthUserGroups(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+# class AuthUser(models.Model):
+#     password = models.CharField(max_length=128)
+#     last_login = models.DateTimeField(blank=True, null=True)
+#     is_superuser = models.BooleanField()
+#     username = models.CharField(unique=True, max_length=150)
+#     first_name = models.CharField(max_length=30)
+#     last_name = models.CharField(max_length=150)
+#     email = models.CharField(max_length=254)
+#     is_staff = models.BooleanField()
+#     is_active = models.BooleanField()
+#     date_joined = models.DateTimeField()
 
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_user'
 
 
-class AuthUserUserPermissions(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+# class AuthUserGroups(models.Model):
+#     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+#     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
 
-    class Meta:
-        managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_user_groups'
+#         unique_together = (('user', 'group'),)
+
+
+# class AuthUserUserPermissions(models.Model):
+#     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+#     permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+
+#     class Meta:
+#         managed = True
+#         db_table = 'auth_user_user_permissions'
+#         unique_together = (('user', 'permission'),)
 
 
 # class ClockifyCalendar(models.Model):
@@ -254,7 +250,7 @@ class AuthUserUserPermissions(models.Model):
 #     year = models.IntegerField()
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_calendar'
 
 
@@ -266,7 +262,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_client'
 
 
@@ -278,7 +274,7 @@ class AuthUserUserPermissions(models.Model):
 #     baserate = models.DecimalField(db_column='baseRate', max_digits=10, decimal_places=2)  # Field name made lowercase.
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_employeeuser'
 
 
@@ -297,7 +293,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_entry'
 
 
@@ -308,7 +304,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_groupmembership'
 
 
@@ -319,7 +315,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_holidays'
 
 
@@ -331,7 +327,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_project'
 
 
@@ -343,7 +339,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_tagsfor'
 
 
@@ -357,7 +353,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_timeoffpolicies'
 
 
@@ -374,7 +370,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_timeoffrequests'
 
 
@@ -392,7 +388,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_timesheet'
 
 
@@ -402,7 +398,7 @@ class AuthUserUserPermissions(models.Model):
 #     workspace = models.ForeignKey('ClockifyWorkspace', models.DO_NOTHING)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_usergroups'
 
 
@@ -411,49 +407,49 @@ class AuthUserUserPermissions(models.Model):
 #     name = models.CharField(max_length=50)
 
 #     class Meta:
-#         managed = False
+#         managed = True
 #         db_table = 'clockify_workspace'
 
 
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.SmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+# class DjangoAdminLog(models.Model):
+#     action_time = models.DateTimeField()
+#     object_id = models.TextField(blank=True, null=True)
+#     object_repr = models.CharField(max_length=200)
+#     action_flag = models.SmallIntegerField()
+#     change_message = models.TextField()
+#     content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
+#     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
 
-    class Meta:
-        managed = False
-        db_table = 'django_admin_log'
-
-
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+#     class Meta:
+#         managed = True
+#         db_table = 'django_admin_log'
 
 
-class DjangoMigrations(models.Model):
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
+# class DjangoContentType(models.Model):
+#     app_label = models.CharField(max_length=100)
+#     model = models.CharField(max_length=100)
 
-    class Meta:
-        managed = False
-        db_table = 'django_migrations'
+#     class Meta:
+#         managed = True
+#         db_table = 'django_content_type'
+#         unique_together = (('app_label', 'model'),)
 
 
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
+# class DjangoMigrations(models.Model):
+#     app = models.CharField(max_length=255)
+#     name = models.CharField(max_length=255)
+#     applied = models.DateTimeField()
 
-    class Meta:
-        managed = False
-        db_table = 'django_session'
+#     class Meta:
+#         managed = True
+#         db_table = 'django_migrations'
+
+
+# class DjangoSession(models.Model):
+#     session_key = models.CharField(primary_key=True, max_length=40)
+#     session_data = models.TextField()
+#     expire_date = models.DateTimeField()
+
+#     class Meta:
+#         managed = True
+#         db_table = 'django_session'

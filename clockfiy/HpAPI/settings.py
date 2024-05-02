@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
-import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +45,7 @@ SECRET_KEY = r'django-insecure-jrw8m%9dqqz2zu+1abxqhupad#1$h%fb%igx@1twnbkn6h5o3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['hpclockifyapi.azurewebsites.net', '169.254.130.3', 'localhost', '127.0.0.1', '169.254.130.2',
+ALLOWED_HOSTS = ['169.254.129.2','hpclockifyapi.azurewebsites.net', '169.254.130.3', 'localhost', '127.0.0.1', '169.254.130.2',
 '20.237.180.234','20.237.181.23','20.237.181.49','20.228.97.254','20.228.99.26','20.237.179.112','104.40.10.200','104.40.9.245','104.40.14.130','104.40.3.249','104.40.18.254','104.40.18.248','40.112.243.106']
 # ALLOWED_HOSTS = ["*"]
 

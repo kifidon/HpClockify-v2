@@ -1,7 +1,6 @@
 from django.contrib import admin 
 from .models import (
     Workspace,
-    Client,
     Employeeuser,
     Timesheet,
     Project,
@@ -18,7 +17,6 @@ from .models import (
 admin.site.register(Employeeuser)
 admin.site.register(Usergroups)
 admin.site.register(Workspace)
-admin.site.register(Client)
 admin.site.register(Timeoffpolicies)
 admin.site.register(Timeoffrequests)
 admin.site.register(Timesheet)

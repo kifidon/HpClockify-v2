@@ -13151,3 +13151,1078 @@ Watching for file changes with StatReloader
 C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Not Found: /favicon.ico
+SQL Error: ('22007', '[22007] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Conversion failed when converting date and/or time from character string. (241) (SQLExecDirectW)')
+None
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Not Found: /HpClockifyAPi/getEntries
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Not Found: /HpClockifyAPi/getEntries
+Not Found: /bankedHrs
+Not Found: /bankedHours
+2024-04-24 10:28:29:
+INFO: GET: bankedHours 
+Starting new HTTPS connection (1): pto.api.clockify.me:443
+https://pto.api.clockify.me:443 "GET /v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65fc91ca17e548286f7bc026?page-size=100&page=1 HTTP/1.1" 200 None
+Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+Done
+Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+Not Found: /static/rest_framework/css/prettify.css
+Not Found: /static/rest_framework/css/bootstrap.min.css
+Not Found: /static/rest_framework/css/default.css
+Not Found: /static/rest_framework/js/bootstrap.min.js
+Not Found: /static/rest_framework/js/csrf.js
+Not Found: /static/rest_framework/js/default.js
+Not Found: /static/rest_framework/js/jquery-3.4.1.min.js
+Not Found: /static/rest_framework/js/ajax-form.js
+Not Found: /static/rest_framework/js/prettify-min.js
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:28:56:
+INFO: GET: bankedHours 
+Starting new HTTPS connection (1): pto.api.clockify.me:443
+https://pto.api.clockify.me:443 "GET /v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65fc91ca17e548286f7bc026?page-size=100&page=1 HTTP/1.1" 200 None
+Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+Done
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:29:56:INFO: GET: bankedHours 
+Starting new HTTPS connection (1): pto.api.clockify.me:443
+https://pto.api.clockify.me:443 "GET /v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65fc91ca17e548286f7bc026?page-size=100&page=1 HTTP/1.1" 200 None
+Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+Done
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:30:06:INFO: GET: bankedHours 
+Starting new HTTPS connection (1): pto.api.clockify.me:443
+https://pto.api.clockify.me:443 "GET /v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65fc91ca17e548286f7bc026?page-size=100&page=1 HTTP/1.1" 200 None
+Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+Done
+2024-04-24 10:30:12:INFO: GET: bankedHours 
+Starting new HTTPS connection (1): pto.api.clockify.me:443
+https://pto.api.clockify.me:443 "GET /v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65fc91ca17e548286f7bc026?page-size=100&page=1 HTTP/1.1" 200 None
+Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+Done
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\SqlClockPull.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:37:51 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+2024-04-24 10:38:00 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:39:29 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+2024-04-24 10:39:30 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:40:07 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:40:41 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:41:27 - INFO: POST: getProjects
+Forbidden: /HpClockifyAPi/getProjects
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-24 10:47:32 - INFO: POST: getProjects
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Inserting Page: 1 of Projects (50 records)
+	Loading..........2.0%
+	Loading..........4.0%
+	Loading..........6.0%
+	Loading..........8.0%
+	Loading..........10.0%
+	Loading..........12.0%
+	Loading..........14.00%
+	Loading..........16.0%
+	Loading..........18.0%
+	Loading..........20.0%
+	Loading..........22.0%
+	Loading..........24.0%
+	Loading..........26.0%
+	Loading..........28.00%
+	Loading..........30.0%
+	Loading..........32.0%
+	Loading..........34.0%
+	Loading..........36.0%
+	Loading..........38.0%
+	Loading..........40.0%
+	Loading..........42.0%
+	Loading..........44.0%
+	Loading..........46.0%
+	Loading..........48.0%
+	Loading..........50.0%
+	Loading..........52.0%
+	Loading..........54.0%
+	Loading..........56.00%
+	Loading..........57.99%
+	Loading..........60.0%
+	Loading..........62.0%
+	Loading..........64.0%
+	Loading..........66.0%
+	Loading..........68.0%
+	Loading..........70.0%
+	Loading..........72.0%
+	Loading..........74.0%
+	Loading..........76.0%
+	Loading..........78.0%
+	Loading..........80.0%
+	Loading..........82.0%
+	Loading..........84.0%
+	Loading..........86.0%
+	Loading..........88.0%
+	Loading..........90.0%
+	Loading..........92.0%
+	Loading..........94.0%
+	Loading..........96.0%
+	Loading..........98.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Inserting Page: 2 of Projects (20 records)
+	Loading..........5.0%
+	Loading..........10.0%
+	Loading..........15.0%
+	Loading..........20.0%
+	Loading..........25.0%
+	Loading..........30.0%
+	Loading..........35.0%
+	Loading..........40.0%
+	Loading..........45.0%
+	Loading..........50.0%
+	Loading..........55.00%
+	Loading..........60.0%
+	Loading..........65.0%
+	Loading..........70.0%
+	Loading..........75.0%
+	Loading..........80.0%
+	Loading..........85.0%
+	Loading..........90.0%
+	Loading..........95.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Committing changes...
+Operation Completed: Project table has 0 new records and 20 unchanged. 0 records updated. 0 deleted
+
+2024-04-24 10:47:52 - Project Event 
+2024-04-24 10:48:53 - INFO: POST: getProjects
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Inserting Page: 1 of Projects (50 records)
+	Loading..........2.0%
+	Loading..........4.0%
+	Loading..........6.0%
+	Loading..........8.0%
+	Loading..........10.0%
+	Loading..........12.0%
+	Loading..........14.00%
+	Loading..........16.0%
+	Loading..........18.0%
+	Loading..........20.0%
+	Loading..........22.0%
+	Loading..........24.0%
+	Loading..........26.0%
+	Loading..........28.00%
+	Loading..........30.0%
+	Loading..........32.0%
+	Loading..........34.0%
+	Loading..........36.0%
+	Loading..........38.0%
+	Loading..........40.0%
+	Loading..........42.0%
+	Loading..........44.0%
+	Loading..........46.0%
+	Loading..........48.0%
+	Loading..........50.0%
+	Loading..........52.0%
+	Loading..........54.0%
+	Loading..........56.00%
+	Loading..........57.99%
+	Loading..........60.0%
+	Loading..........62.0%
+	Loading..........64.0%
+	Loading..........66.0%
+	Loading..........68.0%
+	Loading..........70.0%
+	Loading..........72.0%
+	Loading..........74.0%
+	Loading..........76.0%
+	Loading..........78.0%
+	Loading..........80.0%
+	Loading..........82.0%
+	Loading..........84.0%
+	Loading..........86.0%
+	Loading..........88.0%
+	Loading..........90.0%
+	Loading..........92.0%
+	Loading..........94.0%
+	Loading..........96.0%
+	Loading..........98.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Inserting Page: 2 of Projects (20 records)
+	Loading..........5.0%
+	Loading..........10.0%
+	Loading..........15.0%
+	Loading..........20.0%
+	Loading..........25.0%
+	Loading..........30.0%
+	Loading..........35.0%
+	Loading..........40.0%
+	Loading..........45.0%
+	Loading..........50.0%
+	Loading..........55.00%
+	Loading..........60.0%
+	Loading..........65.0%
+	Loading..........70.0%
+	Loading..........75.0%
+	Loading..........80.0%
+	Loading..........85.0%
+	Loading..........90.0%
+	Loading..........95.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Committing changes...
+Operation Completed: Project table has 0 new records and 20 unchanged. 0 records updated. 0 deleted
+
+2024-04-24 10:49:11 - Project Event 
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPushV2.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 08:27:59 - INFO: POST: getProjects
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=1&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Inserting Page: 1 of Projects (50 records)
+	Loading..........2.0%
+	Loading..........4.0%
+	Loading..........6.0%
+	Loading..........8.0%
+	Loading..........10.0%
+	Loading..........12.0%
+	Loading..........14.00%
+	Loading..........16.0%
+	Loading..........18.0%
+	Loading..........20.0%
+	Loading..........22.0%
+	Loading..........24.0%
+	Loading..........26.0%
+	Loading..........28.00%
+	Loading..........30.0%
+	Loading..........32.0%
+	Loading..........34.0%
+	Loading..........36.0%
+	Loading..........38.0%
+	Loading..........40.0%
+	Loading..........42.0%
+	Loading..........44.0%
+	Loading..........46.0%
+	Loading..........48.0%
+	Loading..........50.0%
+	Loading..........52.0%
+	Loading..........54.0%
+	Loading..........56.00%
+	Loading..........57.99%
+	Loading..........60.0%
+	Loading..........62.0%
+	Loading..........64.0%
+	Loading..........66.0%
+	Loading..........68.0%
+	Loading..........70.0%
+	Loading..........72.0%
+	Loading..........74.0%
+	Loading..........76.0%
+	Loading..........78.0%
+	Loading..........80.0%
+	Loading..........82.0%
+	Loading..........84.0%
+	Loading..........86.0%
+	Loading..........88.0%
+	Loading..........90.0%
+	Loading..........92.0%
+	Loading..........94.0%
+	Loading..........96.0%
+	Loading..........98.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=2&archived=false HTTP/1.1" 200 None
+Inserting Page: 2 of Projects (20 records)
+	Loading..........5.0%
+	Loading..........10.0%
+	Loading..........15.0%
+	Loading..........20.0%
+	Loading..........25.0%
+	Loading..........30.0%
+	Loading..........35.0%
+	Loading..........40.0%
+	Loading..........45.0%
+	Loading..........50.0%
+	Loading..........55.00%
+	Loading..........60.0%
+	Loading..........65.0%
+	Loading..........70.0%
+	Loading..........75.0%
+	Loading..........80.0%
+	Loading..........85.0%
+	Loading..........90.0%
+	Loading..........95.0%
+	Loading..........100.0%
+Starting new HTTPS connection (1): api.clockify.me:443
+https://api.clockify.me:443 "GET /api/v1/workspaces/65c249bfedeea53ae19d7dad/projects?page=3&archived=false HTTP/1.1" 200 2
+Committing changes...
+Operation Completed: Project table has 0 new records and 50 unchanged. 0 records updated. 0 deleted
+
+2024-04-25 08:28:18 - Project Event 
+2024-04-25 08:28:46 - INFO: POST: getProjects
+Internal Server Error: /HpClockifyAPi/getProjects
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\utils\datastructures.py", line 76, in __getitem__
+    list_ = super().__getitem__(key)
+KeyError: 'id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 505, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 465, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 476, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 502, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py", line 593, in getProjects
+    project = Project.objects.get(pk=request.data['id'])
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\utils\datastructures.py", line 78, in __getitem__
+    raise MultiValueDictKeyError(key)
+django.utils.datastructures.MultiValueDictKeyError: 'id'
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\ClockifyPullV2.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\settings.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+<coroutine object get_current_time at 0x00000268B70108C8> - 
+INFO: POST: updateTimesheet
+{
+    "id": "661ef15ca96c0e494523d199",
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Denver",
+        "startOfWeek": "SUNDAY"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-04-17T15:23:33Z",
+        "note": ""
+    }
+}
+<coroutine object get_current_time at 0x00000268B747D1C8> - INFO: UpdateTimesheet:"661ef15ca96c0e494523d199"202
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:38:22 - 
+INFO: POST: updateTimesheet
+{
+    "id": "661ef15ca96c0e494523d199",
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Denver",
+        "startOfWeek": "SUNDAY"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-04-17T15:23:33Z",
+        "note": ""
+    }
+}
+2024-04-25 16:38:24 - INFO: UpdateTimesheet:"661ef15ca96c0e494523d199"202
+Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:39:09 - 
+INFO: POST: updateTimesheet
+{
+    "id": "661ef15ca96c0e494523d199",
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Denver",
+        "startOfWeek": "SUNDAY"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-04-17T15:23:33Z",
+        "note": ""
+    }
+}
+2024-04-25 16:39:10 - INFO: UpdateTimesheet:"661ef15ca96c0e494523d199"202
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:42:06 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:42:08 - ERROR: 
+2024-04-25 16:42:08 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:42:47 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:42:49 - ERROR: 
+2024-04-25 16:42:49 - ERROR:"661ef15ca96c0e494523d199"
+400
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 204, in _get_response
+    response = response.render()
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\template\response.py", line 105, in render
+    self.content = self.rendered_content
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\response.py", line 70, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\renderers.py", line 103, in render
+    allow_nan=not self.strict, separators=separators
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\utils\json.py", line 25, in dumps
+    return json.dumps(*args, **kwargs)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.2544.0_x64__qbz5n2kfra8p0\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.2544.0_x64__qbz5n2kfra8p0\lib\json\encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.2544.0_x64__qbz5n2kfra8p0\lib\json\encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\utils\encoders.py", line 67, in default
+    return super().default(obj)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.2544.0_x64__qbz5n2kfra8p0\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type AssertionError is not JSON serializable
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:43:06 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:43:08 - ERROR: 
+2024-04-25 16:43:08 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:43:35 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:43:37 - ERROR: 
+2024-04-25 16:43:37 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:43:55 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:43:57 - ERROR: 
+2024-04-25 16:43:57 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:44:29 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:44:31 - ERROR: 
+2024-04-25 16:44:31 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:44:56 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:44:58 - ERROR: 
+2024-04-25 16:44:58 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:45:23 - 
+INFO: POST: updateTimesheet
+2024-04-25 16:45:25 - ERROR: 
+2024-04-25 16:45:25 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 16:45:42 - 
+INFO: POST: updateTimesheet
+Using selector: SelectSelector
+{
+    "id": "661ef15ca96c0e494523d199",
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Denver",
+        "startOfWeek": "SUNDAY"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-04-07T06:00:00Z",
+        "end": "2024-04-14T05:59:59Z"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-04-17T15:23:33Z",
+        "note": ""
+    }
+}
+2024-04-25 16:45:43 - INFO: UpdateTimesheet:"661ef15ca96c0e494523d199"202
+Watching for file changes with StatReloader
+Forbidden (CSRF cookie not set.): /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 188, in _get_response
+    self.check_response(response, callback)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 317, in check_response
+    "into your view." % name
+ValueError: The view HpAPI.views.updateTimesheet didn't return an HttpResponse object. It returned an unawaited coroutine instead. You may need to add an 'await' into your view.
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 188, in _get_response
+    self.check_response(response, callback)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 317, in check_response
+    "into your view." % name
+ValueError: The view HpAPI.views.updateTimesheet didn't return an HttpResponse object. It returned an unawaited coroutine instead. You may need to add an 'await' into your view.
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+2024-04-25 17:06:26 - 
+INFO: POST: updateTimesheet
+2024-04-25 17:06:28 - INFO: updateEntries Function called
+2024-04-25 17:06:28 - ERROR: object of type 'coroutine' has no len()
+2024-04-25 17:06:28 - ERROR:"661ef15ca96c0e494523d199"
+400
+Bad Request: /HpClockifyAPi/updateTimeSheets
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\lib\site-packages\rest_framework\views.py", line 422, in finalize_response
+    % type(response)
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\HpAPI\models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\rest_framework\views.py", line 419, in finalize_response
+    assert isinstance(response, HttpResponseBase), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Watching for file changes with StatReloader
+Internal Server Error: /HpClockifyAPi/updateTimeSheets
+Traceback (most recent call last):
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\rest_framework\views.py", line 507, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\clockfiy\.venv\Lib\site-packages\rest_framework\views.py", line 419, in finalize_response
+    assert isinstance(response, HttpResponseBase), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'coroutine'>`
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader

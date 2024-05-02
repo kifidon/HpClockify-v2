@@ -1,0 +1,112 @@
+from rest_framework import serializers
+
+from .models import(
+    Employeeuser,
+    Workspace,
+    Timesheet,
+    Entry,
+    Project,
+    Tagsfor
+)
+from .clockify_util.hpUtil import timeZoneConvert, timeDuration
+
+class TimesheetSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    owner = serializers.DictField()
+    workspaceId = serializers.CharField()
+    dateRange = serializers.DictField()
+    status = serializers.DictField()
+   
+    def create(self, validated_data):
+       
+        timesheet = Timesheet.objects.create(
+           id = validated_data['id'],
+           workspace = Workspace.objects.get(id=validated_data['workspaceId']),
+           emp = Employeeuser.objects.get(id=validated_data.get('owner').get('userId')),
+           start_time = timeZoneConvert(validated_data.get('dateRange').get('start')),
+           end_time = timeZoneConvert(validated_data.get('dateRange').get('end')),
+           status = validated_data.get('status').get('state')
+        )
+        return timesheet
+
+    def update(self, instance: Timesheet, validated_data):
+        try:
+            instance.id = instance.id
+            # print("\n", validated_data, '\n', vars(instance) )
+            instance.workspace = Workspace.objects.get(id=validated_data['workspaceId']) or instance.workspace
+            instance.emp = Employeeuser.objects.get(id = validated_data.get('owner').get('userId')) or instance.emp
+            instance.start_time = timeZoneConvert(validated_data.get('dateRange').get('start')) or instance.start_time
+            instance.end_time = timeZoneConvert(validated_data.get('dateRange').get('end'))or instance.end_time
+            instance.status = validated_data.get('status').get('state') or instance.status
+            instance.save()
+        except Exception as e:
+            print(e.__traceback__.tb_lineno)
+            raise e 
+        return instance
+
+class EntrySerializer(serializers.Serializer): # missing update
+    id = serializers.CharField()
+    description = serializers.CharField(allow_blank = True)
+    approvalRequestId = serializers.CharField(allow_null = True)
+    billable = serializers.BooleanField()
+    project = serializers.DictField()
+    hourlyRate = serializers.DictField(allow_null=True)
+    timeInterval = serializers.DictField()
+    workspace = serializers.SerializerMethodField()
+    tags = serializers.ListField()
+
+    def create(self, validated_data):
+        entry = Entry.objects.create(
+            id= validated_data['id'],
+            time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')),
+            duration = timeDuration(validated_data.get('timeInterval').get('duration')),
+            description = validated_data.get('description'),
+            billable = validated_data.get('billable') ,
+            project = Project.objects.get(validated_data.get('project').get('id')),
+            rate = validated_data.get('hourlyRate').get('amount'),
+            start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')),
+            end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')),
+            workspace = Workspace.objects.get(id=self.context.get('workspaceId'))
+        )
+        return entry
+    
+    def update(self, instance: Entry, validated_data):
+        instance.id = instance.id
+        instance.time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) or instance.time_sheet
+        instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
+        instance.description = validated_data.get('description') or instance.description
+        instance.billable = validated_data.get('billable') or instance.billable
+        instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
+        instance.rate = validated_data.get('hourlyRate').get('amount') or instance.rate
+        instance.start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start_time
+        instance.end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end_time
+        instance.workspace = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspace
+        instance.save()
+        return instance
+
+
+class TagsForSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+    workspaceId = serializers.CharField()
+    timeid = serializers.SerializerMethodField(method_name='get_timeid')
+    entryid = serializers.SerializerMethodField(method_name='get_entryid')
+
+    def create(self,validated_data:dict):
+        tag = Tagsfor.objects.create(
+            id = validated_data.get('id'),
+            entryid = Entry.objects.get(id=self.context.get('entryid')),
+            timeid = Timesheet.objects.get(id=self.context.get('timeid')),
+            workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
+            name = validated_data.get('name')
+        )
+        return tag
+    
+    def update( self , instance: Tagsfor, validated_data:dict):
+        instance.id = instance.id
+        instance.name = validated_data.get('name') or instance.name
+        instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
+        instance.entryid = Entry.objects.get(id=self.context.get('entryid')) or instance.entryid
+        instance.timeid = Timesheet.objects.get(id=self.context.get('timeid')) or instance.timeid
+        instance.save()
+        return instance

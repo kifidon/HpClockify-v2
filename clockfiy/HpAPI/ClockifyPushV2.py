@@ -202,7 +202,7 @@ def deleteProjects(conn, cursor, wkSpaceID):
         logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
     else:
         # Commit changes in timesheet function if no exceptions occurred               
-        return(deleted)
+        return deleted
 
 def updateProjects(conn, cursor, count, update, exists, pID, pCode, pTitle, pName, cID, projects, wkSpaceID):
     try:
@@ -325,7 +325,7 @@ def pushProjects(wkSpaceID, conn, cursor):
     else:
         conn.commit()
         logging.error("Committing changes...")  # Commit changes if no exceptions occurred              
-        return(f"Operation Completed: Project table has {count} new records and {exists} unchanged. {update} records updated. {deleted} deleted" +"\n")
+        return(f"Operation Completed: Project table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated. {deleted} deleted" +"\n")
 
 def pushClients(wkSpaceID, conn, cursor):
     """

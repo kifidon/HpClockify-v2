@@ -4,7 +4,8 @@ import pyodbc
 from datetime import datetime, timedelta, timezone
 import pytz
 import logging
-
+import asyncio 
+import httpx
 def timeZoneConvert(dateTime, format='%Y-%m-%dT%H:%M:%SZ'):
     utcTimezone = pytz.utc
     localTimeZone = pytz.timezone('America/Denver')
@@ -177,7 +178,20 @@ def getProjects(workspaceId, key, page =1):
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
 
-def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page = 1):
+async def FindTimesheet(workspaceId, key, timeId, status, page):
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=200"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers={'X-Api-Key': key})
+        if response.status_code == 200:
+            for timesheet in response.json():
+                if timesheet['approvalRequest']['id'] == timeId:
+                    return timesheet['entries']
+            # Not found on this page, try next page
+            return []
+        else:
+            raise Exception(f"Failed to pull Data From Clockify: {response.json()}")
+
+async def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page = 1):
     """
     Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
 
@@ -195,18 +209,21 @@ def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page = 1):
     }
     url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=200" 
     logging.info(f'INFO: {url}')   
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        while page < 5: 
-            for timesheet in response.json():
-                if timesheet['approvalRequest']['id'] == timeId:
-                    return timesheet['entries']
-            # not found on first page
-            page += 1 
-            return getEntryForApproval(workspaceId, key, timeId, status, page)
-        return [] # can't find timesheet
-    else:
-        raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: \n{response.json()}"))
+    async with httpx.AsyncioClient() as client:
+        response = client.get(url, headers=headers)
+        if response.status_code == 200:
+            for page_number in range(1, 6):  # Iterate from page 1 to page 5 asynchronously
+                tasks = [
+                    FindTimesheet(workspaceId, key, timeId, status, page_number)
+                    for page_number in range(1, 6)
+                ]
+            entries = await asyncio.gather(*tasks)
+            if entries:
+                    return entries
+            return [] 
+            
+        else:
+            raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: \n{response.json()}"))
     # #
     # else:
     #         print(f"Error: {response.status_code}, {response.text}")

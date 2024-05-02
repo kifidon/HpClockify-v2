@@ -1,0 +1,17 @@
+Watching for file changes with StatReloader
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+Listening on TCP address 127.0.0.1:8000
+Killed 0 pending application instances
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+Listening on TCP address 127.0.0.1:8000
+Killed 0 pending application instances
+Starting server at tcp:port=8000:interface=127.0.0.1
+HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+Configuring endpoint tcp:port=8000:interface=127.0.0.1
+Listening on TCP address 127.0.0.1:8000
+2024-05-02 11:40:36 - INFO: C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-24-04
+Killed 0 pending application instances

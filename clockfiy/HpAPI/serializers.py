@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import (
     Workspace,
-    Client,
     Employeeuser,
     Timesheet,
     Project,
@@ -21,10 +20,10 @@ class WorkspaceSerializer(serializers.ModelSerializer):
         model = Workspace
         fields = '__all__'
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = '__all__'
+# class ClientSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Client
+#         fields = '__all__'
 
 class EmployeeUserSerializer(serializers.ModelSerializer):
     class Meta:

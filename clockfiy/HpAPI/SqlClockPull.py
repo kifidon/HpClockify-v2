@@ -1,6 +1,11 @@
 from . import ClockifyPullV2
 from . import ClockifyPushV2
 import logging
+from datetime import datetime
+
+def get_current_time():
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 def getUsrBallances(conn, cursor):
     try:
         cursor.execute(
