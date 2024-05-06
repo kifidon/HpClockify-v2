@@ -34,7 +34,6 @@ def MonthylyProjReport(startDate = None, endDate = None):
             '''
         )
         pIds = cursor.fetchall()
-        print (pIds)
         for pId in pIds:
             current_dir = settings.BASE_DIR
            # current_dir = r"C:\Users\TimmyIfidon\Desktop"

@@ -25,6 +25,10 @@ from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, 
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import get_current_time, asyncio, logging, dumps, loads
 from . import settings
+import time
+
+MAX_RETRIES = 3
+DELAY = 0
 
 def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, workspaceId):
     logging.info(f'{get_current_time()} - INFO: updateTags Function called')
@@ -46,7 +50,7 @@ def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, wor
             Tagsfor.objects.filter(id__in=tags_to_delete).delete()
             logging.info(f'{get_current_time()} - INFO: Deleting old tags...{tags_to_delete}')
         except Tagsfor.DoesNotExist: 
-            # print('No existing taggs')
+            # ('No existing taggs')
             pass
             # Find new tags to create
 
@@ -74,7 +78,7 @@ def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, wor
             logging.info(f'{get_current_time()} - INFO: {reversed_data}')
             return serializer.validated_data
         else: 
-            # print (serializer.validated_data)
+            #  (serializer.validated_data)
             logging.error(f'{get_current_time()} - ERROR: {serializer.error_messages}')
             raise ValidationError(serializer.errors)
     
@@ -86,48 +90,65 @@ def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, wor
 
 async def updateEntries(request: HttpRequest, timeSerializer: TimesheetSerializer):
     if request.method == 'POST':
-        logging.info(f'{get_current_time()} - INFO: updateEntries Function called')
-        key = ClockifyPullV3.getApiKey()
-        timeId = timeSerializer.validated_data['id']
-        workspaceId = timeSerializer.validated_data['workspaceId']
-        stat = timeSerializer.validated_data['status']['state']
-        if stat == 'APPROVED':
-            allEntries = await ClockifyPullV3.getEntryForApproval(workspaceId, key, timeId, stat, 1)
-            # print(dumps(entries, indent = 4))
-            # print(len(entries))
-            def syncUpdateEntries(entries): # create thread 
-                try: # try and update if exists, otherwise create
-                    approvalID = entries['approvalRequestId'] if entries['approvalRequestId'] is not None else timeId
-                    # print(f"{entries[i]['id']}, {workspaceId}, {approvalID} ")
-                    entry = Entry.objects.get(id = entries['id'], workspace = workspaceId , time_sheet = approvalID)
-                    serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                except Entry.DoesNotExist:
-                    serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                    logging.warning(f'{get_current_time()} - WARNING: Creating new Entry on timesheet {timeId}')
-                    # print(json.dumps(entries, indent=3))
-                if serializer.is_valid():
-                    serializer.save()
-                    logging.info(f'{get_current_time()} - INFO: UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
-                    data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-                    reversed_data = '\n'.join(data_lines[::-1])
-                    logging.info(f'{get_current_time()} - INFO: {reversed_data}')
-                    updateTags(serializer, request, timeId, workspaceId)
-                    return serializer.validated_data
+        retries = 0
+        while retries < MAX_RETRIES:
+            logging.info(f'\n{get_current_time()} - INFO: updateEntries Function called')
+            key = ClockifyPullV3.getApiKey()
+            timeId = timeSerializer.validated_data['id']
+            workspaceId = timeSerializer.validated_data['workspaceId']
+            stat = timeSerializer.validated_data['status']['state']
+            if stat == 'APPROVED':
+                allEntries = await ClockifyPullV3.getEntryForApproval(workspaceId, key, timeId, stat, 1)
+                # (dumps(allEntries, indent = 4))
+                # (dumps(entries, indent = 4))
+                # (len(entries))
+                def syncUpdateEntries(entries): # create thread 
+                    try: 
+                        try: # try and update if exists, otherwise create
+                            approvalID = entries['approvalRequestId'] if entries['approvalRequestId'] is not None else timeId
+                            # (f"{entries[i]['id']}, {workspaceId}, {approvalID} ")
+                            entry = Entry.objects.get(id = entries['id'], workspace = workspaceId , time_sheet = approvalID)
+                            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+                            logging.info(f'{get_current_time()} - INFO: Updating Entry {entries['id']}')
+                        except Entry.DoesNotExist:
+                            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+                            logging.warning(f'{get_current_time()} - WARNING: Creating new Entry on timesheet {timeId}')
+                            # (json.dumps(entries, indent=3))
+                        if serializer.is_valid():
+                            serializer.save()
+                            logging.info(f'{get_current_time()} - INFO: UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
+                            data_lines = dumps(serializer.validated_data, indent=4).split('\n')
+                            reversed_data = '\n'.join(data_lines[::-1])
+                            logging.info(f'{get_current_time()} - INFO: {reversed_data}')
+                            updateTags(serializer, request, timeId, workspaceId)
+                            return serializer.validated_data
+                        else: 
+                            logging.error(f'{get_current_time()} - ERROR: {serializer.error_messages}')
+                            raise ValidationError(serializer.error_messages)
+                    except Exception as e:
+                        logging.error(f'{get_current_time()} - ERROR: {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
+                        raise  e
+                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                tasks = []
+                if len(allEntries) != 0:
+                    for i in range(0,len(allEntries)): # updates all entries async 
+                        tasks.append(
+                            updateAsync(allEntries[i])
+                        )
+                    try:
+                        await asyncio.gather(*tasks)
+                        logging.info(f'{get_current_time()} - INFO: Entries added for timesheet {timeId}') 
+                        return 1
+                    except Exception as e:
+                        logging.error(f'{get_current_time()} - ERROR: ({retries}/{MAX_RETRIES}) {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+                        retries += 1 
+                        time.sleep(DELAY)
                 else: 
-                    logging.error(f'{get_current_time()} - ERROR: {serializer.error_messages}')
-                    raise ValidationError(serializer.error_messages)
-                
-            updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-            tasks = []
-            for i in range(0,len(allEntries)): # updates all entries async 
-                tasks.append(
-                    updateAsync(allEntries[i])
-                )
-            await asyncio.gather(*tasks)
-            return 1
-        else:
-            logging.info(f'{get_current_time()} - WARNING: UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary  406 NOT_ACCEPTED    ')
-            return 0
+                    logging.warning(f'{get_current_time()} - WARNING: No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
+                    return 0
+            else:
+                logging.info(f'{get_current_time()} - WARNING: UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary  406 NOT_ACCEPTED    ')
+                return 0
     else:
         logging.warning(f"{get_current_time()} - {status.HTTP_403_FORBIDDEN}")
         return 0
@@ -136,7 +157,7 @@ async def updateEntries(request: HttpRequest, timeSerializer: TimesheetSerialize
 async def updateTimesheets(request:HttpRequest):
     if request.method == 'POST':
         input = loads(request.body)
-        logging.info(f'{get_current_time()} - \nINFO: {request.method}: updateTimesheet')
+        logging.info(f'\n{get_current_time()} - INFO: {request.method}: updateTimesheet')
         try: 
             def updateApproval():
                 # with transaction.atomic(): # if any error occurs then rollback 
@@ -176,17 +197,17 @@ async def updateTimesheets(request:HttpRequest):
     else:
         response = JsonResponse(data=None, status = status.HTTP_403_FORBIDDEN)
         return response
-        
 @api_view(['POST'])
 def newTimeSheets(request: HttpRequest):
+    logging.info(f'\n{get_current_time()} - INFO: {request.method}: newTimesheet')
     if request.method == 'POST':
         try:
             data = request.data
             serializer = TimesheetSerializer(data= data)
             if serializer.is_valid():
                 serializer.save()
-                response = Response( data= serializer.validated_data, status = status.HTTP_201_CREATED)
-                logging.info(f'{get_current_time()} - {response}')
+                response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
+                logging.info(f'{get_current_time()} - INFO: NewTimesheet:{dumps(data["id"])}{response.status_code}')
                 return response
             else:
                 response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
@@ -209,7 +230,7 @@ def newTimeSheets(request: HttpRequest):
                 logging.error(f'{get_current_time()} - {response}')
                 return response
         except Exception as e:
-            logging.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
+            logging.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
             response = Response(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
             logging.error(f'{get_current_time()} - {response}')
             return response
@@ -257,7 +278,7 @@ def monthlyBillableReport(request, start_date = None, end_date= None):
 def weeklyPayrollReport(request, start_date=None, end_date= None):
     logging.info(f'\n{get_current_time()} - INFO: Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
-    print(folder_path)
+    (folder_path)
     return download_text_file(folder_path)
 
 @api_view(['GET'])

@@ -3,12 +3,17 @@ import requests
 import pyodbc
 import asyncio 
 import httpx
+import time
+from httpcore import ConnectTimeout
 from .hpUtil import get_current_time , logging, dumps, sqlConnect, cleanUp
 
+MAX_RETRIES = 3
+DELAY = 2 #seconds 
+
 def getApiKey():
-    API_KEY = 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3' # Matt Dixon 
+    # API_KEY = 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3' # Matt Dixon 
     # API_KEY = 'MmRiYWE2NmMtOTM3My00MjFlLWEwOTItNWEzZTY2Y2YxNDQx' # Shawn Applejohn 
-    # API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
+    API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
     return API_KEY
 
 def getWorkspaces(key):
@@ -82,12 +87,13 @@ def getProjects(workspaceId, key, page =1):
 
 async def FindTimesheet(workspaceId, key, timeId, status, page):
     url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=200"
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10) as client:
         response = await client.get(url, headers={'X-Api-Key': key})
         if response.status_code == 200:
             for timesheet in response.json():
                 if timesheet['approvalRequest']['id'] == timeId:
                     logging.info(f'{get_current_time()} - INFO: Timesheet found on page {page}')
+                    # print(dumps(timesheet['entries'], indent = 4))
                     return timesheet['entries']
             # Not found on this page, try next page
             return []
@@ -105,17 +111,48 @@ async def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page 
     Returns:
         dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
     """    
-    tasks = []
-    for page_number in range(1, 6):  # Iterate from page 1 to page 5 asynchronously
-        tasks.append(
-            FindTimesheet(workspaceId, key, timeId, status, page_number)
-        )
-    entries = await asyncio.gather(*tasks)
-        
-    if entries:
-        return entries[0]             
-    else:
-        raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))
+    retries= 0
+    while retries < MAX_RETRIES:
+        try:
+            tasks = []
+            for page_number in range(1, 7):  # Iterate from page 1 to page 5 asynchronously
+                tasks.append(
+                    FindTimesheet(workspaceId, key, timeId, status, page_number)
+                )
+            entries = await asyncio.gather(*tasks)
+            
+            if entries != 0:
+                output = []
+                for entry in entries:
+                    output.extend(entry)           
+                return output 
+            else:
+                raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))
+        except ConnectTimeout as e:
+            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            retries += 1
+        except httpx.ReadTimeout as e:
+            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            retries += 1
+        except httpx.TimeoutException as e:
+            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            retries += 1
+        except TimeoutError as e:
+            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            retries += 1
+        except Exception as e:
+            logging.error(f'{get_current_time()} - ERROR: {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+            raise e
+    logging.error(f'{get_current_time()} - ERROR: Max Retries reached')
+    raise ConnectTimeout
 
 def getClients(workspaceId, key): 
     """

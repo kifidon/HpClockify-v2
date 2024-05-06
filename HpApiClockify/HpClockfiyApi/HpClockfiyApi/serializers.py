@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+import logging 
 from .models import(
     Employeeuser,
     Workspace,
@@ -8,7 +8,7 @@ from .models import(
     Project,
     Tagsfor
 )
-from .clockify_util.hpUtil import timeZoneConvert, timeDuration
+from .clockify_util.hpUtil import timeZoneConvert, timeDuration, get_current_time
 
 class TimesheetSerializer(serializers.Serializer):
     id = serializers.CharField()
@@ -56,14 +56,17 @@ class EntrySerializer(serializers.Serializer): # missing update
     tags = serializers.ListField()
 
     def create(self, validated_data):
+        if validated_data.get('hourlyRate') is not None:
+            Rate = validated_data.get('hourlyRate').get('amount')
+        else: Rate = -1
         entry = Entry.objects.create(
             id= validated_data['id'],
             time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')),
             duration = timeDuration(validated_data.get('timeInterval').get('duration')),
             description = validated_data.get('description'),
             billable = validated_data.get('billable') ,
-            project = Project.objects.get(validated_data.get('project').get('id')),
-            rate = validated_data.get('hourlyRate').get('amount'),
+            project = Project.objects.get(id=validated_data.get('project').get('id')),
+            rate = Rate,
             start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')),
             end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')),
             workspace = Workspace.objects.get(id=self.context.get('workspaceId'))
@@ -71,19 +74,24 @@ class EntrySerializer(serializers.Serializer): # missing update
         return entry
     
     def update(self, instance: Entry, validated_data):
-        instance.id = instance.id
-        instance.time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) or instance.time_sheet
-        instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
-        instance.description = validated_data.get('description') or instance.description
-        instance.billable = validated_data.get('billable') or instance.billable
-        instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
-        instance.rate = validated_data.get('hourlyRate').get('amount') or instance.rate
-        instance.start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start_time
-        instance.end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end_time
-        instance.workspace = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspace
-        instance.save()
-        return instance
-
+        try:
+            # instance.id = instance.id
+            instance.time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) or instance.time_sheet
+            instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
+            instance.description = validated_data.get('description') or instance.description
+            instance.billable = validated_data.get('billable') or instance.billable
+            instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
+            if validated_data.get('hourlyRate') is not None:     
+                instance.rate = validated_data.get('hourlyRate').get('amount') 
+            else: instance.rate =  -1
+            instance.start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start_time
+            instance.end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end_time
+            instance.workspace = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspace
+            instance.save()
+            return instance
+        except Exception as e:
+            logging.error(f'{get_current_time()} - ERROR: {str(e)} at line {e.__traceback__.tb_lineno}')
+            return instance
 
 class TagsForSerializer(serializers.Serializer):
     id = serializers.CharField()

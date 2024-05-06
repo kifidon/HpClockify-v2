@@ -530,7 +530,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
             endTime = timeZoneConvert(entry['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ') 
             rate = entry['hourlyRate']['amount'] if entry['hourlyRate'] is not None else 0
             tags = entry['tags']
-            logging.info(f'\t{description}')
+            logging.info(f'\t\t\t{description}')
             while True:
                 try: # insert entry
                     cursor.execute( 
@@ -744,7 +744,7 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
     exists = 0
     FK_ConstraintOnEntry = 0
     try:
-        while len(approved) != 0 and page <200:
+        while len(approved) != 0 and page < 30:
             
             logging.info(f"Inserting Page: {page} of TimeSheets ({len(approved)} records)")
             for approve in approved:
@@ -760,7 +760,7 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                 billableAmount = approve['billableAmount']
                 costAmount = approve['costAmount']
                 expenseTotal = approve['expenseTotal']
-                logging.info(f'{aID}, {userID}, {status}, {startDateO},')
+                # logging.info(f'{aID}, {userID}, {status}, {startDateO},')
                 
                 # continue
                 while True:
@@ -816,16 +816,12 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                             logging.debug(f'{approvedTime}, {costAmount}, {str(startDateO)}')
                             break
                         # elif tsExists is not None:
-                        elif tsExists is not None and (status == 'PENDING' or tsExists[2] != status):
+                        elif tsExists is not None or (tsExists[2] != status):
                             # logging.debug(f'DEBUG: Existing timeSheet "{aID}"')
-                            '''
-                            existing time sheet was Pending in status (possible update of entreis) or the status of the time sheet has 
-                            changed from pending too approved or approved to Withdrawn approval 
-                            '''
-                            if (status != 'PENDING'):
-                                logging.info(f'\tStatus change from {tsExists[2]} to {status} on timesheet: {aID}')
-                            else:
-                                logging.info(f'\tChecking for updates on Pending Timesheet: {aID}')
+                            # if (status != 'PENDING'):
+                            #     logging.info(f'\tStatus change from {tsExists[2]} to {status} on timesheet: {aID}')
+                            # else:
+                            logging.info(f'\tChecking for updates Timesheet: {aID}')
                             update, count, exists, FK_errorOnUpdate ,FK_ConstraintOnEntry = updateApprovals( update, count, exists,
                                     cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
                                     billableAmount, costAmount, expenseTotal, status,  approve, approved, conn, wkSpaceID, FK_ConstraintOnEntry

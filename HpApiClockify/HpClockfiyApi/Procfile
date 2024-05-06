@@ -1,0 +1,2 @@
+web: daphne HpClockifyApi.asgi:application - port $PORT - v2
+chatworker: python manage.py runworker -- settings=HpClockifyApi.settings -v2 

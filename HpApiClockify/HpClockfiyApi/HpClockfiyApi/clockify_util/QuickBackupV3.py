@@ -13,7 +13,7 @@ def UserEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect() 
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -28,7 +28,7 @@ def ClientEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -42,7 +42,7 @@ def ProjectEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -56,7 +56,7 @@ def PolicyEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -70,7 +70,7 @@ def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -84,7 +84,7 @@ def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')
@@ -98,7 +98,7 @@ def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFORetrying.....Connecting to server")
+        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
         logging.error('cannot connect to server')

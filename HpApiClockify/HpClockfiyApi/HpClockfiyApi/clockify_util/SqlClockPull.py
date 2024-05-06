@@ -1,6 +1,7 @@
 from . import ClockifyPullV3
 from . import ClockifyPushV3
 from .hpUtil import logging, get_current_time
+import time
 
 def getUsrBallances(conn, cursor):
     try:
@@ -76,7 +77,13 @@ def updateUsrBalances(updateBalances, polID):
         logging.info(f'{get_current_time()} - INFO: Updated Banked Time')
 
 def main():
-    cursor, conn =ClockifyPullV3.sqlConnect()
+    while True:
+        cursor, conn =ClockifyPullV3.sqlConnect()
+        if cursor is None or conn is None:
+            logging.warning(f'{get_current_time()} - WARNING: Failed to initilize cursor and connection in Banked Time')
+            time.sleep(2)
+        else: 
+            break
     usrBalances, polID = getUsrBallances(conn, cursor)
     page = 1
     updateBalances= checkBalanceUpdate(usrBalances, polID, page)

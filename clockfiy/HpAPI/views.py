@@ -35,182 +35,182 @@ import asyncio
 def get_current_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-# @api_view(['GET'])
-# def quickBackup(request: HttpRequest):
-#     result = QuickBackupV2.main() # General String for return output
-#     response = Response(data = result, status=status.HTTP_200_OK)
-#     logging.info(f'{get_current_time()} - {get_current_time()}INFO: Quickbackup:  {response.data}, {response.status_code}')
-#     return response
+@api_view(['GET'])
+def quickBackup(request: HttpRequest):
+    result = QuickBackupV2.main() # General String for return output
+    response = Response(data = result, status=status.HTTP_200_OK)
+    logging.info(f'{get_current_time()} - {get_current_time()}INFO: Quickbackup:  {response.data}, {response.status_code}')
+    return response
 
-# @api_view(['GET'])
-# def timesheets(request: HttpRequest):
-#     result = QuickBackupV2.TimesheetEvent(status='APPROVED')
-#     response = Response(data = result, status=status.HTTP_200_OK)
-#     logging.info(f'{get_current_time()} - INFO: Quickbackup:  {response.data}, {response.status_code}')
+@api_view(['GET'])
+def timesheets(request: HttpRequest):
+    result = QuickBackupV2.TimesheetEvent(status='APPROVED')
+    response = Response(data = result, status=status.HTTP_200_OK)
+    logging.info(f'{get_current_time()} - INFO: Quickbackup:  {response.data}, {response.status_code}')
     
-#     return response
+    return response
 
-# @csrf_exempt
-# def download_text_file(request, start_date = None, end_date= None):
-#     folder_path = QuickBackupV2.monthlyBillable(start_date, end_date )
-#     if folder_path:
-#         temp_dir = f'{folder_path}_tmp'
-#         os.makedirs(temp_dir, exist_ok=True)
-#         # Compress the folder into a zip file
-#         shutil.make_archive(temp_dir, 'zip', folder_path)
-#         # Get the zip file path
-#         zip_file_path = f'{temp_dir}.zip'
+@csrf_exempt
+def download_text_file(request, start_date = None, end_date= None):
+    folder_path = QuickBackupV2.monthlyBillable(start_date, end_date )
+    if folder_path:
+        temp_dir = f'{folder_path}_tmp'
+        os.makedirs(temp_dir, exist_ok=True)
+        # Compress the folder into a zip file
+        shutil.make_archive(temp_dir, 'zip', folder_path)
+        # Get the zip file path
+        zip_file_path = f'{temp_dir}.zip'
 
-#         with open(zip_file_path, 'rb') as file:
-#             response = HttpResponse(file.read(), content_type='application/zip')
-#             response['Content-Disposition'] = f'attachment; filename="{os.path.basename(zip_file_path)}"'
-#         shutil.rmtree(temp_dir)
-#         os.remove(zip_file_path)
-#         return response
-#     return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (YYYY-MM-DD)\nReview Logs for more detail @ https://hpclockifyapi.azurewebsites.net/')
+        with open(zip_file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="{os.path.basename(zip_file_path)}"'
+        shutil.rmtree(temp_dir)
+        os.remove(zip_file_path)
+        return response
+    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (YYYY-MM-DD)\nReview Logs for more detail @ https://hpclockifyapi.azurewebsites.net/')
 
-# '''
-# @api_view(['GET', 'POST'])
-# def getWorkspaces(request: HttpRequest, format = None):
-#     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-#     # payload = request.body
-#     # secret = b'' # input signing secret here 
-#     # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-#     # if hmac.compare_digest(auth, signature):
-#         if request.method == 'GET':
-#             workspaces = Workspace.objects.all()
-#             serializer = WorkspaceSerializer(workspaces, many=True)
-#             response = Response(serializer.data)
-#         elif request.method == 'POST':
-#             try:
-#                 serializer = WorkspaceSerializer(data = request.data)
-#                 if serializer.is_valid():
-#                     serializer.save()
-#                     return(Response(serializer.data, status = status.HTTP_201_CREATED))
-#                 return ( Response( serializer.data, status = status.HTTP_400_BAD_REQUEST))
-#             except Exception as e:
-#                 return (Response(data = None, status=status.HTTP_417_EXPECTATION_FAILED))
-#         else:
-#             response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-#     # else: 
-#     #     Response(data = None, status = status.HTTP_403_FORBIDDEN)
+'''
+@api_view(['GET', 'POST'])
+def getWorkspaces(request: HttpRequest, format = None):
+    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
+    # payload = request.body
+    # secret = b'' # input signing secret here 
+    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
+    # if hmac.compare_digest(auth, signature):
+        if request.method == 'GET':
+            workspaces = Workspace.objects.all()
+            serializer = WorkspaceSerializer(workspaces, many=True)
+            response = Response(serializer.data)
+        elif request.method == 'POST':
+            try:
+                serializer = WorkspaceSerializer(data = request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return(Response(serializer.data, status = status.HTTP_201_CREATED))
+                return ( Response( serializer.data, status = status.HTTP_400_BAD_REQUEST))
+            except Exception as e:
+                return (Response(data = None, status=status.HTTP_417_EXPECTATION_FAILED))
+        else:
+            response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    # else: 
+    #     Response(data = None, status = status.HTTP_403_FORBIDDEN)
     
-# '''
-# @api_view(['POST'])
-# def getClients(request: HttpRequest):
-#     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-#     # payload = request.body
-#     # secret = b'' # input signing secret here 
-#     # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-#     # if hmac.compare_digest(auth, signature):   
-#         '''    
-#         if request.method == 'GET':
-#             clients = Client.objects.all()
-#             serializer = ClientSerializer(clients, many=True)
-#             response = Response(serializer.data )
-#         elif request.method == 'PUT':
-#             try: 
-#                 client = Client.objects.get(pk=request['id'])
-#                 serializer = ClientSerializer(instance= client, data = request.data)
-#                 if serializer.is_valid():
-#                     serializer.save()
-#                     response = Response( data= serializer.data, status= status.HTTP_202_ACCEPTED)
-#                 return(Response(serializer.data, status= status.HTTP_400_BAD_REQUEST))
-#             except Client.DoesNotExist:
-#                 response = Response(data= serializer.data, status= status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-#             except utils.IntegrityError as e:
-#                 if 'PRIMARY KEY constraint' in str(e): 
-#                     response = Response(serializer.data, status=status.HTTP_304_NOT_MODIFIED)
-#                 elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
-#                     response = Response(serializer.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-#                 else:
-#                     response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
-#         '''    
-#         if request.method == 'POST':
-#             stat = QuickBackupV2.ClientEvent()
-#             logging.info(f'{get_current_time()} - Client Event: Add Client')
-#             if stat:
-#                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-#             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-#             return response
-#         '''
-#         elif request.method == 'DELETE':
-#             try:
-#                 client = Client.objects.get(pk=request['id'])
-#                 client.delete()
-#                 response = Response(data = None, status=status.HTTP_200_OK)
-#             except Client.DoesNotExist:
-#                 response = Response(data=None, status= status.HTTP_204_NO_CONTENT)
-#         else:
-#             response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-#     # else:
-#     #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-#         '''
+'''
+@api_view(['POST'])
+def getClients(request: HttpRequest):
+    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
+    # payload = request.body
+    # secret = b'' # input signing secret here 
+    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
+    # if hmac.compare_digest(auth, signature):   
+        '''    
+        if request.method == 'GET':
+            clients = Client.objects.all()
+            serializer = ClientSerializer(clients, many=True)
+            response = Response(serializer.data )
+        elif request.method == 'PUT':
+            try: 
+                client = Client.objects.get(pk=request['id'])
+                serializer = ClientSerializer(instance= client, data = request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = Response( data= serializer.data, status= status.HTTP_202_ACCEPTED)
+                return(Response(serializer.data, status= status.HTTP_400_BAD_REQUEST))
+            except Client.DoesNotExist:
+                response = Response(data= serializer.data, status= status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+            except utils.IntegrityError as e:
+                if 'PRIMARY KEY constraint' in str(e): 
+                    response = Response(serializer.data, status=status.HTTP_304_NOT_MODIFIED)
+                elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
+                    response = Response(serializer.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+                else:
+                    response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
+        '''    
+        if request.method == 'POST':
+            stat = QuickBackupV2.ClientEvent()
+            logging.info(f'{get_current_time()} - Client Event: Add Client')
+            if stat:
+                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
+            else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            return response
+        '''
+        elif request.method == 'DELETE':
+            try:
+                client = Client.objects.get(pk=request['id'])
+                client.delete()
+                response = Response(data = None, status=status.HTTP_200_OK)
+            except Client.DoesNotExist:
+                response = Response(data=None, status= status.HTTP_204_NO_CONTENT)
+        else:
+            response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    # else:
+    #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+        '''
 
-# @api_view(['POST'])
-# def getEmployeeUsers(request: HttpRequest, format = None):
-#     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-#     # payload = request.body
-#     # secret = b'' # input signing secret here 
-#     # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-#     # if hmac.compare_digest(auth, signature):   
-#         '''
-#         if request.method == 'GET':
-#             user = Employeeuser.objects.all()
-#             serializer = EmployeeUserSerializer(user, many=True)
-#             response = Response(serializer.data )
-#         elif request.method == 'PUT':
-#             try: 
-#                 user = Employeeuser.objects.get(pk=request['id'])
-#                 serializer = EmployeeUserSerializer(instance= user, data = request.data)
-#                 if serializer.is_valid():
-#                     serializer.save()
-#                     response = Response( data= serializer.data, status= status.HTTP_202_ACCEPTED)
-#                 return(Response(serializer.data, status= status.HTTP_400_BAD_REQUEST))
-#             except Employeeuser.DoesNotExist:
-#                 response = Response(data= serializer.data, status= status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-#             except utils.IntegrityError as e:
-#                 if 'PRIMARY KEY constraint' in str(e): 
-#                     response = Response(serializer.data, status=status.HTTP_304_NOT_MODIFIED)
-#                 elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
-#                     response = Response(serializer.data, status=status.HTTP_406_NOT_ACCEPTABLE)
-#                 else:
-#                     response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
-#         '''
-#         if request.method == 'POST' or request.method=='GET':
-#             stat = QuickBackupV2.UserEvent()
-#             logging.info(f'{get_current_time()} - User Event: Add User')
-#             if stat:
-#                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-#             else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-#             return response
-#         '''
-#         elif request.method == 'DELETE':
-#             try:
-#                 user = Employeeuser.objects.get(pk=request['id'])
-#                 user.delete()
-#                 response = Response(data = None, status=status.HTTP_200_OK)
-#             except Employeeuser.DoesNotExist:
-#                 response = Response(data=None, status= status.HTTP_204_NO_CONTENT)
-#         else:
-#             response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-#     # else:
-#     #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-#         '''
+@api_view(['POST'])
+def getEmployeeUsers(request: HttpRequest, format = None):
+    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
+    # payload = request.body
+    # secret = b'' # input signing secret here 
+    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
+    # if hmac.compare_digest(auth, signature):   
+        '''
+        if request.method == 'GET':
+            user = Employeeuser.objects.all()
+            serializer = EmployeeUserSerializer(user, many=True)
+            response = Response(serializer.data )
+        elif request.method == 'PUT':
+            try: 
+                user = Employeeuser.objects.get(pk=request['id'])
+                serializer = EmployeeUserSerializer(instance= user, data = request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = Response( data= serializer.data, status= status.HTTP_202_ACCEPTED)
+                return(Response(serializer.data, status= status.HTTP_400_BAD_REQUEST))
+            except Employeeuser.DoesNotExist:
+                response = Response(data= serializer.data, status= status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+            except utils.IntegrityError as e:
+                if 'PRIMARY KEY constraint' in str(e): 
+                    response = Response(serializer.data, status=status.HTTP_304_NOT_MODIFIED)
+                elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
+                    response = Response(serializer.data, status=status.HTTP_406_NOT_ACCEPTABLE)
+                else:
+                    response = Response(serializer.data, status = status.HTTP_400_BAD_REQUEST) 
+        '''
+        if request.method == 'POST' or request.method=='GET':
+            stat = QuickBackupV2.UserEvent()
+            logging.info(f'{get_current_time()} - User Event: Add User')
+            if stat:
+                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
+            else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            return response
+        '''
+        elif request.method == 'DELETE':
+            try:
+                user = Employeeuser.objects.get(pk=request['id'])
+                user.delete()
+                response = Response(data = None, status=status.HTTP_200_OK)
+            except Employeeuser.DoesNotExist:
+                response = Response(data=None, status= status.HTTP_204_NO_CONTENT)
+        else:
+            response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    # else:
+    #     response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+        '''
 
-# @api_view(['GET', 'POST'])
-# def bankedHrs(request: HttpRequest):
-#     logging.info(f'{get_current_time()} - INFO: {request.method}: bankedHours ')
-#     try:
-#         SqlClockPull.main()
-#         return Response(data='Operation Completed', status=status.HTTP_200_OK)
-#     except Exception as e:
-#         logging.error(f'{get_current_time()} - ERROR: {str(e)}')
-#         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
+@api_view(['GET', 'POST'])
+def bankedHrs(request: HttpRequest):
+    logging.info(f'{get_current_time()} - INFO: {request.method}: bankedHours ')
+    try:
+        SqlClockPull.main()
+        return Response(data='Operation Completed', status=status.HTTP_200_OK)
+    except Exception as e:
+        logging.error(f'{get_current_time()} - ERROR: {str(e)}')
+        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 @api_view(['GET'])
 def view_log(request):
