@@ -30,6 +30,7 @@ import time
 MAX_RETRIES = 3
 DELAY = 0
 
+
 def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, workspaceId):
     logging.info(f'{get_current_time()} - INFO: updateTags Function called')
     tags_data = entrySerilizer.validated_data.get('tags')
@@ -500,4 +501,5 @@ def getTimeOffPolicies(request: HttpRequest, format = None):
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
             response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
-            return response          
+            return response 
+

@@ -283,9 +283,11 @@ def pushProjects(wkSpaceID, conn, cursor):
                 pName = ' - '.join(proj[1:])
                 if len(pName)== 0 :
                     pName = None
-                cID = project['clientId']
+                if len(project['clientId'])==0:
+                    cID = '65e8b30e3676853154086777'
+                else: cID = project['clientId'] or '65e8b30e3676853154086777'
                 # insert project 
-                while True: 
+                for i in range (0,2): 
                     try:
                         cursor.execute(
                             '''
@@ -497,7 +499,7 @@ def deleteEntries(conn, cursor, entries, aID):
         return(deleted)
 
 def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
-    logging.info('Push time Entries')
+    logging.info('\t\tPush time Entries')
     """
     Pushes entries data to the database. 
 
