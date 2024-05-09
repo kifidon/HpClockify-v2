@@ -1,9 +1,90 @@
-import logging
+from .. Loggers import setup_background_logger
 import asyncio
-from json import dumps, dump, loads
+from json import dumps, dump, loads, JSONDecodeError
 import pytz
 import pyodbc
 from datetime import datetime, timedelta, timezone
+from urllib.parse import parse_qs
+import ast
+
+def check_category_for_deletion(category_id, categories):
+    """
+    Check if a category should be deleted based on its presence in the categories list.
+
+    Args:
+    category_id (str): The ID of the category to check.
+    categories (list of dict): A list of category dictionaries.
+
+    Returns:
+    bool: True if the category should not be deleted (i.e., it is found in the list), False otherwise.
+    """
+    # Loop through each category in the list
+    for category in categories:
+        # Check if the current category's ID matches the given category ID
+        if category['id'] == category_id:
+            # If a match is found, return False (do not delete)
+            return False
+    # If no match is found after checking all categories, return True (delete)
+    return True
+
+def bytes_to_dict(byte_string):
+    logger = setup_background_logger('DEBUG')
+    try:
+
+        # Decode the byte string into a regular string
+        json_string = byte_string.decode('utf-8')
+
+        # Parse the JSON string into a Python dictionary
+        data = parse_qs(json_string)
+        if data:
+            for key, value in data.items():
+                try:
+                    data[key] = ast.literal_eval(value[0])
+                except SyntaxError:
+                    data[key] = value[0]
+            print(data)
+            return data
+        else:
+            return loads(json_string)
+    except JSONDecodeError as e:
+        # Handle JSON decoding errors
+        logger.error(f"Error decoding JSON: {e} at {e.__traceback__.tb_lineno}")
+        return None
+
+def count_working_days(start_date, end_date, conn, cursor ):
+    """
+    Count the number of working days between two given dates, excluding weekends (Saturday and Sunday)
+    and holidays fetched from the 'Holidays' table in the database.
+
+    Args:
+        start_date (datetime.date): The start date.
+        end_date (datetime.date): The end date.
+        conn: Connection object for the database.
+        cursor: Cursor object for executing SQL queries.
+
+    Returns:
+        int: The number of working days between start_date and end_date.
+    """
+    # Define a list of weekdays (Monday = 0, Sunday = 6)
+    weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
+    
+    # Initialize a counter for working days
+    working_days = 0
+    
+    # Iterate through each date between start_date and end_date
+    current_date = start_date
+    cursor.execute('''
+                    SELECT date From Holidays
+                    ''')
+    holidays = cursor.fetchall()
+    while current_date <= end_date:
+        # Check if the current date is a weekday
+        if current_date.weekday() in weekdays and current_date not in [holiday[0] for holiday in holidays]:
+            working_days += 1
+        # Move to the next day
+        current_date += timedelta(days=1)
+    return working_days
+
 
 def getCurrentPaycycle():
     # Get the current date

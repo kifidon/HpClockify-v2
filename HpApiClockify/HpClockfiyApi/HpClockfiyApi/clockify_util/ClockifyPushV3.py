@@ -1,8 +1,10 @@
 import pyodbc
 import copy
-import logging
+# import logging
+from .. Loggers import setup_background_logger, setup_server_logger
 from .ClockifyPullV3 import getApiKey, getWorkspaces,getWorkspaceUsers, getProjects, getApprovedRequests, getHolidays, getClients, getPolocies, getTimeOff, getUserGroups
-from .hpUtil import sqlConnect, cleanUp, pytz, datetime, timedelta, timeZoneConvert, timeDuration
+from .hpUtil import sqlConnect, cleanUp, pytz, datetime, timedelta, timeZoneConvert, timeDuration, count_working_days
+logger = setup_server_logger('DEBUG')
 
 def pushWorkspaces(conn, cursor):
     """
@@ -32,15 +34,15 @@ def pushWorkspaces(conn, cursor):
                 )
             )
             conn.commit()
-            logging.info("Committing changes...")
+            logger.info("Committing changes...")
         except pyodbc.OperationalError as e:
-            logging.error("OperationalError:", str(e))
+            logger.error("OperationalError:", str(e))
         except pyodbc.ProgrammingError as e:
-            logging.error("ProgrammingError:", str(e))
+            logger.error("ProgrammingError:", str(e))
         except pyodbc.DatabaseError as e:
-            logging.error("DatabaseError:", str(e))
+            logger.error("DatabaseError:", str(e))
         except Exception :
-            logging.error("Unexpected Error:", str(e))  
+            logger.error("Unexpected Error:", str(e))  
     return(f"Operation Completed. Workspace table has {count} new records")
 
 def getWID(wSpace_Name):
@@ -60,9 +62,9 @@ def getWID(wSpace_Name):
     if check and row is not None:
         return row[0]
     elif check and row is None:
-        return logging.error("Invalid Workspace Name")
+        return logger.error("Invalid Workspace Name")
     else:
-        logging.error("An error occured on the system. Please Contact Administrator. Cannot close connection.")
+        logger.error("An error occured on the system. Please Contact Administrator. Cannot close connection.")
 
 def pushUsers(wkSpaceID, conn, cursor):
     """
@@ -100,7 +102,7 @@ def pushUsers(wkSpaceID, conn, cursor):
                         # VALUES (?, ?, ?, ?, ?)
                     # (uid, uEmail, uName, status, hourlyRate )
                 )
-                logging.info(f"Adding Employee  information: {uName} ({count})")
+                logger.info(f"Adding Employee  information: {uName} ({count})")
                 # pushRates(conn, cursor, user, uid)
                 count += 1
             except pyodbc.IntegrityError as e:
@@ -131,12 +133,12 @@ def pushUsers(wkSpaceID, conn, cursor):
                                 ''', (uName, uEmail, status, uid)
                                 # (uName, uEmail, status, hourlyRate, uid)
                             )
-                            logging.info(f"\tUpdating Employee information: {uName} ({update})")
+                            logger.info(f"\tUpdating Employee information: {uName} ({update})")
                             update += 1
                         # record already exists and doesnt need to be updated 
                         else: 
                             exists += 1
-                            logging.info(f"Loading..........{str(round((exists+update+count)/len(users), 2) *100)[:5]}%")
+                            logger.info(f"Loading..........{str(round((exists+update+count)/len(users), 2) *100)[:5]}%")
                     # Unknown error occured, most likley a problem with code logic (debugging)
                     except pyodbc.OperationalError:
                         raise
@@ -149,11 +151,11 @@ def pushUsers(wkSpaceID, conn, cursor):
                     raise          
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame} \n----------{str(exc)}")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame} \n----------{str(exc)}")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred
         return(f"Operation Completed: EmployeeUser table has {count} new records and {exists} unchanged. {update} records updated. \n")
 
 def deleteProjects(conn, cursor, wkSpaceID):
@@ -196,12 +198,12 @@ def deleteProjects(conn, cursor, wkSpaceID):
                         workspace_id = ?
                     ''', (delete[0], wkSpaceID)
                 )
-                logging.info(f"\t\t\tDeleted...{deleted}")
+                logger.info(f"\t\t\tDeleted...{deleted}")
                 deleted += 1
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
     else:
         # Commit changes in timesheet function if no exceptions occurred               
         return deleted
@@ -231,16 +233,16 @@ def updateProjects(conn, cursor, count, update, exists, pID, pCode, pTitle, pNam
                 WHERE id = ? and workspace_id = ?
                 ''', (pName, pTitle, cID, pCode, pID, wkSpaceID)
             )
-            logging.info(f"\tUpdating Project information...({update})")
+            logger.info(f"\tUpdating Project information...({update})")
             update += 1
             return (count, update, exists, True)
         else: # record is unchanged 
             exists += 1
-            logging.error(f"\tLoading..........{str(round((exists+update+count)/len(projects),2)*100)[:5]}%")
+            logger.error(f"\tLoading..........{str(round((exists+update+count)/len(projects),2)*100)[:5]}%")
             return (count, update, exists, True)
     except pyodbc.IntegrityError as ex: # error in updating or checking for update 
         if 'FOREIGN KEY constraint' in str(ex):
-            logging.error(pushClients(wkSpaceID, conn, cursor) + " Called by Project Function (update)")
+            logger.error(pushClients(wkSpaceID, conn, cursor) + " Called by Project Function (update)")
             return (count, update, exists, False)
         else:
             raise          
@@ -272,7 +274,7 @@ def pushProjects(wkSpaceID, conn, cursor):
             gExists += exists; exists = 0
             gUpdate += update; update = 0
             gCount += count; count = 0
-            logging.info(f"Inserting Page: {page} of Projects ({len(projects)} records)")
+            logger.info(f"Inserting Page: {page} of Projects ({len(projects)} records)")
             for project in projects:
                 pID = project['id']
                 pTitle = project['name']
@@ -285,6 +287,7 @@ def pushProjects(wkSpaceID, conn, cursor):
                     pName = None
                 if len(project['clientId'])==0:
                     cID = '65e8b30e3676853154086777'
+                    logger.info(f'client is Null so mapping to HPC')
                 else: cID = project['clientId'] or '65e8b30e3676853154086777'
                 # insert project 
                 for i in range (0,2): 
@@ -306,7 +309,7 @@ def pushProjects(wkSpaceID, conn, cursor):
                                     Values ( ?, ?, ?, ?, ?, ?) 
                                 ''', (pID, pTitle, pName, cID, pCode, wkSpaceID)#title and name semantics are switched
                             )
-                            logging.info(f"\tAdding Project information...({count})")
+                            logger.info(f"\tAdding Project information...({count})")
                             count += 1
                             break
                     except pyodbc.IntegrityError as e:
@@ -317,18 +320,18 @@ def pushProjects(wkSpaceID, conn, cursor):
                             if FLG_update:
                                 break    
                         elif 'FOREIGN KEY constraint' in message: 
-                            logging.info(pushClients(wkSpaceID, conn, cursor) + " Called by Project Function (insert)")
+                            logger.info(pushClients(wkSpaceID, conn, cursor) + " Called by Project Function (insert)")
                         else: 
                             raise
             page += 1
             projects = getProjects(wkSpaceID, key, page)
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.error("Committing changes...")  # Commit changes if no exceptions occurred              
+        logger.error("Committing changes...")  # Commit changes if no exceptions occurred              
         return(f"Operation Completed: Project table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated. {deleted} deleted" +"\n")
 
 def pushClients(wkSpaceID, conn, cursor):
@@ -345,6 +348,7 @@ def pushClients(wkSpaceID, conn, cursor):
     Returns:
         str: Message indicating the operation status.
     """
+    logger = setup_server_logger('DEBUG')
     count = 0
     update =0
     exists = 0
@@ -365,7 +369,7 @@ def pushClients(wkSpaceID, conn, cursor):
                     ''',
                     (cID, cEmail, cAddress, cName, wkSpaceID)
                 )
-                logging.info(f"Adding Client information...({count})")
+                logger.info(f"Adding Client information...({count})")
                 count += 1
             except pyodbc.IntegrityError as e:
                 if 'PRIMARY KEY constraint' in str(e) or 'PRIMARY KEY constraint' in str(e):
@@ -393,20 +397,20 @@ def pushClients(wkSpaceID, conn, cursor):
                             ''',
                             (cEmail, cAddress, cName, cID, wkSpaceID)
                         )
-                        logging.info(f"\tUpdating Client information...({update})")
+                        logger.info(f"\tUpdating Client information...({update})")
                         update += 1
                     else:
                         exists += 1
-                        logging.info(f"Loading..........{str(round( (exists+update+count)/len(clients) ,2)*100)[:5]}%")                
+                        logger.info(f"Loading..........{str(round( (exists+update+count)/len(clients) ,2)*100)[:5]}%")                
                 else:
                     raise
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.error("Committing changes...")  # Commit changes if no exceptions occurred                    
+        logger.error("Committing changes...")  # Commit changes if no exceptions occurred                    
         return(f"Client: {count} new records. {exists} unchanged. {update} updated.\n")
 
 def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
@@ -429,11 +433,11 @@ def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
                     ''', (tag["id"], enID, aID, tag["name"], wkSpaceID)
                 )
                 count += 1
-                logging.info(f"\t\tAdding Tag {tag['name']} to Entry")
+                logger.info(f"\t\tAdding Tag {tag['name']} to Entry")
             else: # Check if update is needed 
                 if existingTag[3] == tag['name']: # exists 
                     exists += 1
-                    logging.info (f"\t\t\tLoading tag {tag['name']}")
+                    logger.info (f"\t\t\tLoading tag {tag['name']}")
                 else: # update 
                     cursor.execute(
                         '''
@@ -443,15 +447,15 @@ def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
                         ''', (tag["name"], tag["id"], wkSpaceID)
                     )
                     update += 1
-                    logging.info(f"\t\t\tUpdating tag name {existingTag[3]} to {tag['name']}")
+                    logger.info(f"\t\t\tUpdating tag name {existingTag[3]} to {tag['name']}")
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else:
         # Commit changes in Timesheet Function function if no exceptions occurred       
-        # logging.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
+        # logger.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
         return(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated.")
          
 def deleteEntries(conn, cursor, entries, aID):
@@ -487,19 +491,19 @@ def deleteEntries(conn, cursor, entries, aID):
                     WHERE id = ? AND time_sheet_id = ?
                     ''', (delete[0], aID)
                 )
-                logging.info(f"\t\t\tDeleted...{deleted}")
+                logger.info(f"\t\t\tDeleted...{deleted}")
                 deleted += 1
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else:
         # Commit changes in timesheet function if no exceptions occurred      
         return(deleted)
 
 def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
-    logging.info('\t\tPush time Entries')
+    logger.info('\t\tPush time Entries')
     """
     Pushes entries data to the database. 
 
@@ -532,7 +536,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
             endTime = timeZoneConvert(entry['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ') 
             rate = entry['hourlyRate']['amount'] if entry['hourlyRate'] is not None else 0
             tags = entry['tags']
-            logging.info(f'\t\t\t{description}')
+            logger.info(f'\t\t\t{description}')
             while True:
                 try: # insert entry
                     cursor.execute( 
@@ -586,7 +590,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                                     ''',
                                     (duration, description, billable, projectID, type, startTime, endTime, rate, eID, approval, wkSpaceID)
                                 )
-                                logging.info(f"\tUpdating Entry information...({startTime})")
+                                logger.info(f"\tUpdating Entry information...({startTime})")
                                 update += 1
                                 break
                             else:  # entry exists
@@ -594,31 +598,31 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                                 break
                         except pyodbc.IntegrityError as ex:
                             if "FOREIGN KEY constraint" in str(ex): # update projects and re try for this entry
-                                logging.info(pushProjects(wkSpaceID, conn, cursor) + ". Called from Entries Function. (Update) \n")
+                                logger.info(pushProjects(wkSpaceID, conn, cursor) + ". Called from Entries Function. (Update) \n")
                             else: # could be any error
                                 raise                                 
                 except pyodbc.IntegrityError as e:                   
                     if 'FOREIGN KEY constraint' in str(e): # update projects and try agaun. Only once per push request of timesheets
                         FK_ConstraintOnEntry += 1
                         if FK_ConstraintOnEntry <=1:
-                            logging.info(f"Foreign Key Constraint on Projects. Attempting to handle\n----------------------")
-                            logging.info(pushProjects(wkSpaceID, conn, cursor) + "\tCalled from Entries Function. (Insert) \n")
+                            logger.info(f"Foreign Key Constraint on Projects. Attempting to handle\n----------------------")
+                            logger.info(pushProjects(wkSpaceID, conn, cursor) + "\tCalled from Entries Function. (Insert) \n")
                         else:
                             if (FK_ConstraintOnEntry ==2):
-                                logging.info(f"\tstaleEntry for TimeSheet{approval}- Project ({projectID}) No Longer Exists")
+                                logger.info(f"\tstaleEntry for TimeSheet{approval}- Project ({projectID}) No Longer Exists")
                             break
                         # Loop through this record again after adding reference 
                     else: # unkonwn error 
                         raise
             if len(tags)!= 0:
-                logging.info(pushTags(wkSpaceID, conn, cursor, tags, approval, enID=eID))            
+                logger.info(pushTags(wkSpaceID, conn, cursor, tags, approval, enID=eID))            
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else: # Commit changes in Timesheet function  if no exceptions occurredand check to delete 
-        logging.info(f"\t\tEntry:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
+        logger.info(f"\t\tEntry:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
         return(FK_ConstraintOnEntry)
 '''
 def pushExpenses(approve, timesheetID, conn, cursor):
@@ -646,15 +650,15 @@ def pushExpenses(approve, timesheetID, conn, cursor):
                 (eID, billable, date, notes, projectID, qty, total, timesheetID, category, eID)
             )
             conn.commit()
-    logging.info("Committing changes...")
+    logger.info("Committing changes...")
             count += 1
         except pyodbc.IntegrityError as e:
             if 'PRIMARY KEY constraint' in str(e):
                 continue
             else:
-                logging.info(f"IntegrityError: {e}")
+                logger.info(f"IntegrityError: {e}")
         except pyodbc.Error as e: 
-            logging.info(f"Error: {e}")
+            logger.info(f"Error: {e}")
     return(f"Operation Completed. Expenses table has {count} new records")
 '''
 
@@ -705,15 +709,15 @@ def updateApprovals(update, count, exists, cursor, aID, userID, startDateO, endD
                 ''', (userID, startDateO, endDateO, approvedTime, billableTime,
                     billableAmount, costAmount, expenseTotal, status, aID, wkSpaceID)
             )
-            logging.info(f"\t\tUpdating Time Sheet...{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% ({aID})")
+            logger.info(f"\t\tUpdating Time Sheet...{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% ({aID})")
             update += 1
         else:
             exists += 1
-            logging.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% (updateAproval)")
+            logger.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% (updateAproval)")
         # regardless if update on Time Sheet, Check for update on entries
         if status != 'WITHDRAWN_APPROVAL':
             FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
-            logging.info("\t\tTime Entry Information Added\n")
+            logger.info("\t\tTime Entry Information Added\n")
         return update, count, exists, True, FK_ConstraintOnEntry
     except pyodbc.IntegrityError as ex:
         if "FOREIGN KEY constraint" in str(ex):
@@ -748,7 +752,7 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
     try:
         while len(approved) != 0 and page < 30:
             
-            logging.info(f"Inserting Page: {page} of TimeSheets ({len(approved)} records)")
+            logger.info(f"Inserting Page: {page} of TimeSheets ({len(approved)} records)")
             for approve in approved:
                 aID = approve['approvalRequest']['id']
                 userID = approve['approvalRequest']['owner']['userId']
@@ -762,7 +766,7 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                 billableAmount = approve['billableAmount']
                 costAmount = approve['costAmount']
                 expenseTotal = approve['expenseTotal']
-                # logging.info(f'{aID}, {userID}, {status}, {startDateO},')
+                # logger.info(f'{aID}, {userID}, {status}, {startDateO},')
                 
                 # continue
                 while True:
@@ -810,20 +814,20 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                                     wkSpaceID
                                     )
                             )
-                            logging.info(f"\tAdding TimeSheet information...{aID}({count})")
+                            logger.info(f"\tAdding TimeSheet information...{aID}({count})")
                             FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
-                            logging.info("\tTime Entry Information Added\n")
+                            logger.info("\tTime Entry Information Added\n")
                             # pushExpenses(approve, aID, conn, cursor)
                             count += 1
-                            logging.debug(f'{approvedTime}, {costAmount}, {str(startDateO)}')
+                            logger.debug(f'{approvedTime}, {costAmount}, {str(startDateO)}')
                             break
                         # elif tsExists is not None:
                         elif tsExists is not None or (tsExists[2] != status):
                             # logging.debug(f'DEBUG: Existing timeSheet "{aID}"')
                             # if (status != 'PENDING'):
-                            #     logging.info(f'\tStatus change from {tsExists[2]} to {status} on timesheet: {aID}')
+                            #     logger.info(f'\tStatus change from {tsExists[2]} to {status} on timesheet: {aID}')
                             # else:
-                            logging.info(f'\tChecking for updates Timesheet: {aID}')
+                            logger.info(f'\tChecking for updates Timesheet: {aID}')
                             update, count, exists, FK_errorOnUpdate ,FK_ConstraintOnEntry = updateApprovals( update, count, exists,
                                     cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
                                     billableAmount, costAmount, expenseTotal, status,  approve, approved, conn, wkSpaceID, FK_ConstraintOnEntry
@@ -833,12 +837,12 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
                         else:
                             exists += 1
                             # logging.debug(f'{aID} {status}, {userID} {str(startDateO)}, {tsExists}')
-                            logging.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
+                            logger.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
                            # FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
                             break
                     except pyodbc.IntegrityError as e: 
                         if "FOREIGN KEY constraint" in str(e):
-                            logging.info(pushUsers(wkSpaceID, conn, cursor) + ". Called by Approval Function")
+                            logger.info(pushUsers(wkSpaceID, conn, cursor) + ". Called by Approval Function")
                         elif "PRIMARY KEY constraint" or 'UNIQUE KEY constraint'in str(e):
                             update, count, exists, FK_errorOnUpdate, FK_ConstraintOnEntry = updateApprovals( update, count, exists,
                                     cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
@@ -856,11 +860,11 @@ def pushApprovedTime(wkSpaceID, conn, cursor, stat):
             approved = getApprovedRequests(wkSpaceID, key, page, stat)
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                      
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                      
         return(f"Operation Completed: TimeSheet table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated.\n")
 
 def pushPolicies(wkSpaceID, conn, cursor):
@@ -895,7 +899,7 @@ def pushPolicies(wkSpaceID, conn, cursor):
                     VALUES (?, ?, ?, ?, ? , ? , ?) 
                     ''', (pId, pName, accrual_amount, accrual_period, timeUnit, wkSpaceID, archived)
                 )
-                logging.info(f"Adding Policies Information...({count})")
+                logger.info(f"Adding Policies Information...({count})")
                 count += 1
             except pyodbc.IntegrityError:
                 cursor.execute(
@@ -923,18 +927,18 @@ def pushPolicies(wkSpaceID, conn, cursor):
                         WHERE id = ?
                         ''', ( pName, accrual_amount, accrual_period, timeUnit, archived, pId)
                     )
-                    logging.info(f"\tUpdating Policies information...{update}")
+                    logger.info(f"\tUpdating Policies information...{update}")
                     update += 1
                 else:
                     exists += 1
-                    logging.info(f"Loading..........{str(round((exists+update+count)/len(policies),2)*100)[:5]}%")
+                    logger.info(f"Loading..........{str(round((exists+update+count)/len(policies),2)*100)[:5]}%")
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                     
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                     
         return(f"Operation Completed: Policies table has {count} new records and {exists} unchanged. {update} records updated.\n")
 
 def removeGroupMembership(conn, cursor, groupID, users, wkspace):
@@ -971,12 +975,12 @@ def removeGroupMembership(conn, cursor, groupID, users, wkspace):
                     WHERE user_id = ? AND group_id = ? and workspace_id = ?
                     ''', (delete[0], groupID, wkspace)
                 )
-                logging.info(f"\t\t\tDeleted...{deleted}")
+                logger.info(f"\t\t\tDeleted...{deleted}")
                 deleted += 1
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else:
         # Commit changes in Groups Function if no exceptions occurred  
@@ -1009,18 +1013,18 @@ def pushGroupMembership(conn, cursor, groupID, users ,wkspace):
                     values (?, ?, ?)
                     ''', (groupID, userID, wkspace)
                 )
-                logging.info(f"\t\tAdding User to Group: {userID}.")
+                logger.info(f"\t\tAdding User to Group: {userID}.")
                 count += 1
             except pyodbc.IntegrityError as e:
                 if "PRIMARY KEY constraint" in str(e):
                     exists += 1
-                    logging.info(f"\t\tLoading..........{str(round((exists+update+count)/len(users),2)*100)[:5]}%")
+                    logger.info(f"\t\tLoading..........{str(round((exists+update+count)/len(users),2)*100)[:5]}%")
                 else:
                     raise   
         deleted = 0
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         # Commit changes in Group Users function if no exceptions occurred
@@ -1060,10 +1064,10 @@ def pushUserGroups(wkSpaceID, conn, cursor):
                         ''',(groupID, gName, wkscpace )
                     )
                     # assign users to a group
-                    logging.info(f"Adding User Group ID: \"{gName}\" ({count})") 
+                    logger.info(f"Adding User Group ID: \"{gName}\" ({count})") 
                     count += 1
                     # add users to a group 
-                    logging.info(pushGroupMembership(conn, cursor, groupID, users, wkscpace))
+                    logger.info(pushGroupMembership(conn, cursor, groupID, users, wkscpace))
                     break
                 except pyodbc.IntegrityError as e:
                     if "FOREIGN KEY constraint" in str(e):
@@ -1086,24 +1090,24 @@ def pushUserGroups(wkSpaceID, conn, cursor):
                                 where id = ? and workspace_id = ?
                                 ''', (gName, groupID, wkscpace )
                             )
-                            logging.info(f"Updating User Group {existingName[0]} to {gName}")
+                            logger.info(f"Updating User Group {existingName[0]} to {gName}")
                             update += 1
                             pushGroupMembership(conn, cursor, groupID, users, wkscpace)
                             break
                         else:
                             exists += 1
-                            logging.info(f"\tLoading ({gName})..........{str(round((exists+update+count)/len(groups),2)*100)[:5]}%")
-                        logging.info(pushGroupMembership(conn, cursor, groupID, users, wkscpace))
+                            logger.info(f"\tLoading ({gName})..........{str(round((exists+update+count)/len(groups),2)*100)[:5]}%")
+                        logger.info(pushGroupMembership(conn, cursor, groupID, users, wkscpace))
                         break
                     else:
                         raise
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                 
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                 
         return(f"Operation Completed: User Groups table has {count} new records and {exists} unchanged. {update} records updated.\n")
 
 def updateCalendar(date, conn, cursor):
@@ -1141,8 +1145,8 @@ def updateCalendar(date, conn, cursor):
     ''', (startDate, endDate)
         )
     conn.commit()
-    logging.info("Committing changes...")
-    logging.info(f"Updated Calander Dates for Year {date[:4]}")
+    logger.info("Committing changes...")
+    logger.info(f"Updated Calander Dates for Year {date[:4]}")
 
 def pushHolidays(wkSpaceID, conn, cursor):
     count = 0
@@ -1163,7 +1167,7 @@ def pushHolidays(wkSpaceID, conn, cursor):
                         values (?, ?, ?, ?)
                         ''', (holID, name, date, wkSpaceID )
                     )
-                    logging.info(f"\tAdding Holiday Information...{count}")
+                    logger.info(f"\tAdding Holiday Information...{count}")
                     update += 1
                     break
                 except pyodbc.IntegrityError as e:
@@ -1197,11 +1201,11 @@ def pushHolidays(wkSpaceID, conn, cursor):
                                         holidayID = ? and workspace_id =?
                                     ''', (date, name, holID, wkSpaceID)
                                 )
-                                logging.info(f"\tUpdating Holiday: {name}.")
+                                logger.info(f"\tUpdating Holiday: {name}.")
                                 update += 1
                             else: 
                                 exists += 1
-                                logging.info(f"Loading {name}..........{str(round((exists+update+count)/len(holidays),2)*100)[:5]}%")
+                                logger.info(f"Loading {name}..........{str(round((exists+update+count)/len(holidays),2)*100)[:5]}%")
                             break
                         except pyodbc.IntegrityError:
                             updateCalendar(date, conn, cursor)
@@ -1211,46 +1215,13 @@ def pushHolidays(wkSpaceID, conn, cursor):
                         raise
     except Exception as exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                 
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                 
         return ( f"Operation Complete: Holidays table has {count} new records and {exists} unchanged. {update} records updated.\n")
 
-def count_working_days(start_date, end_date, conn, cursor ):
-    """
-    Count the number of working days between two given dates, excluding weekends (Saturday and Sunday)
-    and holidays fetched from the 'Holidays' table in the database.
-
-    Args:
-        start_date (datetime.date): The start date.
-        end_date (datetime.date): The end date.
-        conn: Connection object for the database.
-        cursor: Cursor object for executing SQL queries.
-
-    Returns:
-        int: The number of working days between start_date and end_date.
-    """
-    # Define a list of weekdays (Monday = 0, Sunday = 6)
-    weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
-    
-    # Initialize a counter for working days
-    working_days = 0
-    
-    # Iterate through each date between start_date and end_date
-    current_date = start_date
-    cursor.execute('''
-                    SELECT date From Holidays
-                    ''')
-    holidays = cursor.fetchall()
-    while current_date <= end_date:
-        # Check if the current date is a weekday
-        if current_date.weekday() in weekdays and current_date not in [holiday[0] for holiday in holidays]:
-            working_days += 1
-        # Move to the next day
-        current_date += timedelta(days=1)
-    return working_days
 
 def deleteTimeOff(wkSpaceID, conn , cursor , timeOff):
     deleted = 0
@@ -1282,12 +1253,12 @@ def deleteTimeOff(wkSpaceID, conn , cursor , timeOff):
                     WHERE id = ?  and workspace_id = ? 
                     ''', (delete[0], wkSpaceID )
                 )
-                logging.info(f"\t\t\tDeleted...{deleted}")
+                logger.info(f"\t\t\tDeleted...{deleted}")
                 deleted += 1
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logging.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else:
         # Commit changes in timesheet function if no exceptions occurred  
@@ -1315,7 +1286,7 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
         - pushPolicies(wkSpaceID, conn, cursor): Pushes policies to the database.
         - pushUsers(wkSpaceID, conn, cursor): Pushes users to the database.
     """
-    logging.info(pushHolidays(wkSpaceID, conn, cursor))
+    logger.info(pushHolidays(wkSpaceID, conn, cursor))
     
     page = 1
     gCount = 0
@@ -1331,7 +1302,7 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
             gCount += count;  count = 0 
             gUpdate += update; update = 0
             gExists += exists ; exists = 0
-            logging.info(f"Inserting From Page: {page} of Time Off Requests ({len(timeOff['requests'])} records)")
+            logger.info(f"Inserting From Page: {page} of Time Off Requests ({len(timeOff['requests'])} records)")
             for requests in timeOff["requests"]:
                 userID = requests["userId"]
                 policyID = requests["policyId"]
@@ -1365,19 +1336,19 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 ''', (requestID, userID, policyID, startDate, endDate, duration, status, paidTimeOff, balance, wkSpaceID)
                             )
-                            logging.info(f"\tAdding Time Off Request Information...({count})")
+                            logger.info(f"\tAdding Time Off Request Information...({count})")
                             count += 1
                             break
                         elif oldRequest is not None and status != oldRequest[4]: # updates by raising error
                             raise pyodbc.IntegrityError("PRIMARY KEY constraint") #the sub funciton in pushApprovals seems to be faster 
                         else: # exists already
                             exists += 1
-                            logging.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
+                            logger.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
                             break
                     except pyodbc.IntegrityError as e:
                         if "FOREIGN KEY constraint" in str(e):
-                            logging.info(pushPolicies(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
-                            logging.info(pushUsers(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
+                            logger.info(pushPolicies(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
+                            logger.info(pushUsers(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
                         elif "PRIMARY KEY constraint" in str(e):
                             try: # check for update in db and compute if needed 
                                 startDateObject = copy.copy(startDate)
@@ -1409,17 +1380,17 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                                             id = ? AND workspace_id = ?
                                         ''', (policyID, startDate, endDate, duration, status, paidTimeOff, balance, requestID, wkSpaceID )
                                     )
-                                    logging.info(f"\tUpdating TimeOffRequests {oldRequest[4]} to {status}:...({requestID})")
+                                    logger.info(f"\tUpdating TimeOffRequests {oldRequest[4]} to {status}:...({requestID})")
                                     update += 1
                                     break
                                 else: # no updates were made - should never run 
                                     exists += 1
-                                    logging.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
+                                    logger.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
                                     break
                             except pyodbc.IntegrityError as ex:
                                 if "FOREIGN KEY constraint" in str(ex):
-                                    logging.info(pushUsers(wkSpaceID, conn, cursor), "Called by TimeOff FK_ERROR")
-                                    logging.info(pushPolicies(wkSpaceID, conn, cursor),  "Called by TimeOff FK_ERROR")
+                                    logger.info(pushUsers(wkSpaceID, conn, cursor), "Called by TimeOff FK_ERROR")
+                                    logger.info(pushPolicies(wkSpaceID, conn, cursor),  "Called by TimeOff FK_ERROR")
                                 else: # unknown error 
                                     raise
                         else: # unknown error 
@@ -1428,13 +1399,13 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
             timeOff = getTimeOff(wkSpaceID, page, startRange, endRange) 
     except Exception as exc :
         conn.rollback()  # Roll back changes if an exception occurs
-        logging.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit() # saving inserts 
         deleted = 0
         deleteTimeOff(wkSpaceID, conn, cursor, newRequests)
-        logging.info("Committing changes...")  # Commit changes if no exceptions occurred                    
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                    
         return(f"Operation Completed: TimeOffRequest table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated. {deleted} deleted\n")
 ''' 
 def pushAttendance(wkSpaceID, conn, cursor, startDate="2024-02-11T00:00:00Z", endDate="2024-02-17T23:59:59.999Z", page =1):
@@ -1461,7 +1432,7 @@ def pushAttendance(wkSpaceID, conn, cursor, startDate="2024-02-11T00:00:00Z", en
     length = 0
     while len(attendance['entities']) != 0 and page < 10:
         length += len(attendance['entities'])
-        logging.info(f"Inserting Page: {page}. ({len(attendance['entities'])} entries)")
+        logger.info(f"Inserting Page: {page}. ({len(attendance['entities'])} entries)")
         page += 1
         for atten in attendance["entities"]: 
             uID = atten["userId"]
@@ -1477,14 +1448,14 @@ def pushAttendance(wkSpaceID, conn, cursor, startDate="2024-02-11T00:00:00Z", en
                         VALUES ( ?, ?, ?, ?, ?)
                         \''', (uID, date, overtime, timeOff, totalDuration)
                     )
-                    logging.info(f"Adding Attendance information...({count})")
+                    logger.info(f"Adding Attendance information...({count})")
                     conn.commit()
-logging.info("Committing changes...")
+logger.info("Committing changes...")
                     count += 1
                     break
                 except pyodbc.IntegrityError as e:
                     if "FOREIGN KEY constraint" in str(e):
-                        logging.info(pushUsers(wkSpaceID, conn, cursor) + ". Called from Attendance Function (insert)")
+                        logger.info(pushUsers(wkSpaceID, conn, cursor) + ". Called from Attendance Function (insert)")
                     elif "PRIMARY KEY constraint" in str(e):
                         try:
                             cursor.execute(
@@ -1510,12 +1481,12 @@ logging.info("Committing changes...")
                                     \''', (overtime, timeOff, totalDuration, uID, date)
                                 )
                                 conn.commit()
-logging.info("Committing changes...")
+logger.info("Committing changes...")
                                 update += 1
                                 break
                             else:
                                 exists += 1
-                                logging.info(f"Loading..........{str(round((exists+update+count)/length,2)*100)[:5]}%")
+                                logger.info(f"Loading..........{str(round((exists+update+count)/length,2)*100)[:5]}%")
                                 break
                         except pyodbc.OperationalError :
                             raise
@@ -1524,11 +1495,11 @@ logging.info("Committing changes...")
                         except pyodbc.DatabaseError :
                             raise
                         except Exception :
-                            logging.info("Unexpected Error:", str(ex))
+                            logger.info("Unexpected Error:", str(ex))
                              
                             break                           
                     else: 
-                        logging.info(f"Error inserting {uID} into Attendance: {e}")
+                        logger.info(f"Error inserting {uID} into Attendance: {e}")
                         
                         break
                 except pyodbc.OperationalError as e:

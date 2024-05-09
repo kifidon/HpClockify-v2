@@ -5,7 +5,10 @@ import asyncio
 import httpx
 import time
 from httpcore import ConnectTimeout
-from .hpUtil import get_current_time , logging, dumps, sqlConnect, cleanUp
+from .hpUtil import get_current_time , dumps, sqlConnect, cleanUp
+from .. Loggers import setup_background_logger
+
+logger = setup_background_logger('DEBUG')
 
 MAX_RETRIES = 3
 DELAY = 2 #seconds 
@@ -92,7 +95,7 @@ async def FindTimesheet(workspaceId, key, timeId, status, page):
         if response.status_code == 200:
             for timesheet in response.json():
                 if timesheet['approvalRequest']['id'] == timeId:
-                    logging.info(f'{get_current_time()} - INFO: Timesheet found on page {page}')
+                    logger.info(f'Timesheet found on page {page}')
                     # print(dumps(timesheet['entries'], indent = 4))
                     return timesheet['entries']
             # Not found on this page, try next page
@@ -129,29 +132,29 @@ async def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page 
             else:
                 raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))
         except ConnectTimeout as e:
-            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
             time.sleep(DELAY+ retries)
-            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            logger.info(f' Sleeping for {DELAY + retries}s')
             retries += 1
         except httpx.ReadTimeout as e:
-            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
             time.sleep(DELAY+ retries)
-            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            logger.info(f' Sleeping for {DELAY + retries}s')
             retries += 1
         except httpx.TimeoutException as e:
-            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
             time.sleep(DELAY+ retries)
-            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            logger.info(f' Sleeping for {DELAY + retries}s')
             retries += 1
         except TimeoutError as e:
-            logging.warning(f'{get_current_time()} - WARNING: Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
             time.sleep(DELAY+ retries)
-            logging.info(f'{get_current_time()} - INFO: Sleeping for {DELAY + retries}s')
+            logger.info(f' Sleeping for {DELAY + retries}s')
             retries += 1
         except Exception as e:
-            logging.error(f'{get_current_time()} - ERROR: {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+            logger.error(f' {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
             raise e
-    logging.error(f'{get_current_time()} - ERROR: Max Retries reached')
+    logger.error(f' Max Retries reached')
     raise ConnectTimeout
 
 def getClients(workspaceId, key): 
@@ -354,6 +357,19 @@ def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
             print(f"Error: {response.status_code}, {response.text}")
             output.append({})
     return output
+
+def getCategories(workspaceId, page):
+    logger.info(f' Begining Clockify data pull')
+    key = getApiKey()
+    headers = {
+        'X-Api-Key': key
+    }
+    url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/expenses/categories'
+    response = requests.get(url=url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise(Exception('Failed to pull from Clockify'))
 
 def main():
     pass

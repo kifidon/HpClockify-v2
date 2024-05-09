@@ -4,8 +4,8 @@ from .sqlDataFormatter import MonthylyProjReport, WeeklyTimeSheet
 
 import datetime
 import pytz
-import logging
-
+from .. Loggers import setup_server_logger
+logger = setup_server_logger('DEBUG')
 
 def UserEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
@@ -13,41 +13,43 @@ def UserEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect() 
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushUsers(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushUsers(wid, conn, cursor))
 
     cleanUp(conn=conn, cursor=cursor)
     return 1
+
 def ClientEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushClients(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushClients(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
+
 def ProjectEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushProjects(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushProjects(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 def PolicyEvent(wkSpaceName = 'Hill Plain'):
@@ -56,12 +58,12 @@ def PolicyEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushPolicies(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushPolicies(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
@@ -70,12 +72,12 @@ def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(f"({status}) {ClockifyPushV3.pushApprovedTime(wid, conn, cursor, status)}")
+    logger.info(f"({status}) {ClockifyPushV3.pushApprovedTime(wid, conn, cursor, status)}")
     cleanUp(conn=conn, cursor=cursor)
 
 def TimeOffEvent(wkSpaceName = 'Hill Plain'):
@@ -84,12 +86,12 @@ def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushTimeOff(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushTimeOff(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 def UserGroupEvent(wkSpaceName = 'Hill Plain'):
@@ -98,12 +100,12 @@ def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     attempts = 0
     while cursor is None and conn is None and attempts < 10:
         attempts += 1
-        logging.info(f"{get_current_time()} - INFO: Retrying.....Connecting to server")
+        logger.info(f" Retrying.....Connecting to server")
         cursor , conn = sqlConnect()
     if cursor is None and conn is None:
-        logging.error('cannot connect to server')
+        logger.error('cannot connect to server')
         return 0
-    logging.info(ClockifyPushV3.pushUserGroups(wid, conn, cursor))
+    logger.info(ClockifyPushV3.pushUserGroups(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 def CreateTextFile():
@@ -115,16 +117,16 @@ def CreateTextFile():
         file.write(f"Clockify to Sql Data Push Log - {currentDateTime}\n")
         file.write("--------------------------------------------------------------------\n")
     file.close()
-    logging.info(filePath, end="")
+    logger.info(filePath, end="")
          
 def monthlyBillable(start_date = None, end_date = None):
     file_path = (MonthylyProjReport(start_date, end_date ))
-    logging.info(f"{get_current_time()} - INFO: {file_path}")
+    logger.info(f" {file_path}")
     return file_path
     
 def weeklyPayroll(start_date = None, end_date = None):
     file_path = WeeklyTimeSheet(start_date, end_date)
-    logging.info(f"{get_current_time()} - INFO: {file_path}")
+    logger.info(f" {file_path}")
     return file_path
 
 def main():

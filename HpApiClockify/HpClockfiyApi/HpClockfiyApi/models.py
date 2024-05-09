@@ -14,6 +14,9 @@ class Workspace(models.Model):
     class Meta:
         managed = False
         db_table = 'Workspace'
+    
+    def __str__(self):
+        return self.name or ""
 
 class Calendar(models.Model):
     date = models.DateField(primary_key=True)
@@ -25,6 +28,9 @@ class Calendar(models.Model):
         managed = False
         db_table = 'Calendar'
 
+    def __str__(self):
+        return self.date or ""
+    
 class Client(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, workspace_id) found, that is not supported. The first column is selected.
     email = models.CharField(max_length=50, blank=True, null=True)
@@ -36,6 +42,10 @@ class Client(models.Model):
         managed = False
         db_table = 'Client'
         unique_together = (('id', 'workspace'),)
+
+    def __str__(self):
+        return self.name or ""
+    
 
 class Employeeuser(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
@@ -49,6 +59,9 @@ class Employeeuser(models.Model):
         managed = False
         db_table = 'EmployeeUser'
 
+    def __str__(self):
+        return self.name or ""
+    
 class Timesheet(models.Model):
     id = models.CharField(max_length=50, primary_key=True)
     emp = models.ForeignKey('Employeeuser', models.DO_NOTHING, to_field='id', db_column='emp_id')  # The composite primary key (emp_id, id, workspace_id) found, that is not supported. The first column is selected.
@@ -62,6 +75,9 @@ class Timesheet(models.Model):
         db_table = 'TimeSheet'
         unique_together = (('emp', 'id', 'workspace'), ('id', 'workspace'),)
 
+    def __str__(self):
+        return self.id or ""
+    
 class Project(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, workspace_id, workspace_id) found, that is not supported. The first column is selected.
     name = models.TextField(blank=True, null=True)
@@ -75,6 +91,9 @@ class Project(models.Model):
         db_table = 'Project'
         unique_together = (('id', 'workspace', 'workspace'),)
 
+    def __str__(self):
+        return self.name or ""
+    
 class Entry(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, time_sheet_id, workspace_id, workspace_id) found, that is not supported. The first column is selected.
     time_sheet = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id')
@@ -93,19 +112,61 @@ class Entry(models.Model):
         db_table = 'Entry'
         unique_together = (('id', 'time_sheet', 'workspace'))
 
+    def __str__(self):
+        return self.id or ""
+    
 class Tagsfor(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, entryID, timeID, workspace_id) found, that is not supported. The first column is selected.
     entryid = models.ForeignKey('Entry', models.DO_NOTHING, db_column='entryID', to_field='id')  # Field name made lowercase.
     timeid = models.ForeignKey('TimeSheet', models.DO_NOTHING, db_column='timeID', to_field='id')  # Field name made lowercase.
     workspace = models.ForeignKey('Workspace', models.DO_NOTHING, db_column='workspace_id')
     name = models.CharField(max_length=50, blank=True, null=True)
-
     class Meta:
         managed = False
         db_table = 'TagsFor'
         unique_together = (('id', 'entryid', 'timeid', 'workspace'),)
 
+    def __str__(self):
+        return self.name or ""
+    
+class Category(models.Model):
+    id = models.CharField(primary_key=True,max_length = 50 )
+    name = models.CharField( max_length=50, blank=False, null = False)
+    hasUnitPrice = models.BooleanField(default=False, max_length=1)
+    unit = models.CharField(max_length=50, blank=True, null= True)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId', to_field='id' )
+    archived = models.BooleanField(default=False, max_length=1)
+    priceInCents = models.IntegerField(default = 0, null=True, blank=True )
+    class Meta:
+        managed = False
+        db_table = 'ExpenseCategory'
+        unique_together = (('id', 'workspaceId'))
 
+    def __str__(self):
+        return self.name or ""
+    
+class Expense(models.Model):
+    id = models.CharField(primary_key=True,max_length = 50 )
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    userId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='userId')
+    date = models.DateField(blank=False, null = False)
+    projectId = models.ForeignKey(Project, models.DO_NOTHING , db_column='projectId')
+    categoryId = models.ForeignKey(Category, models.DO_NOTHING, db_column='categoryId' )
+    notes = models.TextField(blank=True, null=True)
+    quantity = models.FloatField( blank=True, null=True)
+    billable = models.BooleanField(default=True, max_length=1)
+    fileId = models.CharField(max_length=50, blank=True, null=True)
+    total = models.IntegerField( blank=True, null=True)
+    timesheetId = models.CharField(max_length=50, blank= True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Expense'
+        unique_together= (('id', 'workspaceId'))
+
+    def __str__(self):
+        return self.id or ""
+    
 ##################################################################################################################################################################################################
 class AuthGroup(models.Model):
     name = models.CharField(max_length=150)

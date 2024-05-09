@@ -1,173 +1,55 @@
-from django.http import HttpRequest, JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse
+from django.core.handlers.asgi import ASGIRequest
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction , utils
 from .serializers import (
     TimesheetSerializer,
-    EntrySerializer,
-    TagsForSerializer,
+    ExpenseSerializer,
+    # CategorySerializer
 
 )
 from .models import(
     Timesheet,
-    Entry,
-    Tagsfor
+    Expense
 )
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response 
+from rest_framework.request import Request 
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
 import shutil
+from .clockify_util.hpUtil import bytes_to_dict
 from .clockify_util import ClockifyPullV3
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, UserEvent, ProjectEvent, TimeOffEvent, PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import get_current_time, asyncio, logging, dumps, loads
+from .clockify_util.hpUtil import get_current_time, asyncio, dumps, loads
 from . import settings
 import time
+import httpx
+from . Loggers import setup_server_logger
+from json.decoder import JSONDecodeError
 
-MAX_RETRIES = 3
-DELAY = 0
-
-
-def updateTags(entrySerilizer: EntrySerializer, request:HttpRequest, timeId, workspaceId):
-    logging.info(f'{get_current_time()} - INFO: updateTags Function called')
-    tags_data = entrySerilizer.validated_data.get('tags')
-    entry_id = entrySerilizer.validated_data.get('id')
-    # Get existing tags associated with the entry
-    def deleteOldTags():
-        try: 
-            existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspace=workspaceId))
-                # Extract tag ids from the existing tags
-            existing_tag_ids = []
-            for tag in existing_tags: 
-                existing_tag_ids.append(tag.id) 
-            existing_tag_ids = set(existing_tag_ids)
-                # Extract tag ids from the request payload
-            request_tag_ids = set(tag['id'] for tag in tags_data)
-                # Find tags to delete
-            tags_to_delete = existing_tag_ids - request_tag_ids
-            Tagsfor.objects.filter(id__in=tags_to_delete).delete()
-            logging.info(f'{get_current_time()} - INFO: Deleting old tags...{tags_to_delete}')
-        except Tagsfor.DoesNotExist: 
-            # ('No existing taggs')
-            pass
-            # Find new tags to create
-
-    def updateTags(tag): # as thread 
-        # Create new tags
-        try: 
-            tag = Tagsfor.objects.get(id=tag['id'], entryid = entry_id, workspace = workspaceId)
-            serializer = TagsForSerializer(data=tag, instance=tag, context={
-                'workspaceId': workspaceId,
-                'timeid': timeId,
-                'entryid': entry_id
-            })
-        except Tagsfor.DoesNotExist:
-            serializer = TagsForSerializer(data=tag, context={
-                'workspaceId': workspaceId,
-                'timeid': timeId,
-                'entryid': entry_id
-            })
-            logging.warning(f'WARNING: Creating new tag')
-        if serializer.is_valid():
-            serializer.save()
-            logging.info(f'{get_current_time()} - INFO: UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag['id']} 202 ACCEPTED') 
-            data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-            reversed_data = '\n'.join(data_lines[::-1])
-            logging.info(f'{get_current_time()} - INFO: {reversed_data}')
-            return serializer.validated_data
-        else: 
-            #  (serializer.validated_data)
-            logging.error(f'{get_current_time()} - ERROR: {serializer.error_messages}')
-            raise ValidationError(serializer.errors)
-    
-    deleteOldTags()
-    for i in range(1, len(tags_data)):
-        updateTags(tags_data[i])
-    logging.info(f'{get_current_time()} - INFO: Update TagsFor on Timesheet{timeId}: Complete ')
-    return 1
-
-async def updateEntries(request: HttpRequest, timeSerializer: TimesheetSerializer):
-    if request.method == 'POST':
-        retries = 0
-        while retries < MAX_RETRIES:
-            logging.info(f'\n{get_current_time()} - INFO: updateEntries Function called')
-            key = ClockifyPullV3.getApiKey()
-            timeId = timeSerializer.validated_data['id']
-            workspaceId = timeSerializer.validated_data['workspaceId']
-            stat = timeSerializer.validated_data['status']['state']
-            if stat == 'APPROVED':
-                allEntries = await ClockifyPullV3.getEntryForApproval(workspaceId, key, timeId, stat, 1)
-                # (dumps(allEntries, indent = 4))
-                # (dumps(entries, indent = 4))
-                # (len(entries))
-                def syncUpdateEntries(entries): # create thread 
-                    try: 
-                        try: # try and update if exists, otherwise create
-                            approvalID = entries['approvalRequestId'] if entries['approvalRequestId'] is not None else timeId
-                            # (f"{entries[i]['id']}, {workspaceId}, {approvalID} ")
-                            entry = Entry.objects.get(id = entries['id'], workspace = workspaceId , time_sheet = approvalID)
-                            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                            logging.info(f'{get_current_time()} - INFO: Updating Entry {entries['id']}')
-                        except Entry.DoesNotExist:
-                            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                            logging.warning(f'{get_current_time()} - WARNING: Creating new Entry on timesheet {timeId}')
-                            # (json.dumps(entries, indent=3))
-                        if serializer.is_valid():
-                            serializer.save()
-                            logging.info(f'{get_current_time()} - INFO: UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
-                            data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-                            reversed_data = '\n'.join(data_lines[::-1])
-                            logging.info(f'{get_current_time()} - INFO: {reversed_data}')
-                            updateTags(serializer, request, timeId, workspaceId)
-                            return serializer.validated_data
-                        else: 
-                            logging.error(f'{get_current_time()} - ERROR: {serializer.error_messages}')
-                            raise ValidationError(serializer.error_messages)
-                    except Exception as e:
-                        logging.error(f'{get_current_time()} - ERROR: {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
-                        raise  e
-                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-                tasks = []
-                if len(allEntries) != 0:
-                    for i in range(0,len(allEntries)): # updates all entries async 
-                        tasks.append(
-                            updateAsync(allEntries[i])
-                        )
-                    try:
-                        await asyncio.gather(*tasks)
-                        logging.info(f'{get_current_time()} - INFO: Entries added for timesheet {timeId}') 
-                        return 1
-                    except Exception as e:
-                        logging.error(f'{get_current_time()} - ERROR: ({retries}/{MAX_RETRIES}) {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                        retries += 1 
-                        time.sleep(DELAY)
-                else: 
-                    logging.warning(f'{get_current_time()} - WARNING: No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                    return 0
-            else:
-                logging.info(f'{get_current_time()} - WARNING: UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary  406 NOT_ACCEPTED    ')
-                return 0
-    else:
-        logging.warning(f"{get_current_time()} - {status.HTTP_403_FORBIDDEN}")
-        return 0
+logger = setup_server_logger('DEBUG')
 
 @csrf_exempt
-async def updateTimesheets(request:HttpRequest):
+async def updateTimesheets(request:ASGIRequest):
     if request.method == 'POST':
-        input = loads(request.body)
-        logging.info(f'\n{get_current_time()} - INFO: {request.method}: updateTimesheet')
+        logger = setup_server_logger('DEBUG')
+        inputData = loads(request.body)
+        logger.info(f'\n{get_current_time()} - INFO: {request.method}: updateTimesheet')
         try: 
             def updateApproval():
                 # with transaction.atomic(): # if any error occurs then rollback 
                     try:
-                        timesheet = Timesheet.objects.get(pk=input['id'])
-                        serializer = TimesheetSerializer(instance= timesheet, data = input)
+                        timesheet = Timesheet.objects.get(pk=inputData['id'])
+                        serializer = TimesheetSerializer(instance= timesheet, data = inputData)
                     except Timesheet.DoesNotExist:
-                        serializer = TimesheetSerializer(data=input)
-                        logging.warning(f'WARNING: Adding new timesheet on update function. Timesheet { input["id"] }')
+                        serializer = TimesheetSerializer(data=inputData)
+                        logger.warning(f'WARNING: Adding new timesheet on update function. Timesheet { inputData["id"] }')
                     if serializer.is_valid():
                         serializer.save()
                         # task = asyncio.ensure_future(updateEntries(request, serializer))
@@ -175,82 +57,90 @@ async def updateTimesheets(request:HttpRequest):
                         response = JsonResponse(data={
                                                 'timesheet':serializer.validated_data
                                             }, status = status.HTTP_202_ACCEPTED)
-                        logging.info(f'{get_current_time()} - INFO: UpdateTimesheet:{dumps(input["id"])}{response.status_code}')
+                        logger.info(f'{get_current_time()} - INFO: UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
                         return [response, serializer]
                     else: 
                         response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                        logging.error(f'{get_current_time()} - ERROR: UpdateTimesheet:{dumps(input["id"])}{response.status_code}')
+                        logger.error(f'{get_current_time()} - ERROR: UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
                         return [response, None]
+
+            async def callBackgroungEntry():
+                url =  'http://localhost:5000/HpClockifyApi/task/Entry'
+                async with httpx.AsyncClient(timeout=300) as client:
+                    await client.post(url=url, data=inputData)
 
             updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
             result = await updateAsync()
             if result[1]:
-                asyncio.create_task(updateEntries(request, result[1]))
+                asyncio.create_task(callBackgroungEntry()) 
             else: 
                 raise ValidationError('Unknown Error occured. Timesheet Serializer not created.')
             return result[0]
         except Exception as e:
             # transaction.rollback()
             response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
-            logging.error(f'{get_current_time()} - ERROR: {str(e)}')
-            logging.error(f'{get_current_time()} - ERROR: {dumps(input["id"])}\n{response.status_code}')
+            logger.error(f'{str(e)}')
+            logger.error(f'{dumps(inputData["id"])} - {response.status_code}')
             return response
     else:
-        response = JsonResponse(data=None, status = status.HTTP_403_FORBIDDEN)
+        response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
         return response
+
 @api_view(['POST'])
-def newTimeSheets(request: HttpRequest):
-    logging.info(f'\n{get_current_time()} - INFO: {request.method}: newTimesheet')
+def newTimeSheets(request: ASGIRequest):
+    logger = setup_server_logger('DEBUG')
+    logger.info(f'{request.method}: newTimesheet')
     if request.method == 'POST':
+        logger = setup_server_logger('DEBUG')
         try:
-            data = request.data
+            data = loads(request.body)
             serializer = TimesheetSerializer(data= data)
             if serializer.is_valid():
                 serializer.save()
                 response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
-                logging.info(f'{get_current_time()} - INFO: NewTimesheet:{dumps(data["id"])}{response.status_code}')
+                logger.info(f'{get_current_time()} - INFO: NewTimesheet:{dumps(data["id"])}{response.status_code}')
                 return response
             else:
                 response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                logging.error(f'{get_current_time()} - {response}')
+                logger.error(f'{get_current_time()} - {response}')
                 return response
         except utils.IntegrityError as e:
             if 'PRIMARY KEY constraint' in str(e): 
                 response = Response(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT)
-                logging.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
-                logging.error(f'{get_current_time()} - {response}')
+                logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
+                logger.error(f'{get_current_time()} - {response}')
                 return response
             elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
                 response = Response(data=str(e), status=status.HTTP_406_NOT_ACCEPTABLE)
-                logging.error(f"{get_current_time()} -ERROR: on timesheet {request.data['id']}")
-                logging.error(f'{get_current_time()} - {response}')
+                logger.error(f"{get_current_time()} -ERROR: on timesheet {request.data['id']}")
+                logger.error(f'{get_current_time()} - {response}')
                 return response
             else:
                 response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
-                logging.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
-                logging.error(f'{get_current_time()} - {response}')
+                logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
+                logger.error(f'{get_current_time()} - {response}')
                 return response
         except Exception as e:
-            logging.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
+            logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
             response = Response(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
-            logging.error(f'{get_current_time()} - {response}')
+            logger.error(f'{get_current_time()} - {response}')
             return response
     else:
-        response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+        response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
         return response
 
 @api_view(['GET'])
-def quickBackup(request: HttpRequest):
+def quickBackup(request: ASGIRequest):
     result = main() # General String for return output
     response = Response(data = result, status=status.HTTP_200_OK)
-    logging.info(f'{get_current_time()} - {get_current_time()}INFO: Quickbackup:  {response.data}, {response.status_code}')
+    logger.info(f'{get_current_time()} - {get_current_time()}INFO: Quickbackup:  {response.data}, {response.status_code}')
     return response
 
 @api_view(['GET'])
-def timesheets(request: HttpRequest):
+def timesheets(request: ASGIRequest):
     result = TimesheetEvent(status='APPROVED')
     response = Response(data = result, status=status.HTTP_200_OK)
-    logging.info(f'{get_current_time()} - INFO: Quickbackup:  {response.data}, {response.status_code}')
+    logger.info(f'{get_current_time()} - INFO: Quickbackup:  {response.data}, {response.status_code}')
     
     return response
 
@@ -273,18 +163,20 @@ def download_text_file(folder_path = None):
 
 @api_view(['GET'])
 def monthlyBillableReport(request, start_date = None, end_date= None):
+    logger = setup_server_logger('DEBUG')
+    logger.info('BillableReport Called')
     folder_path = monthlyBillable(start_date, end_date )
     return download_text_file(folder_path)
 
 def weeklyPayrollReport(request, start_date=None, end_date= None):
-    logging.info(f'\n{get_current_time()} - INFO: Weekly Payroll Report Called')
+    logger.info(f'\n{get_current_time()} - INFO: Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
     (folder_path)
     return download_text_file(folder_path)
 
 @api_view(['GET'])
 def view_log(request):
-    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logging file
+    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
             # Read all lines from the file
@@ -297,10 +189,10 @@ def view_log(request):
             log_contents = ''.join(reversed_lines)
         return HttpResponse(log_contents, content_type='text/plain')
     else:
-        return HttpResponse('Logging file not found', status=404)
+        return HttpResponse('logger file not found', status=404)
 
 @api_view(['POST'])
-def getClients(request: HttpRequest):
+def getClients(request: ASGIRequest):
     # for security 
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
@@ -315,17 +207,18 @@ def getClients(request: HttpRequest):
             response = Response(serializer.data )
         '''    
         if request.method == 'POST':
+            logger = setup_server_logger('DEBUG')
             stat = ClientEvent()
-            logging.info(f'{get_current_time()} - Client Event: Add Client')
+            logger.info(f'{get_current_time()} - Client Event: Add Client')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
 
 @api_view(['POST'])
-def getEmployeeUsers(request: HttpRequest, format = None):
+def getEmployeeUsers(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -339,27 +232,27 @@ def getEmployeeUsers(request: HttpRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET':
             stat = UserEvent()
-            logging.info(f'{get_current_time()} - User Event: Add User')
+            logger.info(f'{get_current_time()} - User Event: Add User')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
         
 @api_view(['GET', 'POST'])
-def bankedHrs(request: HttpRequest):
-    logging.info(f'{get_current_time()} - INFO: {request.method}: bankedHours ')
+def bankedHrs(request: ASGIRequest):
+    logger.info(f'{get_current_time()} - INFO: {request.method}: bankedHours ')
     try:
         SqlClockPull.main()
         return Response(data='Operation Completed', status=status.HTTP_200_OK)
     except Exception as e:
-        logging.error(f'{get_current_time()} - ERROR: {str(e)}')
+        logger.error(f'{get_current_time()} - ERROR: {str(e)}')
         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 '''
 @api_view(['GET', 'POST'])
-def getWorkspaces(request: HttpRequest, format = None):
+def getWorkspaces(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -370,7 +263,7 @@ def getWorkspaces(request: HttpRequest, format = None):
             serializer = WorkspaceSerializer(workspaces, many=True)
             response = Response(serializer.data)
         elif request.method == 'POST':
-            try:
+        logger = setup_server_logger('DEBUG')    try:
                 serializer = WorkspaceSerializer(data = request.data)
                 if serializer.is_valid():
                     serializer.save()
@@ -381,11 +274,11 @@ def getWorkspaces(request: HttpRequest, format = None):
         else:
             response = Response(data=None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     # else: 
-    #     Response(data = None, status = status.HTTP_403_FORBIDDEN)
+    #     Response(data = None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
    ''' 
 
 @api_view(['POST'])
-def getClients(request: HttpRequest):
+def getClients(request: ASGIRequest):
     # for security 
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
@@ -400,17 +293,18 @@ def getClients(request: HttpRequest):
             response = Response(serializer.data )
         '''    
         if request.method == 'POST':
+            logger = setup_server_logger('DEBUG')
             stat = ClientEvent()
-            logging.info(f'{get_current_time()} - Client Event: Add Client')
+            logger.info(f'{get_current_time()} - Client Event: Add Client')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
 
 @api_view(['POST'])
-def getEmployeeUsers(request: HttpRequest, format = None):
+def getEmployeeUsers(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -424,17 +318,17 @@ def getEmployeeUsers(request: HttpRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET':
             stat = UserEvent()
-            logging.info(f'{get_current_time()} - User Event: Add User')
+            logger.info(f'{get_current_time()} - User Event: Add User')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
         
 @api_view(['GET', 'POST',])
-def getProjects(request: HttpRequest, format = None):
-        logging.info(f'{get_current_time()} - INFO: POST: getProjects')
+def getProjects(request: ASGIRequest, format = None):
+        logger.info(f'{get_current_time()} - INFO: POST: getProjects')
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -448,16 +342,16 @@ def getProjects(request: HttpRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET': 
             stat = ProjectEvent()
-            logging.info(f'{get_current_time()} - Project Event ')
+            logger.info(f'{get_current_time()} - Project Event ')
             if stat:
                 return Response(data= 'Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
         
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def getTimeOffRequests(request: HttpRequest, format = None):
+def getTimeOffRequests(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -472,16 +366,16 @@ def getTimeOffRequests(request: HttpRequest, format = None):
         '''
         if request.method == 'POST' or request.method == 'GET':
             stat = TimeOffEvent()
-            logging.info(f'{get_current_time()} - Time Off  Event: Add Time Off')
+            logger.info(f'{get_current_time()} - Time Off  Event: Add Time Off')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
         
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def getTimeOffPolicies(request: HttpRequest, format = None):
+def getTimeOffPolicies(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -495,11 +389,115 @@ def getTimeOffPolicies(request: HttpRequest, format = None):
         '''
         if request.method == 'POST' or request.method == 'GET':
             stat = PolicyEvent()
-            logging.info(f'{get_current_time()} - Policy Event: Add Policy')
+            logger.info(f'{get_current_time()} - Policy Event: Add Policy')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
         else:
-            response = Response(data=None, status = status.HTTP_403_FORBIDDEN)
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response 
 
+@csrf_exempt
+async def newExpense(request: ASGIRequest):
+    logger = setup_server_logger('DEBUG')
+    logger.info('newExpense view called')
+    if request.method == 'POST':
+        try:
+            inputData = loads(request.body)
+            RetryFlag = False
+        except JSONDecodeError:
+            logger.info('Called Internally')
+            inputData = request.POST
+            RetryFlag = True
+        except Exception as e:
+            logger.warning('Unknown Exception, attempting to handle')
+            inputData = request.POST
+            RetryFlag = True
+        logger.debug(dumps(inputData, indent=4))
+        
+        def processExpense(inputData):
+            try:
+                expense = Expense.objects.get(id=inputData['id'])
+                serializer = ExpenseSerializer(data= inputData, instance=expense)
+                logger.info('Updating Expense')
+            except Expense.DoesNotExist:
+                logger.info('Inserting New Expense ')
+                serializer = ExpenseSerializer(data = inputData)
+            try:
+                if serializer.is_valid():
+                    serializer.save()
+                    logger.info(dumps(inputData, indent= 4))
+                    logger.info(f'Saved Expense with Id - {inputData['id']}')
+                    return True, 'V' # V for valid 
+                else:
+                    #force backgroung task 
+                    logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                    for key, value in serializer.errors.items():
+                        logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        # Check if the value is an instance of ErrorDetail
+                        if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                            # Print the key and each error code and message
+                            for error_detail in value:
+                                code = error_detail.code
+                                field = key
+                                '''
+                                include check for other foreign keys to know which foreign key 
+                                constraint is violated and which function should handle it
+                                '''
+                                if code == 'does_not_exist': 
+                                    return False, 'C' # C for category P for Project, F for file in later updates 
+                    return False, 'X' # Unknown, Raise error (BAD Request)
+            except Exception as e:
+                logger.error(f'Unknown Error Caught -{e} at {e.__traceback__.tb_lineno}')
+                return False, 'X'
+
+        async def callBackgroungCategory():
+            if not RetryFlag:
+                url =  'http://localhost:5000/HpClockifyApi/task/retryExpense'
+                async with httpx.AsyncClient(timeout=300) as client:
+                    await client.post(url=url, data=inputData)
+            else: 
+                logger.error('Max retries reached. Failing task')
+                      
+        processExpenseAsync = sync_to_async(processExpense)
+        result = await processExpenseAsync(inputData)
+        if result[0]:
+            return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) # validated data later
+        elif result[1] == 'C':
+            # Enqueue a background task to retry the operation
+            asyncio.create_task(callBackgroungCategory()) 
+            return JsonResponse(
+                data={
+                    'Message': 'Foreign Key Constraint on Category. Calling background task and trying again. Review Logs for result '
+                    }, status=status.HTTP_307_TEMPORARY_REDIRECT)
+        elif result[1] == 'X':
+            return JsonResponse(
+                data= {
+                    'Message': 'Post Data could not be validated. Review Logs'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+            )
+
+@csrf_exempt
+async def deleteExpense(request: ASGIRequest):
+    logger = setup_server_logger('DEBUG')
+    logger.info('Delete Expense Function called')
+    inputData = bytes_to_dict(request.body)
+    
+    logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+    if request.method == 'POST':
+        def delete():
+            try:
+                expense = Expense.objects.get(pk=inputData['id'])
+                expense.delete()
+                response = JsonResponse(data = {
+                    'Message': 'Expense Deleted',
+                    'data': inputData
+                }, status=status.HTTP_200_OK)
+                return response
+            except Expense.DoesNotExist:
+                response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+                return response
+        deleteAsync =  sync_to_async(delete)
+        response = await deleteAsync()
+        return response

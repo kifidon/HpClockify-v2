@@ -5,23 +5,39 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        },
+    },
     'handlers': {
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGS_DIR, 'ServerLog.log'),
+            'formatter': 'standard'
+        },
+        'background_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'BackgroundTasksLog.log'),
+            'formatter': 'standard',  # Use the 'standard' formatter
         },
     },
     'loggers': {
-        '': {
+        'server': {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'background_tasks': {  # Create a logger for background tasks
+            'handlers': ['background_file'],  # Use the 'background_file' handler
+            'level': 'DEBUG',  # Set the logging level for background tasks
+            'propagate': False,  # Do not propagate to root logger
         },
     },
 }
@@ -51,6 +67,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -120,6 +138,18 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Celery Configuration
+# Celery Configuration
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+task_ignore_result = False
+# SQL Server result backend
+# CELERY_RESULT_BACKEND = 'django-db'
+
+# CELERY_RESULT_BACKEND = 'mssql+pyodbc://hpUser:0153HP!!@hpcs.database.windows.net:1433/hpdb?driver=ODBC+Driver+18+for+SQL+Server'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+# App to discover tasks
+CELERY_APP = 'HpClockfiyApi'
+CELERY_WORKER_CONCURRENCY = 4
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

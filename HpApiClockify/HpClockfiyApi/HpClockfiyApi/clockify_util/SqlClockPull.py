@@ -1,9 +1,10 @@
 from . import ClockifyPullV3
 from . import ClockifyPushV3
-from .hpUtil import logging, get_current_time
+from ..Loggers import setup_background_logger
 import time
 
 def getUsrBallances(conn, cursor):
+    logger = setup_background_logger('DEBUG')
     try:
         cursor.execute(
             '''
@@ -21,13 +22,14 @@ def getUsrBallances(conn, cursor):
     except Exception as  exc:
         # Roll back changes if an exception occurs
         conn.rollback()
-        logging.error(f"{get_current_time()} - ERROR: ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         raise
     else:
-        logging.info(f"{get_current_time()} - INFO: Checking User Balances")
+        logger.info(" Checking User Balances")
         return usrBalances, result[1]
        
 def checkBalanceUpdate(usrBalances, polID, page):
+    logger = setup_background_logger('DEBUG')
     try:
         wid = ClockifyPushV3.getWID('Hill Plain')
         url = f"https://pto.api.clockify.me/v1/workspaces/{wid}/balance/policy/{polID}?page-size=100&page={page}"
@@ -45,13 +47,14 @@ def checkBalanceUpdate(usrBalances, polID, page):
                     continue
     except Exception as  exc:
         # Roll back changes if an exception occurs
-        logging.error(f"{get_current_time()} - ERROR: ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         raise
     else:
-        logging.info(f"{get_current_time()} - INFO: Updating User Balances: {{Employee ID: [New Balance, Old Balance]}}, updateBalances")
+        logger.info(f" Updating User Balances: {{Employee ID: [New Balance, Old Balance]}}, updateBalances")
         return updateBalances
     
 def updateUsrBalances(updateBalances, polID):
+    logger = setup_background_logger('DEBUG')
     try:
         wid = ClockifyPushV3.getWID('Hill Plain')
         url = f"https://pto.api.clockify.me/v1/workspaces/{wid}/balance/policy/{polID}"
@@ -71,16 +74,17 @@ def updateUsrBalances(updateBalances, polID):
                 raise Exception(f"Failed to update balance for user {id}: {response.reason}")
     except Exception as  exc:
         # Roll back changes if an exception occurs
-        logging.error(f"{get_current_time()} - ERROR: ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error(f"({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         raise
     else:
-        logging.info(f'{get_current_time()} - INFO: Updated Banked Time')
+        logger.info('Updated Banked Time')
 
 def main():
+    logger = setup_background_logger('DEBUG')
     while True:
         cursor, conn =ClockifyPullV3.sqlConnect()
         if cursor is None or conn is None:
-            logging.warning(f'{get_current_time()} - WARNING: Failed to initilize cursor and connection in Banked Time')
+            logger.warning(f' Failed to initilize cursor and connection in Banked Time')
             time.sleep(2)
         else: 
             break
@@ -88,11 +92,11 @@ def main():
     page = 1
     updateBalances= checkBalanceUpdate(usrBalances, polID, page)
     while len(updateBalances) != 0 :
-        logging.info(updateBalances)
+        logger.info(updateBalances)
         updateUsrBalances(updateBalances, polID)
         page += 1
         updateBalances= checkBalanceUpdate(usrBalances, polID, page)
-    logging.info("SqlClockPull: Banked Time")
+    logger.info("SqlClockPull: Banked Time")
 
 if __name__ == "__main__":
     main()

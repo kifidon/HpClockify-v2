@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from . import tasks
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +35,10 @@ urlpatterns = [
     path('HpClockifyApi/getUsers', views.getEmployeeUsers),
     path('HpClockifyApi/getTimeOffPolicies', views.getTimeOffPolicies),
     path('HpClockifyApi/getTimeOffRequests', views.getTimeOffRequests),
-    path('HpClockifyAPi/getProjects', views.getProjects)
+    path('HpClockifyApi/getProjects', views.getProjects),
+    path('HpClockifyApi/newExpense', views.newExpense),
+    path('HpClockifyApi/deleteExpense', views.deleteExpense),
+    path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
+    path('HpClockifyApi/task/Entry', tasks.updateEntries),
+
 ]
