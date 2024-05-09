@@ -49,7 +49,8 @@ async def retryExpenses(request):
         categories = getCategories(inputData['workspaceId'], 1)
         
         logger.info('Checking for stale Categories... ')
-        deleted = deleteCategory(categories['categories'])
+        deleteCategoryAsync = sync_to_async(deleteCategory)
+        deleted = deleteCategoryAsync(categories['categories'])
         logger.info(f'Deleted {deleted} Categories')
         logger.debug(dumps(categories, indent=4))
         def pushCategories(category:dict):
