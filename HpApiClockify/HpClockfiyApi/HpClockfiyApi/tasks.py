@@ -182,7 +182,7 @@ async def approvedEntries(request: ASGIRequest):
                     try: # try and update if exists, otherwise create
                         approvalID = entries['approvalRequestId'] if entries['approvalRequestId'] is not None else timeId
     
-                        entry = Entry.objects.get(id = entries['id'], workspace = workspaceId , time_sheet = approvalID)
+                        entry = Entry.objects.get(id = entries['id'], workspace = workspaceId )
                         serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
                         logger.info(f'Updating Entry {entries['id']}')
                     except Entry.DoesNotExist:
