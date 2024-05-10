@@ -7,6 +7,11 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs
 import ast
 
+def reverseForOutput(data:dict):
+    data_lines = dumps(data, indent=4).split('\n')
+    reversed_data = '\n'.join(data_lines[::-1])
+    return reversed_data
+
 def check_category_for_deletion(category_id, categories):
     """
     Check if a category should be deleted based on its presence in the categories list.

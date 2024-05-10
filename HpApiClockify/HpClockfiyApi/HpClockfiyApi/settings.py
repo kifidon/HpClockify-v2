@@ -4,6 +4,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOG_LEVEL = 'INFO'
 
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 LOGGING = {
@@ -16,13 +17,13 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGS_DIR, 'ServerLog.log'),
             'formatter': 'standard'
         },
         'background_file': {
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGS_DIR, 'BackgroundTasksLog.log'),
             'formatter': 'standard',  # Use the 'standard' formatter
@@ -31,12 +32,12 @@ LOGGING = {
     'loggers': {
         'server': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'propagate': True,
         },
         'background_tasks': {  # Create a logger for background tasks
             'handlers': ['background_file'],  # Use the 'background_file' handler
-            'level': 'DEBUG',  # Set the logging level for background tasks
+            'level': LOG_LEVEL,  # Set the logging level for background tasks
             'propagate': False,  # Do not propagate to root logger
         },
     },

@@ -96,11 +96,11 @@ class Project(models.Model):
     
 class Entry(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, time_sheet_id, workspace_id, workspace_id) found, that is not supported. The first column is selected.
-    time_sheet = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id')
+    time_sheet = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id', blank=True, null=True)
     duration = models.FloatField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     billable = models.BooleanField(blank=True, null=True)
-    project = models.ForeignKey('Project', models.DO_NOTHING, to_field='id', blank=True, null=True, db_column='project_id')
+    project = models.ForeignKey('Project', models.CASCADE, to_field='id', blank=True, null=True, db_column='project_id')
     # type = models.CharField(max_length=20, blank=True, null=True)
     rate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     start_time = models.DateTimeField(blank=True, null=True)
@@ -110,7 +110,7 @@ class Entry(models.Model):
     class Meta:
         managed = False
         db_table = 'Entry'
-        unique_together = (('id', 'time_sheet', 'workspace'))
+        unique_together = (('id',  'workspace'))
 
     def __str__(self):
         return self.id or ""
@@ -124,7 +124,7 @@ class Tagsfor(models.Model):
     class Meta:
         managed = False
         db_table = 'TagsFor'
-        unique_together = (('id', 'entryid', 'timeid', 'workspace'),)
+        unique_together = (('id', 'entryid', 'workspace'),)
 
     def __str__(self):
         return self.name or ""
@@ -157,7 +157,7 @@ class Expense(models.Model):
     billable = models.BooleanField(default=True, max_length=1)
     fileId = models.CharField(max_length=50, blank=True, null=True)
     total = models.IntegerField( blank=True, null=True)
-    timesheetId = models.CharField(max_length=50, blank= True, null=True)
+    timesheetId = models.ForeignKey(Timesheet, models.CASCADE, blank= True, null=True, db_column='timesheetId')
 
     class Meta:
         managed = False

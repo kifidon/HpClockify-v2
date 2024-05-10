@@ -21,13 +21,16 @@ from . import tasks
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.view_log),
+    path('', views.viewServerLog),
+    path('task', views.viewTaskLog),
+
     path('quickBackup', views.quickBackup),
     path('billableReport', views.monthlyBillableReport),
     path('billableReport/<str:start_date>/<str:end_date>/', views.monthlyBillableReport),
     path('payroll', views.weeklyPayrollReport),
     path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
     path('timeSheets', views.timesheets),
+    
     path('HpClockifyApi/bankedHours', views.bankedHrs),
     path('HpClockifyApi/newTimeSheets', views.newTimeSheets),
     path('HpClockifyApi/updateTimeSheets', views.updateTimesheets),
@@ -38,7 +41,9 @@ urlpatterns = [
     path('HpClockifyApi/getProjects', views.getProjects),
     path('HpClockifyApi/newExpense', views.newExpense),
     path('HpClockifyApi/deleteExpense', views.deleteExpense),
+    
     path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
-    path('HpClockifyApi/task/Entry', tasks.updateEntries),
+    path('HpClockifyApi/task/Entry', tasks.approvedEntries),
+    path('HpClockifyApi/task/Expense', tasks.approvedExpenses),
 
 ]

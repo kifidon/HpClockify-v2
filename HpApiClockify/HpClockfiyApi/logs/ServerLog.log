@@ -749,3 +749,142 @@
     "fileId": "663a63c05e8ef3683b304b83",
     "total": 12300
 }
+2024-05-10 11:42:25,231 - server - INFO - newExpense view called
+2024-05-10 11:42:25,232 - server - DEBUG - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-10 11:42:27,625 - server - INFO - Inserting New Expense 
+2024-05-10 11:42:28,870 - server - INFO - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-10 11:42:28,874 - server - INFO - Saved Expense with Id - 663a63c05e8ef3683b304b85
+2024-05-10 11:42:52,992 - server - INFO - newExpense view called
+2024-05-10 11:42:55,037 - server - INFO - Updating Expense
+2024-05-10 11:42:56,106 - server - INFO - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-10 11:42:56,109 - server - INFO - Saved Expense with Id - 663a63c05e8ef3683b304b85
+2024-05-10 11:43:30,540 - server - INFO - newExpense view called
+2024-05-10 11:43:32,622 - server - INFO - Updating Expense
+2024-05-10 11:43:33,718 - server - INFO - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-10 11:43:33,722 - server - INFO - Saved Expense with Id - 663a63c05e8ef3683b304b85
+2024-05-10 11:44:15,793 - server - INFO - newExpense view called
+2024-05-10 11:44:18,072 - server - INFO - Updating Expense
+2024-05-10 11:44:19,282 - server - INFO - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-10 11:44:19,282 - server - INFO - Saved Expense with Id - 663a63c05e8ef3683b304b85
+2024-05-10 11:45:27,561 - server - INFO - Delete Expense Function called
+2024-05-10 11:45:50,917 - server - INFO - 
+2024-05-10 11:45:50 - INFO: POST: updateTimesheet
+2024-05-10 11:45:57,407 - server - INFO - 2024-05-10 11:45:57 - INFO: UpdateTimesheet:"663d0e8f2021485a003aa44d"202
+2024-05-10 11:49:52,610 - server - INFO - 
+2024-05-10 11:49:52 - INFO: POST: updateTimesheet
+2024-05-10 11:49:55,311 - server - INFO - 2024-05-10 11:49:55 - INFO: UpdateTimesheet:"663d0e8f2021485a003aa44d"202
+2024-05-10 11:56:04,359 - server - INFO - 
+2024-05-10 11:56:04 - INFO: POST: updateTimesheet
+2024-05-10 11:56:05,844 - server - INFO - 2024-05-10 11:56:05 - INFO: UpdateTimesheet:"663d0e8f2021485a003aa44d"202
+2024-05-10 12:01:35,930 - server - INFO - POST: updateTimesheet
+2024-05-10 12:01:38,601 - server - INFO - UpdateTimesheet:"663d0e8f2021485a003aa44d"202
+2024-05-10 12:03:30,043 - server - INFO - POST: updateTimesheet
+2024-05-10 12:03:31,216 - server - INFO - UpdateTimesheet:"663d0e8f2021485a003aa44d"202
+2024-05-10 12:07:08,317 - server - INFO - POST: updateTimesheet
+2024-05-10 12:07:10,170 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:08:04,496 - server - INFO - POST: updateTimesheet
+2024-05-10 12:08:07,421 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:09:57,619 - server - INFO - POST: updateTimesheet
+2024-05-10 12:10:00,418 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:13:15,911 - server - INFO - POST: updateTimesheet
+2024-05-10 12:13:18,852 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:16:24,931 - server - INFO - POST: updateTimesheet
+2024-05-10 12:16:28,063 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:21:14,900 - server - INFO - POST: updateTimesheet
+2024-05-10 12:21:17,850 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:23:46,472 - server - INFO - POST: updateTimesheet
+2024-05-10 12:23:49,257 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:29:28,965 - server - INFO - POST: updateTimesheet
+2024-05-10 12:29:32,071 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:29:48,876 - server - INFO - POST: updateTimesheet
+2024-05-10 12:29:50,056 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:32:14,819 - server - INFO - POST: updateTimesheet
+2024-05-10 12:32:17,509 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:32:45,988 - server - INFO - POST: updateTimesheet
+2024-05-10 12:32:49,010 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:33:41,238 - server - INFO - POST: updateTimesheet
+2024-05-10 12:33:44,218 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:36:03,102 - server - INFO - POST: updateTimesheet
+2024-05-10 12:36:05,757 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:36:50,472 - server - INFO - POST: updateTimesheet
+2024-05-10 12:36:53,168 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:37:49,117 - server - INFO - POST: updateTimesheet
+2024-05-10 12:37:52,028 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:38:43,997 - server - INFO - POST: updateTimesheet
+2024-05-10 12:38:46,687 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:40:14,586 - server - INFO - POST: updateTimesheet
+2024-05-10 12:40:17,391 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 12:44:12,806 - server - INFO - POST: updateTimesheet
+2024-05-10 12:44:15,928 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 13:39:16,421 - server - INFO - POST: updateTimesheet
+2024-05-10 13:39:19,540 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 13:42:38,566 - server - INFO - POST: updateTimesheet
+2024-05-10 13:42:40,876 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 13:53:15,842 - server - INFO - POST: updateTimesheet
+2024-05-10 13:53:19,169 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 13:55:27,567 - server - INFO - POST: updateTimesheet
+2024-05-10 13:55:30,326 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 13:57:38,395 - server - INFO - POST: updateTimesheet
+2024-05-10 13:57:43,100 - server - INFO - UpdateTimesheet:"663e1edce50416318c64cd82"202
+2024-05-10 14:01:32,151 - server - INFO - POST: updateTimesheet
+2024-05-10 14:01:33,997 - server - INFO - UpdateTimesheet:"663e1edf72b1301e4d0db01d"202

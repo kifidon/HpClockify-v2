@@ -3762,3 +3762,973 @@
 2024-05-09 14:49:46,782 - background_tasks - INFO - New Category... Inserting
 2024-05-09 14:49:47,481 - background_tasks - INFO - Changes Saved
 2024-05-09 14:49:47,481 - background_tasks - INFO - Categories updated
+2024-05-10 11:46:00,740 - background_tasks - INFO - updateEntries Function called
+2024-05-10 11:46:33,768 - background_tasks - WARNING - No entries were found on timesheet with id 663d0e8f2021485a003aa44d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 11:49:56,975 - background_tasks - INFO - updateEntries Function called
+2024-05-10 11:50:27,360 - background_tasks - WARNING - No entries were found on timesheet with id 663d0e8f2021485a003aa44d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 11:56:08,904 - background_tasks - INFO - updateEntries Function called
+2024-05-10 11:56:08,905 - background_tasks - DEBUG - {
+    "id": "663d0e8f2021485a003aa44d",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65bd6a6077682a20767a6c0b",
+        "updatedByUserName": "Timmy Ifidon",
+        "updatedAt": "2024-05-09T17:57:42Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "userEmail": "timmy.ifidon@hillplain.com"
+    }
+}
+2024-05-10 11:56:41,773 - background_tasks - WARNING - No entries were found on timesheet with id 663d0e8f2021485a003aa44d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:01:39,766 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:01:39,766 - background_tasks - DEBUG - {
+    "id": "663d0e8f2021485a003aa44d",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65bd6a6077682a20767a6c0b",
+        "updatedByUserName": "Timmy Ifidon",
+        "updatedAt": "2024-05-09T17:57:42Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "userEmail": "timmy.ifidon@hillplain.com"
+    }
+}
+2024-05-10 12:02:11,635 - background_tasks - WARNING - No entries were found on timesheet with id 663d0e8f2021485a003aa44d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:03:31,738 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:03:31,738 - background_tasks - DEBUG - {
+    "id": "663d0e8f2021485a003aa44d",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65bd6a6077682a20767a6c0b",
+        "updatedByUserName": "Timmy Ifidon",
+        "updatedAt": "2024-05-09T17:57:42Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65bd6a6077682a20767a6c0b",
+        "userName": "Timmy Ifidon",
+        "userEmail": "timmy.ifidon@hillplain.com"
+    }
+}
+2024-05-10 12:04:02,862 - background_tasks - WARNING - No entries were found on timesheet with id 663d0e8f2021485a003aa44d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:07:10,762 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:07:10,762 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:07:41,191 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:07:42,162 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:08:10,073 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:08:43,139 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:08:43,141 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:10:03,293 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:10:34,841 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:10:38,974 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:13:21,906 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:14:15,665 - background_tasks - ERROR -  object Response can't be used in 'await' expression at line 128 in 
+	<frame at 0x0000013EB7B87220, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\clockify_util\\ClockifyPullV3.py', line 158, code getEntryForApproval>
+2024-05-10 12:16:31,241 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:16:50,089 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:17:04,075 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:21:21,107 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:21:21,108 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:21:21,108 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:21:21,110 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:21:21,112 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:21:29,809 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:21:38,279 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:21:38,280 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:21:47,302 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:21:50,950 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:21:52,393 - background_tasks - DEBUG - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:21:54,116 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:23:52,325 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:23:52,325 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:23:52,326 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:23:52,329 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:23:52,330 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:24:01,346 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:24:10,168 - background_tasks - INFO - Timesheet found on page 2
+2024-05-10 12:24:10,168 - background_tasks - DEBUG - []
+2024-05-10 12:24:10,170 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:24:18,000 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:24:21,438 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:24:22,709 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:24:24,052 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:29:51,612 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:29:51,612 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:29:51,612 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:29:51,613 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:29:51,613 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:29:53,523 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:29:53,524 - background_tasks - DEBUG - []
+2024-05-10 12:29:53,524 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:29:53,524 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:29:55,421 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:29:55,422 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:29:57,283 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:29:57,285 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:29:59,136 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:29:59,137 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:30:01,047 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:30:01,047 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:30:02,906 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:30:02,907 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:32:20,203 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:32:20,203 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:32:20,203 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:32:20,205 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:32:20,206 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:32:20,846 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:32:21,440 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:32:21,998 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:32:22,779 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:32:23,428 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:32:23,963 - background_tasks - ERROR -  'Client' object does not support the asynchronous context manager protocol at line 131 in 
+	<frame at 0x000002794E2E42C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\clockify_util\\ClockifyPullV3.py', line 161, code getEntryForApproval>
+2024-05-10 12:32:52,178 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:32:52,178 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:32:52,179 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:32:52,180 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:32:52,180 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:32:52,895 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:32:53,521 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:32:54,104 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:32:54,722 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:32:55,297 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:32:57,505 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:32:57,506 - background_tasks - DEBUG - []
+2024-05-10 12:32:57,506 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:32:57,623 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:32:57,629 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:32:57,677 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:32:57,681 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:32:57,684 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:32:57,684 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:33:47,505 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:33:47,505 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:33:47,505 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:33:47,507 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:33:47,507 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:33:48,611 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:33:50,197 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:33:52,261 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:33:54,820 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:33:57,897 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:34:03,116 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:34:03,116 - background_tasks - DEBUG - []
+2024-05-10 12:34:03,118 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:34:03,197 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:34:03,203 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:34:03,260 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:34:03,262 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:34:03,288 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:34:03,288 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:36:08,277 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:36:08,278 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:36:08,278 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:36:08,279 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:36:08,281 - background_tasks - ERROR -  list.append() takes exactly one argument (2 given) at line 128 in 
+	<frame at 0x0000020BA25402C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\clockify_util\\ClockifyPullV3.py', line 162, code getEntryForApproval>
+2024-05-10 12:36:55,666 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:36:55,667 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:36:55,667 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:36:55,670 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:36:55,671 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:36:56,288 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:36:56,832 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:36:57,395 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:36:57,974 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:36:58,531 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:37:00,788 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:37:00,788 - background_tasks - DEBUG - []
+2024-05-10 12:37:00,789 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:37:00,886 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:00,919 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:00,944 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:00,948 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:00,983 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:04,555 - background_tasks - ERROR -  'NoneType' object is not iterable at line 138 in 
+	<frame at 0x00000244BC854F40, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\clockify_util\\ClockifyPullV3.py', line 163, code getEntryForApproval>
+2024-05-10 12:37:53,497 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:37:53,497 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:37:53,497 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:37:53,497 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:37:53,497 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:37:53,770 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:37:54,025 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:37:54,277 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:37:54,479 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:37:54,688 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:37:56,417 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:37:56,417 - background_tasks - DEBUG - []
+2024-05-10 12:37:56,417 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:37:56,537 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:56,567 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:56,580 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:56,597 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:37:56,597 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:00,691 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:38:47,174 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:38:47,174 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:38:47,175 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:38:47,179 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:38:47,180 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:38:47,387 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:38:47,586 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:38:48,139 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:38:48,794 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:38:49,356 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:38:51,512 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:38:51,513 - background_tasks - DEBUG - []
+2024-05-10 12:38:51,513 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:38:51,633 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:51,647 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:51,668 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:51,671 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:51,724 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:38:55,372 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 12:40:19,951 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:40:19,951 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:40:19,952 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:40:19,953 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:40:19,953 - background_tasks - ERROR -  'coroutine' object has no attribute 'then' at line 130 in 
+	<frame at 0x000001D3FF2EC2C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\clockify_util\\ClockifyPullV3.py', line 163, code getEntryForApproval>
+2024-05-10 12:44:19,292 - background_tasks - INFO - updateEntries Function called
+2024-05-10 12:44:19,292 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 12:44:19,292 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 12:44:19,296 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 12:44:20,294 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 12:44:21,289 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 12:44:22,307 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 12:44:23,114 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 12:44:23,114 - background_tasks - DEBUG - []
+2024-05-10 12:44:23,115 - background_tasks - DEBUG - FindTimesheet executed
+2024-05-10 12:44:23,304 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 12:44:24,072 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:44:24,314 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 12:44:25,098 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:44:25,297 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 12:44:26,055 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:44:27,029 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:44:27,470 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 
+2024-05-10 12:44:27,471 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:39:23,188 - background_tasks - INFO - updateEntries Function called
+2024-05-10 13:39:23,189 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-10 13:39:23,189 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-10 13:39:23,191 - background_tasks - DEBUG - {
+    "id": "663e1edce50416318c64cd82",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-03-03T07:00:00Z",
+        "end": "2024-03-10T06:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Sean Goodson",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "updatedByUserName": "Michelle Tost",
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+        "userName": "Michelle Tost",
+        "userEmail": "michelle.tost@hillplain.com"
+    }
+}
+2024-05-10 13:39:24,199 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:39:25,196 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:39:26,196 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:39:27,196 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:39:28,202 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:39:28,890 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:39:28,891 - background_tasks - DEBUG - []
+2024-05-10 13:39:28,891 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-10 13:39:29,191 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:39:29,788 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 2
+2024-05-10 13:39:30,197 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 3
+2024-05-10 13:39:31,179 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 4
+2024-05-10 13:39:32,093 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 5
+2024-05-10 13:39:32,760 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 6
+2024-05-10 13:39:32,761 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:39:33,705 - background_tasks - INFO - Approved Expense function called
+2024-05-10 13:39:33,707 - background_tasks - DEBUG - InputData
+}
+    }
+        "userEmail": "michelle.tost@hillplain.com"
+        "userName": "Michelle Tost",
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+    "creator": {
+    },
+        "note": ""
+        "updatedAt": "2024-05-10T14:32:27Z",
+        "updatedByUserName": "Michelle Tost",
+        "updatedBy": "65dce82b02c47e2ed83ddc8e",
+        "state": "APPROVED",
+    "status": {
+    },
+        "startOfWeek": "SUNDAY"
+        "timeZone": "America/Edmonton",
+        "userName": "Sean Goodson",
+        "userId": "65dcdd57ea15ab53ab7b14ce",
+    "owner": {
+    },
+        "end": "2024-03-10T06:59:59Z"
+        "start": "2024-03-03T07:00:00Z",
+    "dateRange": {
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1edce50416318c64cd82",
+{
+2024-05-10 13:39:34,722 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:39:35,717 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:39:36,721 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:39:37,720 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:39:38,705 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:39:38,705 - background_tasks - DEBUG - []
+2024-05-10 13:39:38,706 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-10 13:39:38,707 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:39:39,622 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 2
+2024-05-10 13:39:39,714 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:39:40,528 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 3
+2024-05-10 13:39:41,639 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 4
+2024-05-10 13:39:42,582 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 5
+2024-05-10 13:39:43,151 - background_tasks - DEBUG - FindTimesheet executed - Not Found in range 6
+2024-05-10 13:39:45,431 - background_tasks - INFO - Updating Expense...
+2024-05-10 13:39:46,618 - background_tasks - INFO - UpdateExpense on timesheet(663e1edce50416318c64cd82): EX-663e1c204312372f75c9babf 202 ACCEPTED
+2024-05-10 13:39:46,620 - background_tasks - INFO - }
+    "projectId": "65c25bc5ffbbb676c5e212cf"
+    "categoryId": "65c2522effbbb676c5e010b2",
+    "locked": true,
+    "currency": "USD",
+    "approvalRequestId": "663e1edce50416318c64cd82",
+    "total": 11674.0,
+    "fileName": "Oil Change - Mar_9_2024.pdf",
+    "fileId": "663e1c204312372f75c9bab0",
+    "billable": true,
+    "quantity": 11674.0,
+    "notes": "Oil Change",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Transportation",
+        "id": "65c2522effbbb676c5e010b2",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-03-09T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14ce",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1c204312372f75c9babf",
+{
+2024-05-10 13:39:46,621 - background_tasks - INFO - Entries added for timesheet 663e1edce50416318c64cd82
+2024-05-10 13:42:43,786 - background_tasks - INFO - updateEntries Function called
+2024-05-10 13:42:44,790 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:42:45,795 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:42:46,805 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:42:47,798 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:42:48,791 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:42:49,608 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:42:49,792 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:42:54,290 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:42:55,214 - background_tasks - INFO - Approved Expense function called
+2024-05-10 13:42:56,220 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:42:57,240 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:42:58,226 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:42:59,219 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:43:00,231 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:43:00,886 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:43:01,221 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:43:09,055 - background_tasks - INFO - Updating Expense...
+2024-05-10 13:43:11,227 - background_tasks - INFO - UpdateExpense on timesheet(663e1edce50416318c64cd82): EX-663e1c204312372f75c9babf 202 ACCEPTED
+2024-05-10 13:43:11,228 - background_tasks - INFO - }
+    "projectId": "65c25bc5ffbbb676c5e212cf"
+    "categoryId": "65c2522effbbb676c5e010b2",
+    "locked": true,
+    "currency": "USD",
+    "approvalRequestId": "663e1edce50416318c64cd82",
+    "total": 11674.0,
+    "fileName": "Oil Change - Mar_9_2024.pdf",
+    "fileId": "663e1c204312372f75c9bab0",
+    "billable": true,
+    "quantity": 11674.0,
+    "notes": "Oil Change",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Transportation",
+        "id": "65c2522effbbb676c5e010b2",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-03-09T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14ce",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1c204312372f75c9babf",
+{
+2024-05-10 13:43:11,229 - background_tasks - INFO - Expense added for timesheet 663e1edce50416318c64cd82
+2024-05-10 13:53:21,203 - background_tasks - INFO - updateEntries Function called
+2024-05-10 13:53:22,214 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:53:23,203 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:53:24,216 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:53:25,211 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:53:25,454 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:53:26,207 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:53:27,215 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:53:30,357 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:53:30,829 - background_tasks - INFO - Approved Expense function called
+2024-05-10 13:53:31,833 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:53:32,842 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:53:33,833 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:53:34,802 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:53:34,850 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:53:35,841 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:53:36,829 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:53:42,027 - background_tasks - ERROR - ('42S22', "[42S22] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid column name 'timesheetId_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") at line 259 in 
+	<frame at 0x000001F745E61030, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 275, code syncUpdateExpense>
+2024-05-10 13:53:42,027 - background_tasks - ERROR - ('42S22', "[42S22] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid column name 'timesheetId_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") at line 285 in 
+	<frame at 0x000001F745DFC2C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 290, code approvedExpenses>
+2024-05-10 13:55:31,618 - background_tasks - INFO - updateEntries Function called
+2024-05-10 13:55:32,631 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:55:33,615 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:55:34,616 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:55:35,617 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:55:35,965 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:55:36,613 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:55:37,618 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:55:40,783 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:55:41,277 - background_tasks - INFO - Approved Expense function called
+2024-05-10 13:55:42,295 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:55:43,287 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:55:44,284 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:55:45,282 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:55:45,519 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:55:46,293 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:55:47,278 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:55:52,624 - background_tasks - INFO - Updating Expense...
+2024-05-10 13:55:54,771 - background_tasks - INFO - UpdateExpense on timesheet(663e1edce50416318c64cd82): EX-663e1c204312372f75c9babf 202 ACCEPTED
+2024-05-10 13:55:54,772 - background_tasks - INFO - }
+    "timesheetId": "663e1edce50416318c64cd82"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b2",
+    "locked": true,
+    "currency": "USD",
+    "approvalRequestId": "663e1edce50416318c64cd82",
+    "total": 11674.0,
+    "fileName": "Oil Change - Mar_9_2024.pdf",
+    "fileId": "663e1c204312372f75c9bab0",
+    "billable": true,
+    "quantity": 11674.0,
+    "notes": "Oil Change",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Transportation",
+        "id": "65c2522effbbb676c5e010b2",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-03-09T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14ce",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1c204312372f75c9babf",
+{
+2024-05-10 13:55:54,773 - background_tasks - INFO - Expense added for timesheet 663e1edce50416318c64cd82
+2024-05-10 13:57:44,370 - background_tasks - INFO - updateEntries Function called
+2024-05-10 13:57:45,394 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:57:46,361 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:57:47,392 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:57:48,361 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:57:49,353 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:57:49,385 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:57:50,375 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:57:54,226 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edce50416318c64cd82. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 13:57:54,720 - background_tasks - INFO - Approved Expense function called
+2024-05-10 13:57:55,709 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 1 
+2024-05-10 13:57:56,715 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 2 
+2024-05-10 13:57:57,718 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 3 
+2024-05-10 13:57:58,724 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 4 
+2024-05-10 13:57:59,704 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 13:57:59,704 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 5 
+2024-05-10 13:58:00,724 - background_tasks - INFO - FindTimesheet called for 663e1edce50416318c64cd82 on page 6 
+2024-05-10 13:58:07,694 - background_tasks - INFO - Updating Expense...
+2024-05-10 13:58:10,903 - background_tasks - INFO - UpdateExpense on timesheet(663e1edce50416318c64cd82): EX-663e1c204312372f75c9babf 202 ACCEPTED
+2024-05-10 13:58:10,904 - background_tasks - INFO - }
+    "timesheetId": "663e1edce50416318c64cd82"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b2",
+    "locked": true,
+    "currency": "USD",
+    "approvalRequestId": "663e1edce50416318c64cd82",
+    "total": 11674.0,
+    "fileName": "Oil Change - Mar_9_2024.pdf",
+    "fileId": "663e1c204312372f75c9bab0",
+    "billable": true,
+    "quantity": 11674.0,
+    "notes": "Oil Change",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Transportation",
+        "id": "65c2522effbbb676c5e010b2",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-03-09T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14ce",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1c204312372f75c9babf",
+{
+2024-05-10 13:58:10,905 - background_tasks - INFO - Expense added for timesheet 663e1edce50416318c64cd82
+2024-05-10 14:01:34,534 - background_tasks - INFO - updateEntries Function called
+2024-05-10 14:01:35,539 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 1 
+2024-05-10 14:01:36,546 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 2 
+2024-05-10 14:01:37,537 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 3 
+2024-05-10 14:01:38,544 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 4 
+2024-05-10 14:01:38,770 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 14:01:39,549 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 5 
+2024-05-10 14:01:40,533 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 6 
+2024-05-10 14:01:43,799 - background_tasks - WARNING - No entries were found on timesheet with id 663e1edf72b1301e4d0db01d. Review Clockify. 304 NOT_MODIFIED
+2024-05-10 14:01:44,461 - background_tasks - INFO - Approved Expense function called
+2024-05-10 14:01:45,460 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 1 
+2024-05-10 14:01:46,465 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 2 
+2024-05-10 14:01:47,468 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 3 
+2024-05-10 14:01:48,449 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 4 
+2024-05-10 14:01:48,664 - background_tasks - INFO - Timesheet found on page 1
+2024-05-10 14:01:49,468 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 5 
+2024-05-10 14:01:50,469 - background_tasks - INFO - FindTimesheet called for 663e1edf72b1301e4d0db01d on page 6 
+2024-05-10 14:01:54,645 - background_tasks - INFO - Updating Expense...
+2024-05-10 14:01:56,455 - background_tasks - INFO - UpdateExpense on timesheet(663e1edf72b1301e4d0db01d): EX-663e1eb172b1301e4d0da86f 202 ACCEPTED
+2024-05-10 14:01:56,455 - background_tasks - INFO - }
+    "timesheetId": "663e1edf72b1301e4d0db01d"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b2",
+    "locked": true,
+    "currency": "USD",
+    "approvalRequestId": "663e1edf72b1301e4d0db01d",
+    "total": 14068.0,
+    "fileName": "Oil Change - Apr_18_2024.pdf",
+    "fileId": "663e1eb172b1301e4d0da862",
+    "billable": true,
+    "quantity": 14068.0,
+    "notes": "Oil Change",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Transportation",
+        "id": "65c2522effbbb676c5e010b2",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-04-18T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14ce",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e1eb172b1301e4d0da86f",
+{
+2024-05-10 14:01:56,464 - background_tasks - INFO - Expense added for timesheet 663e1edf72b1301e4d0db01d

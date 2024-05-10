@@ -33,14 +33,14 @@ import httpx
 from . Loggers import setup_server_logger
 from json.decoder import JSONDecodeError
 
-logger = setup_server_logger('DEBUG')
-
+loggerLevel = 'DEBUG'
+logger = setup_server_logger(loggerLevel)
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
     if request.method == 'POST':
-        logger = setup_server_logger('DEBUG')
+        logger = setup_server_logger(loggerLevel)
         inputData = loads(request.body)
-        logger.info(f'\n{get_current_time()} - INFO: {request.method}: updateTimesheet')
+        logger.info(f'{request.method}: updateTimesheet')
         try: 
             def updateApproval():
                 # with transaction.atomic(): # if any error occurs then rollback 
@@ -57,7 +57,7 @@ async def updateTimesheets(request:ASGIRequest):
                         response = JsonResponse(data={
                                                 'timesheet':serializer.validated_data
                                             }, status = status.HTTP_202_ACCEPTED)
-                        logger.info(f'{get_current_time()} - INFO: UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
+                        logger.info(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
                         return [response, serializer]
                     else: 
                         response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
@@ -68,11 +68,19 @@ async def updateTimesheets(request:ASGIRequest):
                 url =  'http://localhost:5000/HpClockifyApi/task/Entry'
                 async with httpx.AsyncClient(timeout=300) as client:
                     await client.post(url=url, data=inputData)
+            async def callBackgroungExpense():
+                url =  'http://localhost:5000/HpClockifyApi/task/Expense'
+                async with httpx.AsyncClient(timeout=300) as client:
+                    await client.post(url=url, data=inputData)
 
+            async def createTask(): # handles Entries and Expenses Once at a time
+                await callBackgroungEntry()
+                await callBackgroungExpense()
+                
             updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
             result = await updateAsync()
             if result[1]:
-                asyncio.create_task(callBackgroungEntry()) 
+                asyncio.create_task(createTask()) 
             else: 
                 raise ValidationError('Unknown Error occured. Timesheet Serializer not created.')
             return result[0]
@@ -88,10 +96,10 @@ async def updateTimesheets(request:ASGIRequest):
 
 @api_view(['POST'])
 def newTimeSheets(request: ASGIRequest):
-    logger = setup_server_logger('DEBUG')
+    logger = setup_server_logger(loggerLevel)
     logger.info(f'{request.method}: newTimesheet')
     if request.method == 'POST':
-        logger = setup_server_logger('DEBUG')
+        logger = setup_server_logger(loggerLevel)
         try:
             data = loads(request.body)
             serializer = TimesheetSerializer(data= data)
@@ -163,19 +171,19 @@ def download_text_file(folder_path = None):
 
 @api_view(['GET'])
 def monthlyBillableReport(request, start_date = None, end_date= None):
-    logger = setup_server_logger('DEBUG')
+    logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called')
     folder_path = monthlyBillable(start_date, end_date )
     return download_text_file(folder_path)
 
 def weeklyPayrollReport(request, start_date=None, end_date= None):
-    logger.info(f'\n{get_current_time()} - INFO: Weekly Payroll Report Called')
+    logger.info(f'Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
     (folder_path)
     return download_text_file(folder_path)
 
 @api_view(['GET'])
-def view_log(request):
+def viewServerLog(request):
     log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
@@ -190,6 +198,24 @@ def view_log(request):
         return HttpResponse(log_contents, content_type='text/plain')
     else:
         return HttpResponse('logger file not found', status=404)
+
+@api_view(['GET'])
+def viewTaskLog(request):
+    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-5000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='text/plain')
+    else:
+        return HttpResponse('logger file not found', status=404)
+    
 
 @api_view(['POST'])
 def getClients(request: ASGIRequest):
@@ -207,7 +233,7 @@ def getClients(request: ASGIRequest):
             response = Response(serializer.data )
         '''    
         if request.method == 'POST':
-            logger = setup_server_logger('DEBUG')
+            logger = setup_server_logger(loggerLevel)
             stat = ClientEvent()
             logger.info(f'{get_current_time()} - Client Event: Add Client')
             if stat:
@@ -263,7 +289,7 @@ def getWorkspaces(request: ASGIRequest, format = None):
             serializer = WorkspaceSerializer(workspaces, many=True)
             response = Response(serializer.data)
         elif request.method == 'POST':
-        logger = setup_server_logger('DEBUG')    try:
+        logger = setup_server_logger(loggerLevel)    try:
                 serializer = WorkspaceSerializer(data = request.data)
                 if serializer.is_valid():
                     serializer.save()
@@ -293,7 +319,7 @@ def getClients(request: ASGIRequest):
             response = Response(serializer.data )
         '''    
         if request.method == 'POST':
-            logger = setup_server_logger('DEBUG')
+            logger = setup_server_logger(loggerLevel)
             stat = ClientEvent()
             logger.info(f'{get_current_time()} - Client Event: Add Client')
             if stat:
@@ -373,7 +399,7 @@ def getTimeOffRequests(request: ASGIRequest, format = None):
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-        
+        w
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getTimeOffPolicies(request: ASGIRequest, format = None):
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
@@ -399,7 +425,7 @@ def getTimeOffPolicies(request: ASGIRequest, format = None):
 
 @csrf_exempt
 async def newExpense(request: ASGIRequest):
-    logger = setup_server_logger('DEBUG')
+    logger = setup_server_logger(loggerLevel)
     logger.info('newExpense view called')
     if request.method == 'POST':
         try:
@@ -480,11 +506,12 @@ async def newExpense(request: ASGIRequest):
 
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
-    logger = setup_server_logger('DEBUG')
+    logger = setup_server_logger(loggerLevel)
     logger.info('Delete Expense Function called')
     inputData = bytes_to_dict(request.body)
     
     logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+    
     if request.method == 'POST':
         def delete():
             try:
@@ -501,3 +528,5 @@ async def deleteExpense(request: ASGIRequest):
         deleteAsync =  sync_to_async(delete)
         response = await deleteAsync()
         return response
+    
+    

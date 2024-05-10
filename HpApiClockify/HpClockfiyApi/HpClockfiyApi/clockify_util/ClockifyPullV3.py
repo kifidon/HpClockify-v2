@@ -5,6 +5,7 @@ import asyncio
 import httpx
 import time
 from httpcore import ConnectTimeout
+from asgiref.sync import sync_to_async
 from .hpUtil import get_current_time , dumps, sqlConnect, cleanUp
 from .. Loggers import setup_background_logger
 
@@ -88,22 +89,33 @@ def getProjects(workspaceId, key, page =1):
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
 
-async def FindTimesheet(workspaceId, key, timeId, status, page):
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=200"
-    async with httpx.AsyncClient(timeout=10) as client:
+async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
+    if entry and expense:
+        logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
+        return []
+    logger.info(f'FindTimesheet called for {timeId} on page {page} ')
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=50&sort-column=UPDATED_AT"
+    async with httpx.AsyncClient(timeout=300) as client:
         response = await client.get(url, headers={'X-Api-Key': key})
         if response.status_code == 200:
             for timesheet in response.json():
                 if timesheet['approvalRequest']['id'] == timeId:
                     logger.info(f'Timesheet found on page {page}')
-                    # print(dumps(timesheet['entries'], indent = 4))
-                    return timesheet['entries']
+                    logger.debug(dumps(timesheet['entries'], indent = 4))
+                    logger.debug(f'FindTimesheet executed {page}')
+                    if entry:
+                        return timesheet['entries']
+                    elif expense:
+                        return timesheet['expenses']
+                    else:
+                        return []
             # Not found on this page, try next page
+            logger.debug(f'FindTimesheet executed - Not Found in range {page}')
             return []
         else:
-            raise Exception(f"Failed to pull Data From Clockify: {response.json()}")
+            raise Exception(f"Failed to pull Data From Clockify: {response._text}")
 
-async def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page = 1):
+async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
     """
     Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
 
@@ -115,19 +127,28 @@ async def getEntryForApproval(workspaceId, key, timeId, status='APPROVED', page 
         dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
     """    
     retries= 0
+
+    async def delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay): #que requests 
+        await asyncio.sleep(delay)
+        return await FindTimesheet(workspaceId, key, timeId, status, page_number, entryFlag , expenseFlag )
+
+    tasks = []
+    delay_between_tasks = 1
     while retries < MAX_RETRIES:
         try:
             tasks = []
-            for page_number in range(1, 7):  # Iterate from page 1 to page 5 asynchronously
+            for page_number in range(1, 7):  # Iterate from page 1 to page 6 asynchronously
+                # findTimesheetAsync = sync_to_async(FindTimesheet)   
                 tasks.append(
-                    FindTimesheet(workspaceId, key, timeId, status, page_number)
+                    asyncio.create_task(delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay_between_tasks * page_number))
                 )
-            entries = await asyncio.gather(*tasks)
+            dataAll = await asyncio.gather(*tasks)
             
-            if entries != 0:
+            if dataAll != 0:
                 output = []
-                for entry in entries:
-                    output.extend(entry)           
+                for data in dataAll:
+                    if data is not None:
+                        output.extend(data)           
                 return output 
             else:
                 raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))

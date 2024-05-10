@@ -159,5 +159,5 @@ class ExpenseSerializer(serializers.ModelSerializer):
         return data
     class Meta:
         model = Expense
-        fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'total']
+        fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']
         
