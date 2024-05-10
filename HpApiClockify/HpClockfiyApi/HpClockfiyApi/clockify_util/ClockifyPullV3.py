@@ -94,7 +94,7 @@ async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, e
         logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
         return []
     logger.info(f'FindTimesheet called for {timeId} on page {page} ')
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=50&sort-column=UPDATED_AT"
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
     async with httpx.AsyncClient(timeout=300) as client:
         response = await client.get(url, headers={'X-Api-Key': key})
         if response.status_code == 200:
@@ -137,7 +137,8 @@ async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryF
     while retries < MAX_RETRIES:
         try:
             tasks = []
-            for page_number in range(1, 7):  # Iterate from page 1 to page 6 asynchronously
+            # for page_number in range(1, 7):  # Iterate from page 1 to page 6 asynchronously
+            for page_number in range(1, 2):  # First page of recent changes 
                 # findTimesheetAsync = sync_to_async(FindTimesheet)   
                 tasks.append(
                     asyncio.create_task(delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay_between_tasks * page_number))
