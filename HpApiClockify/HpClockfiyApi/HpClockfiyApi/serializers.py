@@ -134,8 +134,8 @@ class TagsForSerializer(serializers.Serializer):
         try:
             # instance.id = instance.id
             instance.name = validated_data.get('name') or instance.name
-            instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
-            instance.entryid = Entry.objects.get(id=self.context.get('entryid'), workspace=validated_data.get('workspaceId')) or instance.entryid
+            # instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
+            # instance.entryid = Entry.objects.get(id=self.context.get('entryid'), workspace=validated_data.get('workspaceId')) or instance.entryid
             instance.timeid = Timesheet.objects.get(id=self.context.get('timeid')) or instance.timeid
             instance.save(force_update=True)
             return instance
