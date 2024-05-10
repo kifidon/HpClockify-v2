@@ -192,7 +192,7 @@ async def approvedEntries(request: ASGIRequest):
                     if serializer.is_valid():
                         serializer.save()
                         logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
-                        reversed_data = reverseForOutput(serializer.data)
+                        reversed_data = reverseForOutput(entries)
                         logger.info(f'{reversed_data}')
                         if (len(entries['tags']) != 0):
                             data = {
