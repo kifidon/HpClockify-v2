@@ -113,7 +113,7 @@ async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, e
             logger.debug(f'FindTimesheet executed - Not Found in range {page}')
             return []
         else:
-            raise Exception(f"Failed to pull Data From Clockify: {response._text}")
+            raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
 
 async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
     """
