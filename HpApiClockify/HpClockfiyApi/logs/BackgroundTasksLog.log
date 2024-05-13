@@ -7618,3 +7618,35 @@
 2024-05-13 11:44:56,510 - background_tasks - WARNING - UnknownError: "'timesheetId'"
 2024-05-13 11:47:20,601 - background_tasks - INFO - Update Entry Called
 2024-05-13 11:47:20,602 - background_tasks - WARNING - UnknownError: "'timesheetId'"
+2024-05-13 13:28:01,786 - background_tasks - INFO - Create Entry Called
+2024-05-13 13:28:05,566 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:28:05,566 - background_tasks - WARNING - UnknownError: "'timesheetId'"
+2024-05-13 13:28:32,703 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:28:32,704 - background_tasks - WARNING - UnknownError: 89 "'timesheetId'"
+2024-05-13 13:30:00,727 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:30:01,229 - background_tasks - WARNING - UnknownError: 103 "Workspace matching query does not exist."
+2024-05-13 13:31:06,852 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:31:06,853 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:31:07,940 - background_tasks - WARNING - UnknownError: 103 "Workspace matching query does not exist."
+2024-05-13 13:32:46,449 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:32:46,450 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:32:46,738 - background_tasks - WARNING - UnknownError: 103 "'workspaceId'"
+2024-05-13 13:33:51,242 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:33:51,242 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:34:27,729 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:34:27,730 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:34:28,090 - background_tasks - WARNING - UnknownError: 103 None"'workspaceId'"
+2024-05-13 13:35:01,449 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:35:01,450 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:35:01,867 - background_tasks - WARNING - UnknownError: 103 'workspaceId'"'workspaceId'"
+2024-05-13 13:36:48,342 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:36:48,343 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:36:48,573 - background_tasks - WARNING - UnknownError: 103 "'dict' object has no attribute 'grt'"
+2024-05-13 13:37:11,160 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:37:11,160 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:37:11,533 - background_tasks - WARNING - UnknownError: 103 "Workspace matching query does not exist."
+2024-05-13 13:37:59,874 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:37:59,875 - background_tasks - DEBUG - <class 'KeyError'>
+2024-05-13 13:38:00,117 - background_tasks - WARNING - UnknownError: 103 "Workspace matching query does not exist."
+2024-05-13 13:38:13,299 - background_tasks - INFO - Update Entry Called
+2024-05-13 13:38:13,299 - background_tasks - DEBUG - <class 'KeyError'>

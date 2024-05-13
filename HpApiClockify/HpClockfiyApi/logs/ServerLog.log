@@ -1289,3 +1289,583 @@
 }
 2024-05-13 11:49:42,095 - server - INFO - Entry Deleted...
 2024-05-13 11:49:42,098 - server - DEBUG - <JsonResponse status_code=200, "application/json">
+2024-05-13 13:27:59,094 - server - INFO - newEntry view called
+2024-05-13 13:28:01,597 - server - INFO - Insert path taken for Entry
+2024-05-13 13:28:04,676 - server - INFO - newEntry view called
+2024-05-13 13:28:05,360 - server - INFO - Update path taken for Entry
+2024-05-13 13:28:30,492 - server - INFO - newEntry view called
+2024-05-13 13:28:32,559 - server - INFO - Update path taken for Entry
+2024-05-13 13:29:58,246 - server - INFO - newEntry view called
+2024-05-13 13:30:00,552 - server - INFO - Update path taken for Entry
+2024-05-13 13:31:04,406 - server - INFO - newEntry view called
+2024-05-13 13:31:04,407 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:31:06,696 - server - INFO - Update path taken for Entry
+2024-05-13 13:32:44,084 - server - INFO - newEntry view called
+2024-05-13 13:32:44,085 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:32:46,278 - server - INFO - Update path taken for Entry
+2024-05-13 13:33:48,849 - server - INFO - newEntry view called
+2024-05-13 13:33:48,850 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:33:51,086 - server - INFO - Update path taken for Entry
+2024-05-13 13:34:25,215 - server - INFO - newEntry view called
+2024-05-13 13:34:25,216 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:34:27,538 - server - INFO - Update path taken for Entry
+2024-05-13 13:34:58,843 - server - INFO - newEntry view called
+2024-05-13 13:34:58,844 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:35:01,285 - server - INFO - Update path taken for Entry
+2024-05-13 13:36:45,974 - server - INFO - newEntry view called
+2024-05-13 13:36:45,974 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:36:48,179 - server - INFO - Update path taken for Entry
+2024-05-13 13:37:08,766 - server - INFO - newEntry view called
+2024-05-13 13:37:08,767 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:37:10,995 - server - INFO - Update path taken for Entry
+2024-05-13 13:37:59,048 - server - INFO - newEntry view called
+2024-05-13 13:37:59,048 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:37:59,714 - server - INFO - Update path taken for Entry
+2024-05-13 13:38:10,983 - server - INFO - newEntry view called
+2024-05-13 13:38:10,984 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 13:38:13,298 - server - INFO - Update path taken for Entry
+2024-05-13 13:38:31,322 - server - INFO - Delete Entry Function called
+2024-05-13 13:38:31,324 - server - DEBUG - Input data: 
+{
+    "id": "66423c558b23134e5619e0a5",
+    "description": "",
+    "userId": "659d63f583e8651e8c336e02",
+    "billable": false,
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "timeInterval": {
+        "start": "2024-05-13T15:00:00Z",
+        "end": "2024-05-13T16:00:00Z",
+        "duration": "PT1H"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "hourlyRate": null,
+    "costRate": null,
+    "customFieldValues": [],
+    "type": "REGULAR",
+    "kioskId": null,
+    "projectCurrency": null,
+    "currentlyRunning": false,
+    "project": {
+        "name": "000-000 - Overhead (Non Billable)",
+        "clientId": "65c25ae977682a2076d96d49",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "billable": false,
+        "estimate": {
+            "estimate": "PT0S",
+            "type": "AUTO"
+        },
+        "color": "#03A9F4",
+        "archived": false,
+        "clientName": "Hill Plain Internal",
+        "duration": "PT7687H45M",
+        "note": "",
+        "activeEstimate": "NONE",
+        "timeEstimate": {
+            "includeNonBillable": true,
+            "estimate": 0,
+            "type": "AUTO",
+            "resetOption": null
+        },
+        "budgetEstimate": null,
+        "estimateReset": null,
+        "id": "65c262c0edeea53ae1a27b84",
+        "public": true,
+        "template": false
+    },
+    "task": null,
+    "user": {
+        "id": "659d63f583e8651e8c336e02",
+        "name": "Matthew Dixon",
+        "status": "ACTIVE"
+    },
+    "tags": []
+}
+2024-05-13 13:38:32,136 - server - INFO - Entry Deleted...
+2024-05-13 13:38:32,138 - server - DEBUG - <JsonResponse status_code=200, "application/json">

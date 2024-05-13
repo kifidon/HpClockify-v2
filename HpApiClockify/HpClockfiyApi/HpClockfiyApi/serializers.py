@@ -54,7 +54,7 @@ class EntrySerializer(serializers.Serializer): # missing update
     project = serializers.DictField()
     hourlyRate = serializers.DictField(allow_null=True)
     timeInterval = serializers.DictField()
-    workspaceId = serializers.PrimaryKeyRelatedField(queryset=Workspace.objects.all())
+    workspaceId = serializers.CharField()
     tags = serializers.ListField()
 
     def create(self, validated_data):
@@ -86,7 +86,11 @@ class EntrySerializer(serializers.Serializer): # missing update
         logger.info('Update Entry Called')
         try:
             # instance.id = instance.id
-            instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) or instance.timesheetId
+            try:
+                instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
+            except Exception as e:
+                instance.timesheetId
+                logger.debug(type(e))
             instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
             instance.description = validated_data.get('description') or instance.description
             instance.billable = validated_data.get('billable') or instance.billable
@@ -96,11 +100,11 @@ class EntrySerializer(serializers.Serializer): # missing update
             else: instance.hourlyRate =  -1
             instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
             instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
-            instance.workspaceId = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspaceId
+            instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
             instance.save(force_update=True)
             return instance
         except Exception as e:
-            logger.warning(f'UnknownError: {dumps(str(e), indent = 4)}')
+            logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
             return instance
 
 class TagsForSerializer(serializers.Serializer):

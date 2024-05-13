@@ -555,7 +555,7 @@ async def newEntry(request:ASGIRequest):
         processEntryAsync = sync_to_async(processEntry)
         result = await processEntryAsync(inputData)
         if result[0]:
-            return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+            return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
         else:
             return JsonResponse(
                 data= {
