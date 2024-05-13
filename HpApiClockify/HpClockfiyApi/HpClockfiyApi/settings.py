@@ -5,6 +5,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOG_LEVEL = 'INFO'
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
 
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 LOGGING = {
@@ -50,8 +52,6 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-x^ek8@8+=301_nj87hs4tf2d$$28%1n2lj#n81dga5v_a3ztb-'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 # ALLOWED_HOSTS = ['169.254.129.2','hpclockifyapi.azurewebsites.net', '169.254.130.3','169.254.129.3', 'localhost', '127.0.0.1', '169.254.130.2',
 # '20.237.180.234','20.237.181.23','20.237.181.49','20.228.97.254','20.228.99.26','20.237.179.112','104.40.10.200','104.40.9.245','104.40.14.130','104.40.3.249','104.40.18.254','104.40.18.248','40.112.243.106']

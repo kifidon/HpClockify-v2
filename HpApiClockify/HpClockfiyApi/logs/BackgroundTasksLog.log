@@ -4732,3 +4732,1940 @@
     "id": "663e1eb172b1301e4d0da86f",
 {
 2024-05-10 14:01:56,464 - background_tasks - INFO - Expense added for timesheet 663e1edf72b1301e4d0db01d
+2024-05-13 09:27:03,919 - background_tasks - INFO - updateEntries Function called
+2024-05-13 09:27:03,919 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-13 09:27:03,919 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-13 09:27:03,921 - background_tasks - DEBUG - {
+    "id": "6642303f59593b0ef8054c03",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+        "userName": "Steven Parks",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "659d63f583e8651e8c336e02",
+        "userName": "Matthew Dixon",
+        "userEmail": "matthew.dixon@hillplain.com"
+    }
+}
+2024-05-13 09:27:04,913 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:27:07,591 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:27:07,591 - background_tasks - DEBUG - [
+    {
+        "id": "663e1638a1a03649bdfeb2ff",
+        "description": "came in on the weekend to manage the sub trades working the weekend",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-11T12:30:00Z",
+            "end": "2024-05-11T21:30:00Z",
+            "duration": "PT9H"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15e22b09fe4a4fc140e1",
+        "description": "manage subtrades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-10T12:30:00Z",
+            "end": "2024-05-10T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dea1a03649bdfea38b",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-09T12:30:00Z",
+            "end": "2024-05-09T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dc4312372f75c8818a",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-08T12:30:00Z",
+            "end": "2024-05-08T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b7071e45cba747189a123",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-07T12:30:00Z",
+            "end": "2024-05-07T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b706a946742694d2a5479",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-06T12:30:00Z",
+            "end": "2024-05-06T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    }
+]
+2024-05-13 09:27:07,591 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:27:09,842 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 09:27:09,843 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:10,804 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 09:27:10,805 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 09:27:10,970 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 09:27:10,970 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:11,695 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 09:27:11,696 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 09:27:11,872 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 09:27:11,872 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:12,579 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 09:27:12,579 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 09:27:12,748 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 09:27:12,749 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:13,480 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 09:27:13,481 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 09:27:13,662 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 09:27:13,665 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:14,385 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 09:27:14,385 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 09:27:14,560 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 09:27:14,561 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:27:15,302 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 09:27:15,302 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 09:27:15,304 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 09:27:15,777 - background_tasks - INFO - Approved Expense function called
+2024-05-13 09:27:15,782 - background_tasks - DEBUG - InputData
+}
+    }
+        "userEmail": "matthew.dixon@hillplain.com"
+        "userName": "Matthew Dixon",
+        "userId": "659d63f583e8651e8c336e02",
+    "creator": {
+    },
+        "note": ""
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "state": "APPROVED",
+    "status": {
+    },
+        "startOfWeek": "SUNDAY"
+        "timeZone": "America/Edmonton",
+        "userName": "Steven Parks",
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+    "owner": {
+    },
+        "end": "2024-05-12T05:59:59Z"
+        "start": "2024-05-05T06:00:00Z",
+    "dateRange": {
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "6642303f59593b0ef8054c03",
+{
+2024-05-13 09:27:16,783 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:27:18,680 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:27:18,680 - background_tasks - DEBUG - [
+    {
+        "id": "663e1638a1a03649bdfeb2ff",
+        "description": "came in on the weekend to manage the sub trades working the weekend",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-11T12:30:00Z",
+            "end": "2024-05-11T21:30:00Z",
+            "duration": "PT9H"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15e22b09fe4a4fc140e1",
+        "description": "manage subtrades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-10T12:30:00Z",
+            "end": "2024-05-10T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dea1a03649bdfea38b",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-09T12:30:00Z",
+            "end": "2024-05-09T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dc4312372f75c8818a",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-08T12:30:00Z",
+            "end": "2024-05-08T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b7071e45cba747189a123",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-07T12:30:00Z",
+            "end": "2024-05-07T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b706a946742694d2a5479",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-06T12:30:00Z",
+            "end": "2024-05-06T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    }
+]
+2024-05-13 09:27:18,681 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:27:19,348 - background_tasks - INFO - Updating Expense...
+2024-05-13 09:27:21,214 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 09:27:21,215 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 09:27:21,216 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 09:32:16,003 - background_tasks - INFO - updateEntries Function called
+2024-05-13 09:32:16,003 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-13 09:32:16,004 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-13 09:32:16,006 - background_tasks - DEBUG - {
+    "id": "6642303f59593b0ef8054c03",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+        "userName": "Steven Parks",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "659d63f583e8651e8c336e02",
+        "userName": "Matthew Dixon",
+        "userEmail": "matthew.dixon@hillplain.com"
+    }
+}
+2024-05-13 09:32:17,009 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:32:19,368 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:32:19,369 - background_tasks - DEBUG - [
+    {
+        "id": "663e1638a1a03649bdfeb2ff",
+        "description": "came in on the weekend to manage the sub trades working the weekend",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-11T12:30:00Z",
+            "end": "2024-05-11T21:30:00Z",
+            "duration": "PT9H"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15e22b09fe4a4fc140e1",
+        "description": "manage subtrades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-10T12:30:00Z",
+            "end": "2024-05-10T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dea1a03649bdfea38b",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-09T12:30:00Z",
+            "end": "2024-05-09T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dc4312372f75c8818a",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-08T12:30:00Z",
+            "end": "2024-05-08T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b7071e45cba747189a123",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-07T12:30:00Z",
+            "end": "2024-05-07T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b706a946742694d2a5479",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-06T12:30:00Z",
+            "end": "2024-05-06T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    }
+]
+2024-05-13 09:32:19,369 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:32:20,510 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 09:32:20,512 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:21,455 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 09:32:21,455 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 09:32:21,598 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 09:32:21,600 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:22,229 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 09:32:22,229 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 09:32:22,398 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 09:32:22,399 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:23,041 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 09:32:23,041 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 09:32:23,186 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 09:32:23,186 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:23,839 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 09:32:23,839 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 09:32:23,998 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 09:32:24,000 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:24,645 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 09:32:24,645 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 09:32:24,793 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 09:32:24,795 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:25,425 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 09:32:25,425 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 09:32:25,426 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 09:32:25,951 - background_tasks - INFO - Approved Expense function called
+2024-05-13 09:32:25,957 - background_tasks - DEBUG - InputData
+}
+    }
+        "userEmail": "matthew.dixon@hillplain.com"
+        "userName": "Matthew Dixon",
+        "userId": "659d63f583e8651e8c336e02",
+    "creator": {
+    },
+        "note": ""
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "state": "APPROVED",
+    "status": {
+    },
+        "startOfWeek": "SUNDAY"
+        "timeZone": "America/Edmonton",
+        "userName": "Steven Parks",
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+    "owner": {
+    },
+        "end": "2024-05-12T05:59:59Z"
+        "start": "2024-05-05T06:00:00Z",
+    "dateRange": {
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "6642303f59593b0ef8054c03",
+{
+2024-05-13 09:32:26,972 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:32:28,931 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:32:28,932 - background_tasks - DEBUG - [
+    {
+        "id": "663e1638a1a03649bdfeb2ff",
+        "description": "came in on the weekend to manage the sub trades working the weekend",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-11T12:30:00Z",
+            "end": "2024-05-11T21:30:00Z",
+            "duration": "PT9H"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15e22b09fe4a4fc140e1",
+        "description": "manage subtrades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-10T12:30:00Z",
+            "end": "2024-05-10T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dea1a03649bdfea38b",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-09T12:30:00Z",
+            "end": "2024-05-09T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dc4312372f75c8818a",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-08T12:30:00Z",
+            "end": "2024-05-08T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b7071e45cba747189a123",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-07T12:30:00Z",
+            "end": "2024-05-07T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b706a946742694d2a5479",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-06T12:30:00Z",
+            "end": "2024-05-06T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    }
+]
+2024-05-13 09:32:28,932 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:32:29,517 - background_tasks - INFO - Updating Expense...
+2024-05-13 09:32:31,823 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 09:32:31,824 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 09:32:43,619 - background_tasks - INFO - updateEntries Function called
+2024-05-13 09:32:43,619 - background_tasks - DEBUG - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-13 09:32:43,619 - background_tasks - DEBUG - <class 'bytes'>
+2024-05-13 09:32:43,620 - background_tasks - DEBUG - {
+    "id": "6642303f59593b0ef8054c03",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "dateRange": {
+        "start": "2024-05-05T06:00:00Z",
+        "end": "2024-05-12T05:59:59Z"
+    },
+    "owner": {
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+        "userName": "Steven Parks",
+        "timeZone": "America/Edmonton",
+        "startOfWeek": "SUNDAY"
+    },
+    "status": {
+        "state": "APPROVED",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "note": ""
+    },
+    "creator": {
+        "userId": "659d63f583e8651e8c336e02",
+        "userName": "Matthew Dixon",
+        "userEmail": "matthew.dixon@hillplain.com"
+    }
+}
+2024-05-13 09:32:44,614 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:32:46,427 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:32:46,428 - background_tasks - DEBUG - Data found:
+[
+    {
+        "id": "663e1638a1a03649bdfeb2ff",
+        "description": "came in on the weekend to manage the sub trades working the weekend",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-11T12:30:00Z",
+            "end": "2024-05-11T21:30:00Z",
+            "duration": "PT9H"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15e22b09fe4a4fc140e1",
+        "description": "manage subtrades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-10T12:30:00Z",
+            "end": "2024-05-10T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dea1a03649bdfea38b",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-09T12:30:00Z",
+            "end": "2024-05-09T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663e15dc4312372f75c8818a",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-08T12:30:00Z",
+            "end": "2024-05-08T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b7071e45cba747189a123",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-07T12:30:00Z",
+            "end": "2024-05-07T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    },
+    {
+        "id": "663b706a946742694d2a5479",
+        "description": "manage sub trades",
+        "tags": [],
+        "billable": true,
+        "task": {
+            "id": null,
+            "name": null
+        },
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "timeInterval": {
+            "start": "2024-05-06T12:30:00Z",
+            "end": "2024-05-06T22:00:00Z",
+            "duration": "PT9H30M"
+        },
+        "customFieldValues": [],
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "hourlyRate": {
+            "amount": 9787
+        },
+        "costRate": {
+            "amount": 0
+        },
+        "type": "REGULAR",
+        "isLocked": false
+    }
+]
+2024-05-13 09:32:46,428 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:32:48,463 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 09:32:48,464 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:49,224 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 09:32:49,224 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 09:32:49,389 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 09:32:49,390 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:50,060 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 09:32:50,060 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 09:32:50,215 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 09:32:50,218 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:50,883 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 09:32:50,883 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 09:32:51,042 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 09:32:51,043 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:51,704 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 09:32:51,705 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 09:32:51,867 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 09:32:51,868 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:52,544 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 09:32:52,545 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 09:32:52,700 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 09:32:52,701 - background_tasks - INFO - Update Entry Called
+2024-05-13 09:32:53,386 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 09:32:53,390 - background_tasks - INFO - }
+    "isLocked": false
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 09:32:53,393 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 09:32:53,893 - background_tasks - INFO - Approved Expense function called
+2024-05-13 09:32:53,900 - background_tasks - DEBUG - InputData
+}
+    }
+        "userEmail": "matthew.dixon@hillplain.com"
+        "userName": "Matthew Dixon",
+        "userId": "659d63f583e8651e8c336e02",
+    "creator": {
+    },
+        "note": ""
+        "updatedAt": "2024-05-13T15:23:28Z",
+        "updatedByUserName": "Matthew Dixon",
+        "updatedBy": "659d63f583e8651e8c336e02",
+        "state": "APPROVED",
+    "status": {
+    },
+        "startOfWeek": "SUNDAY"
+        "timeZone": "America/Edmonton",
+        "userName": "Steven Parks",
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+    "owner": {
+    },
+        "end": "2024-05-12T05:59:59Z"
+        "start": "2024-05-05T06:00:00Z",
+    "dateRange": {
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "6642303f59593b0ef8054c03",
+{
+2024-05-13 09:32:54,902 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 09:32:56,704 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 09:32:56,704 - background_tasks - DEBUG - Data found: 
+[
+    {
+        "id": "663e190c44e5c3794827a38c",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "userId": "65dcdd57ea15ab53ab7b14dc",
+        "date": "2024-05-10T00:00:00Z",
+        "project": {
+            "id": "65c25bc5ffbbb676c5e212cf",
+            "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+            "color": "#00BCD4",
+            "clientId": "65c25a26c642257db282938b",
+            "clientName": "ANSN"
+        },
+        "category": {
+            "id": "65c2522effbbb676c5e010b4",
+            "name": "Other",
+            "hasUnitPrice": false,
+            "priceInCents": 0,
+            "unit": "",
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "archived": false
+        },
+        "notes": "OIL CHANGE AT JIFFY LUBE",
+        "quantity": 15115.0,
+        "billable": true,
+        "fileId": "663e190c44e5c3794827a383",
+        "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+        "total": 15115.0,
+        "approvalRequestId": "6642303f59593b0ef8054c03",
+        "currency": "CAD",
+        "locked": false
+    }
+]
+2024-05-13 09:32:56,704 - background_tasks - DEBUG - FindTimesheet executed 1
+2024-05-13 09:32:57,398 - background_tasks - INFO - Updating Expense...
+2024-05-13 09:32:59,260 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 09:32:59,260 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 09:32:59,262 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03

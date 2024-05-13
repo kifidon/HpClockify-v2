@@ -101,11 +101,13 @@ async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, e
             for timesheet in response.json():
                 if timesheet['approvalRequest']['id'] == timeId:
                     logger.info(f'Timesheet found on page {page}')
-                    logger.debug(dumps(timesheet['entries'], indent = 4))
-                    logger.debug(f'FindTimesheet executed {page}')
                     if entry:
+                        logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
+                        logger.debug(f'FindTimesheet executed {page}')
                         return timesheet['entries']
                     elif expense:
+                        logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
+                        logger.debug(f'FindTimesheet executed {page}')
                         return timesheet['expenses']
                     else:
                         return []

@@ -49,7 +49,7 @@ async def updateTimesheets(request:ASGIRequest):
                         serializer = TimesheetSerializer(instance= timesheet, data = inputData)
                     except Timesheet.DoesNotExist:
                         serializer = TimesheetSerializer(data=inputData)
-                        logger.warning(f'WARNING: Adding new timesheet on update function. Timesheet { inputData["id"] }')
+                        logger.warning(f'Adding new timesheet on update function. Timesheet { inputData["id"] }')
                     if serializer.is_valid():
                         serializer.save()
                         # task = asyncio.ensure_future(updateEntries(request, serializer))
@@ -106,7 +106,7 @@ def newTimeSheets(request: ASGIRequest):
             if serializer.is_valid():
                 serializer.save()
                 response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
-                logger.info(f'{get_current_time()} - INFO: NewTimesheet:{dumps(data["id"])}{response.status_code}')
+                logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
                 return response
             else:
                 response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
@@ -141,14 +141,14 @@ def newTimeSheets(request: ASGIRequest):
 def quickBackup(request: ASGIRequest):
     result = main() # General String for return output
     response = Response(data = result, status=status.HTTP_200_OK)
-    logger.info(f'{get_current_time()} - {get_current_time()}INFO: Quickbackup:  {response.data}, {response.status_code}')
+    logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     return response
 
 @api_view(['GET'])
 def timesheets(request: ASGIRequest):
     result = TimesheetEvent(status='APPROVED')
     response = Response(data = result, status=status.HTTP_200_OK)
-    logger.info(f'{get_current_time()} - INFO: Quickbackup:  {response.data}, {response.status_code}')
+    logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     
     return response
 
@@ -268,7 +268,7 @@ def getEmployeeUsers(request: ASGIRequest, format = None):
         
 @api_view(['GET', 'POST'])
 def bankedHrs(request: ASGIRequest):
-    logger.info(f'{get_current_time()} - INFO: {request.method}: bankedHours ')
+    logger.info(f'{request.method}: bankedHours ')
     try:
         SqlClockPull.main()
         return Response(data='Operation Completed', status=status.HTTP_200_OK)
@@ -354,7 +354,7 @@ def getEmployeeUsers(request: ASGIRequest, format = None):
         
 @api_view(['GET', 'POST',])
 def getProjects(request: ASGIRequest, format = None):
-        logger.info(f'{get_current_time()} - INFO: POST: getProjects')
+        logger.info(f'POST: getProjects')
     # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
     # payload = request.body
     # secret = b'' # input signing secret here 
@@ -528,5 +528,4 @@ async def deleteExpense(request: ASGIRequest):
         deleteAsync =  sync_to_async(delete)
         response = await deleteAsync()
         return response
-    
     
