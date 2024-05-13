@@ -64,7 +64,7 @@ class EntrySerializer(serializers.Serializer): # missing update
             Rate = validated_data.get('hourlyRate').get('amount')
         else: Rate = -1
         try: 
-            timesheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) 
+            timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
         except Timesheet.DoesNotExist:
             timesheet = None 
         entry = Entry.objects.create(
