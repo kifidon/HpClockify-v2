@@ -96,21 +96,21 @@ class Project(models.Model):
     
 class Entry(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, time_sheet_id, workspace_id, workspace_id) found, that is not supported. The first column is selected.
-    time_sheet = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id', blank=True, null=True)
+    timesheetId = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id', blank=True, null=True)
     duration = models.FloatField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     billable = models.BooleanField(blank=True, null=True)
     project = models.ForeignKey('Project', models.CASCADE, to_field='id', blank=True, null=True, db_column='project_id')
     # type = models.CharField(max_length=20, blank=True, null=True)
-    rate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    start_time = models.DateTimeField(blank=True, null=True)
-    end_time = models.DateTimeField(blank=True, null=True)
-    workspace = models.ForeignKey('Workspace', models.DO_NOTHING, db_column='workspace_id', to_field='id')
+    hourlyRate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, db_column='rate')
+    start = models.DateTimeField(blank=True, null=True, db_column='start_time')
+    end = models.DateTimeField(blank=True, null=True, db_column='end_time')
+    workspaceId = models.ForeignKey('Workspace', models.DO_NOTHING, db_column='workspace_id', to_field='id')
 
     class Meta:
         managed = False
         db_table = 'Entry'
-        unique_together = (('id',  'workspace'))
+        unique_together = (('id',  'workspaceId'))
 
     def __str__(self):
         return self.id or ""

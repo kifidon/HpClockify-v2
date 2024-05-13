@@ -7,12 +7,14 @@ from django.db import transaction , utils
 from .serializers import (
     TimesheetSerializer,
     ExpenseSerializer,
+    EntrySerializer
     # CategorySerializer
 
 )
 from .models import(
     Timesheet,
-    Expense
+    Expense,
+    Entry
 )
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
@@ -26,7 +28,7 @@ from .clockify_util.hpUtil import bytes_to_dict
 from .clockify_util import ClockifyPullV3
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, UserEvent, ProjectEvent, TimeOffEvent, PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import get_current_time, asyncio, dumps, loads
+from .clockify_util.hpUtil import asyncio, dumps, loads, reverseForOutput
 from . import settings
 import time
 import httpx
@@ -35,6 +37,7 @@ from json.decoder import JSONDecodeError
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
+
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
     if request.method == 'POST':
@@ -61,7 +64,7 @@ async def updateTimesheets(request:ASGIRequest):
                         return [response, serializer]
                     else: 
                         response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                        logger.error(f'{get_current_time()} - ERROR: UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
+                        logger.error(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
                         return [response, None]
 
             async def callBackgroungEntry():
@@ -110,28 +113,28 @@ def newTimeSheets(request: ASGIRequest):
                 return response
             else:
                 response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                logger.error(f'{get_current_time()} - {response}')
+                logger.error(f'{response}')
                 return response
         except utils.IntegrityError as e:
             if 'PRIMARY KEY constraint' in str(e): 
                 response = Response(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT)
-                logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
-                logger.error(f'{get_current_time()} - {response}')
+                logger.error(f"on timesheet {request.data['id']}")
+                logger.error(f'{response}')
                 return response
             elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
                 response = Response(data=str(e), status=status.HTTP_406_NOT_ACCEPTABLE)
-                logger.error(f"{get_current_time()} -ERROR: on timesheet {request.data['id']}")
-                logger.error(f'{get_current_time()} - {response}')
+                logger.error(f"on timesheet {request.data['id']}")
+                logger.error(f'{response}')
                 return response
             else:
                 response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
-                logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}")
-                logger.error(f'{get_current_time()} - {response}')
+                logger.error(f"on timesheet {request.data['id']}")
+                logger.error(f'{response}')
                 return response
         except Exception as e:
-            logger.error(f"{get_current_time()} - ERROR: on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
+            logger.error(f"on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
             response = Response(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
-            logger.error(f'{get_current_time()} - {response}')
+            logger.error(f'{response}')
             return response
     else:
         response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -235,7 +238,7 @@ def getClients(request: ASGIRequest):
         if request.method == 'POST':
             logger = setup_server_logger(loggerLevel)
             stat = ClientEvent()
-            logger.info(f'{get_current_time()} - Client Event: Add Client')
+            logger.info(f'Client Event: Add Client')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -258,7 +261,7 @@ def getEmployeeUsers(request: ASGIRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET':
             stat = UserEvent()
-            logger.info(f'{get_current_time()} - User Event: Add User')
+            logger.info(f'User Event: Add User')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -273,7 +276,7 @@ def bankedHrs(request: ASGIRequest):
         SqlClockPull.main()
         return Response(data='Operation Completed', status=status.HTTP_200_OK)
     except Exception as e:
-        logger.error(f'{get_current_time()} - ERROR: {str(e)}')
+        logger.error(f'{str(e)}')
         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 '''
@@ -321,7 +324,7 @@ def getClients(request: ASGIRequest):
         if request.method == 'POST':
             logger = setup_server_logger(loggerLevel)
             stat = ClientEvent()
-            logger.info(f'{get_current_time()} - Client Event: Add Client')
+            logger.info(f'Client Event: Add Client')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -344,7 +347,7 @@ def getEmployeeUsers(request: ASGIRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET':
             stat = UserEvent()
-            logger.info(f'{get_current_time()} - User Event: Add User')
+            logger.info(f'User Event: Add User')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -368,7 +371,7 @@ def getProjects(request: ASGIRequest, format = None):
         '''
         if request.method == 'POST' or request.method=='GET': 
             stat = ProjectEvent()
-            logger.info(f'{get_current_time()} - Project Event ')
+            logger.info(f'Project Event ')
             if stat:
                 return Response(data= 'Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -392,7 +395,7 @@ def getTimeOffRequests(request: ASGIRequest, format = None):
         '''
         if request.method == 'POST' or request.method == 'GET':
             stat = TimeOffEvent()
-            logger.info(f'{get_current_time()} - Time Off  Event: Add Time Off')
+            logger.info(f'Time Off  Event: Add Time Off')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -415,7 +418,7 @@ def getTimeOffPolicies(request: ASGIRequest, format = None):
         '''
         if request.method == 'POST' or request.method == 'GET':
             stat = PolicyEvent()
-            logger.info(f'{get_current_time()} - Policy Event: Add Policy')
+            logger.info(f'Policy Event: Add Policy')
             if stat:
                 return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
             else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
@@ -505,17 +508,110 @@ async def newExpense(request: ASGIRequest):
             )
 
 @csrf_exempt
-async def deleteExpense(request: ASGIRequest):
+async def newEntry(request:ASGIRequest):
+    logger = setup_server_logger()
+    logger.info('newEntry view called')
+    if request.method == 'POST':
+        try:
+            inputData = loads(request.body)
+            RetryFlag = False 
+        except Exception:
+            logger.warning('Unknown Exception, attempting to handle')
+            inputData = request.POST
+            RetryFlag = True
+        logger.debug(reverseForOutput(inputData))
+
+        def processEntry(inputData):
+            try:
+                entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+                serializer = EntrySerializer(instance=entry, data= inputData )
+                logger.info(f'Update path taken for Entry')
+            except Entry.DoesNotExist:
+                serializer = EntrySerializer(data = inputData )
+                logger.info(f'Insert path taken for Entry')
+            if serializer.is_valid():
+                serializer.save()
+                # do the rest 
+                return True, 'V'
+            else:
+                #force backgroung task 
+                logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                for key, value in serializer.errors.items():
+                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                    # Check if the value is an instance of ErrorDetail
+                    if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                        # Print the key and each error code and message
+                        for error_detail in value:
+                            code = error_detail.code
+                            field = key
+                            '''
+                            include check for other foreign keys to know which foreign key 
+                            constraint is violated and which function should handle it
+                            '''
+                            if code == 'does_not_exist': 
+                                return False, 'C' # C for category P for Project, F for file in later updates 
+                return False, 'X' # Unknown, Raise error (BAD Request)
+        
+        processEntryAsync = sync_to_async(processEntry)
+        result = await processEntryAsync(inputData)
+        if result[0]:
+            return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse(
+                data= {
+                    'Message': 'Post Data could not be validated. Review Logs'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+            )
+
+@csrf_exempt
+async def deleteEntry(request:ASGIRequest):
     logger = setup_server_logger(loggerLevel)
-    logger.info('Delete Expense Function called')
-    inputData = bytes_to_dict(request.body)
+    logger.info('Delete Entry Function called')
+    inputData = loads(request.body)
     
     logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
     
     if request.method == 'POST':
-        def delete():
+        
+        def deleteEntry():
             try:
-                expense = Expense.objects.get(pk=inputData['id'])
+                expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
+                expense.delete()
+                logger.info('Entry Deleted...')
+                return True
+            except Entry.DoesNotExist:
+                logger.warning('Entry was not deleted successfully')
+                return False
+        
+        deleteAsync =  sync_to_async(deleteEntry)
+        result = await deleteAsync()
+        
+        if result:
+            response = JsonResponse(data = {
+                    'Message': 'Expense Deleted',
+                    'data': inputData
+                }, status=status.HTTP_200_OK)
+            logger.debug(response)
+            return response
+        else: 
+            response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+            logger.debug(response)
+            return response
+
+    
+@csrf_exempt
+async def deleteExpense(request: ASGIRequest):
+    logger = setup_server_logger(loggerLevel)
+    logger.info('Delete Expense Function called')
+    inputData = loads(request.body)
+    
+    logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+    
+    if request.method == 'POST':
+        def deleteExpense():
+            try:
+                expense = Expense.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
                 expense.delete()
                 response = JsonResponse(data = {
                     'Message': 'Expense Deleted',
@@ -525,7 +621,7 @@ async def deleteExpense(request: ASGIRequest):
             except Expense.DoesNotExist:
                 response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
                 return response
-        deleteAsync =  sync_to_async(delete)
+        deleteAsync =  sync_to_async(deleteExpense)
         response = await deleteAsync()
         return response
     

@@ -49,12 +49,12 @@ class TimesheetSerializer(serializers.Serializer):
 class EntrySerializer(serializers.Serializer): # missing update
     id = serializers.CharField()
     description = serializers.CharField(allow_blank = True)
-    approvalRequestId = serializers.CharField(allow_null = True)
+    timesheetId = serializers.CharField(allow_null = True, allow_blank=True, required=False)
     billable = serializers.BooleanField()
     project = serializers.DictField()
     hourlyRate = serializers.DictField(allow_null=True)
     timeInterval = serializers.DictField()
-    workspace = serializers.SerializerMethodField()
+    workspaceId = serializers.PrimaryKeyRelatedField(queryset=Workspace.objects.all())
     tags = serializers.ListField()
 
     def create(self, validated_data):
@@ -63,17 +63,21 @@ class EntrySerializer(serializers.Serializer): # missing update
         if validated_data.get('hourlyRate') is not None:
             Rate = validated_data.get('hourlyRate').get('amount')
         else: Rate = -1
+        try: 
+            timesheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) 
+        except Timesheet.DoesNotExist:
+            timesheet = None 
         entry = Entry.objects.create(
             id= validated_data['id'],
-            time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')),
+            timesheetId = timesheet,
             duration = timeDuration(validated_data.get('timeInterval').get('duration')),
             description = validated_data.get('description'),
             billable = validated_data.get('billable') ,
             project = Project.objects.get(id=validated_data.get('project').get('id')),
-            rate = Rate,
-            start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')),
-            end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')),
-            workspace = Workspace.objects.get(id=self.context.get('workspaceId'))
+            hourlyRate = Rate,
+            start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
+            end = timeZoneConvert(validated_data.get('timeInterval').get('end')),
+            workspaceId = validated_data.get('workspaceId') or self.context.get('workspaceId'),
         )
         return entry
     
@@ -82,17 +86,17 @@ class EntrySerializer(serializers.Serializer): # missing update
         logger.info('Update Entry Called')
         try:
             # instance.id = instance.id
-            instance.time_sheet = Timesheet.objects.get(id=self.context.get('approvalRequestId')) or instance.time_sheet
+            instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) or instance.timesheetId
             instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
             instance.description = validated_data.get('description') or instance.description
             instance.billable = validated_data.get('billable') or instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
             if validated_data.get('hourlyRate') is not None:     
                 instance.rate = validated_data.get('hourlyRate').get('amount') 
-            else: instance.rate =  -1
-            instance.start_time = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start_time
-            instance.end_time = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end_time
-            instance.workspace = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspace
+            else: instance.hourlyRate =  -1
+            instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
+            instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
+            instance.workspaceId = Workspace.objects.get(id= self.context.get('workspaceId')) or instance.workspaceId
             instance.save(force_update=True)
             return instance
         except Exception as e:

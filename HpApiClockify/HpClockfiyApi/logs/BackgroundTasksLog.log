@@ -6669,3 +6669,952 @@
     "id": "663e190c44e5c3794827a38c",
 {
 2024-05-13 09:32:59,262 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:10:03,538 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:11:18,444 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:12:22,121 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:14:36,864 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:16:36,543 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:18:00,137 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:19:56,358 - background_tasks - INFO - updateEntries Function called
+2024-05-13 11:19:57,356 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:19:59,264 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:19:59,268 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E98820, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,268 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E98DC0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,268 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E99000, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,269 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E99240, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,270 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E99360, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,270 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 218 in 
+	<frame at 0x00000136F8E342C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 223, code approvedEntries>
+2024-05-13 11:19:59,270 - background_tasks - ERROR - Cannot resolve keyword 'workspace' into field. Choices are: billable, description, duration, end, hourlyRate, id, project, project_id, start, tagsfor, timesheetId, timesheetId_id, workspaceId, workspaceId_id at line 185 in 
+	<frame at 0x00000136F8E995A0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:19:59,748 - background_tasks - INFO - Approved Expense function called
+2024-05-13 11:20:00,752 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:20:02,574 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:20:04,868 - background_tasks - INFO - Updating Expense...
+2024-05-13 11:20:06,759 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 11:20:06,760 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 11:20:06,761 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:22:38,597 - background_tasks - INFO - updateEntries Function called
+2024-05-13 11:22:39,603 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:22:42,404 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:22:44,643 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 11:22:44,643 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:44,643 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AFA665900, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:44,644 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 218 in 
+	<frame at 0x0000029AFA5FC2C0, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 223, code approvedEntries>
+2024-05-13 11:22:44,817 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 11:22:44,819 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:44,819 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AE1DED360, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:44,995 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 11:22:44,997 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:44,997 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AFA665A20, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:45,179 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 11:22:45,181 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:45,181 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AFA665B40, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:45,368 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 11:22:45,371 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:45,371 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AFA665C60, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:45,541 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 11:22:45,543 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:22:45,543 - background_tasks - ERROR - {'workspaceId': [ErrorDetail(string='This field is required.', code='required')]} at line 206 in 
+	<frame at 0x0000029AFA665D80, file 'C:\\Users\\TimmyIfidon\\Desktop\\Docs and Projects\\HPDB Stuff\\HpClockify-v2\\HpApiClockify\\HpClockfiyApi\\HpClockfiyApi\\tasks.py', line 208, code syncUpdateEntries>
+2024-05-13 11:22:46,016 - background_tasks - INFO - Approved Expense function called
+2024-05-13 11:22:47,008 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:22:49,229 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:22:49,915 - background_tasks - INFO - Updating Expense...
+2024-05-13 11:22:51,812 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 11:22:51,813 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 11:22:51,815 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:26:06,259 - background_tasks - INFO - updateEntries Function called
+2024-05-13 11:26:07,260 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:26:09,319 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:26:11,305 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 11:26:11,504 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:11,597 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:11,597 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 11:26:11,597 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 11:26:11,753 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 11:26:11,917 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:11,995 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:11,996 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 11:26:11,996 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 11:26:12,152 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 11:26:12,309 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:12,388 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:12,388 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 11:26:12,389 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 11:26:12,543 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 11:26:12,691 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:12,770 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:12,771 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 11:26:12,771 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 11:26:12,949 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 11:26:13,119 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:13,193 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:13,193 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 11:26:13,194 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 11:26:13,355 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 11:26:13,508 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:26:13,581 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:26:13,582 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 11:26:13,582 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 11:26:13,583 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:26:14,066 - background_tasks - INFO - Approved Expense function called
+2024-05-13 11:26:15,079 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:26:16,994 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:26:17,602 - background_tasks - INFO - Updating Expense...
+2024-05-13 11:26:19,376 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 11:26:19,377 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 11:26:19,377 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:28:33,000 - background_tasks - INFO - updateEntries Function called
+2024-05-13 11:28:33,997 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:28:36,291 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:28:38,336 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 11:28:38,500 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:38,579 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:38,579 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 11:28:38,579 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 11:28:38,734 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 11:28:38,888 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:38,966 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:38,966 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 11:28:38,967 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 11:28:39,120 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 11:28:39,281 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:39,356 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:39,356 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 11:28:39,356 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 11:28:39,522 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 11:28:39,705 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:39,816 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:39,817 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 11:28:39,817 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 11:28:39,983 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 11:28:40,137 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:40,212 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:40,213 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 11:28:40,213 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 11:28:40,370 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 11:28:40,534 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:28:40,618 - background_tasks - WARNING - UnknownError: "Timesheet matching query does not exist."
+2024-05-13 11:28:40,618 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 11:28:40,618 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 11:28:40,618 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:28:41,106 - background_tasks - INFO - Approved Expense function called
+2024-05-13 11:28:42,115 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:28:45,141 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:28:45,759 - background_tasks - INFO - Updating Expense...
+2024-05-13 11:28:47,894 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 11:28:47,895 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 11:28:47,897 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:30:34,634 - background_tasks - INFO - updateEntries Function called
+2024-05-13 11:30:35,633 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:30:37,859 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:30:40,152 - background_tasks - INFO - Updating Entry 663e1638a1a03649bdfeb2ff
+2024-05-13 11:30:40,329 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:41,130 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e1638a1a03649bdfeb2ff 202 ACCEPTED
+2024-05-13 11:30:41,130 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H"
+        "end": "2024-05-11T21:30:00Z",
+        "start": "2024-05-11T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "came in on the weekend to manage the sub trades working the weekend",
+    "id": "663e1638a1a03649bdfeb2ff",
+{
+2024-05-13 11:30:41,298 - background_tasks - INFO - Updating Entry 663e15e22b09fe4a4fc140e1
+2024-05-13 11:30:41,836 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:42,622 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15e22b09fe4a4fc140e1 202 ACCEPTED
+2024-05-13 11:30:42,623 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-10T22:00:00Z",
+        "start": "2024-05-10T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage subtrades",
+    "id": "663e15e22b09fe4a4fc140e1",
+{
+2024-05-13 11:30:43,107 - background_tasks - INFO - Updating Entry 663e15dea1a03649bdfea38b
+2024-05-13 11:30:43,656 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:45,147 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dea1a03649bdfea38b 202 ACCEPTED
+2024-05-13 11:30:45,148 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-09T22:00:00Z",
+        "start": "2024-05-09T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dea1a03649bdfea38b",
+{
+2024-05-13 11:30:45,342 - background_tasks - INFO - Updating Entry 663e15dc4312372f75c8818a
+2024-05-13 11:30:45,629 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:46,496 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663e15dc4312372f75c8818a 202 ACCEPTED
+2024-05-13 11:30:46,497 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-08T22:00:00Z",
+        "start": "2024-05-08T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663e15dc4312372f75c8818a",
+{
+2024-05-13 11:30:46,723 - background_tasks - INFO - Updating Entry 663b7071e45cba747189a123
+2024-05-13 11:30:46,933 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:47,690 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b7071e45cba747189a123 202 ACCEPTED
+2024-05-13 11:30:47,691 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-07T22:00:00Z",
+        "start": "2024-05-07T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b7071e45cba747189a123",
+{
+2024-05-13 11:30:47,867 - background_tasks - INFO - Updating Entry 663b706a946742694d2a5479
+2024-05-13 11:30:48,038 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:30:48,795 - background_tasks - INFO - UpdateEntries on timesheet(6642303f59593b0ef8054c03): E-663b706a946742694d2a5479 202 ACCEPTED
+2024-05-13 11:30:48,796 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 9787
+    "hourlyRate": {
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "customFieldValues": [],
+    },
+        "duration": "PT9H30M"
+        "end": "2024-05-06T22:00:00Z",
+        "start": "2024-05-06T12:30:00Z",
+    "timeInterval": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": true,
+    "tags": [],
+    "description": "manage sub trades",
+    "id": "663b706a946742694d2a5479",
+{
+2024-05-13 11:30:48,798 - background_tasks - INFO - Entries added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:30:49,285 - background_tasks - INFO - Approved Expense function called
+2024-05-13 11:30:50,303 - background_tasks - INFO - FindTimesheet called for 6642303f59593b0ef8054c03 on page 1 
+2024-05-13 11:30:52,556 - background_tasks - INFO - Timesheet found on page 1
+2024-05-13 11:30:53,253 - background_tasks - INFO - Updating Expense...
+2024-05-13 11:30:55,196 - background_tasks - INFO - UpdateExpense on timesheet(6642303f59593b0ef8054c03): EX-663e190c44e5c3794827a38c 202 ACCEPTED
+2024-05-13 11:30:55,196 - background_tasks - INFO - }
+    "timesheetId": "6642303f59593b0ef8054c03"
+    "projectId": "65c25bc5ffbbb676c5e212cf",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "locked": false,
+    "currency": "CAD",
+    "approvalRequestId": "6642303f59593b0ef8054c03",
+    "total": 15115.0,
+    "fileName": "Receipt_2024-05-10_065333 OIL CHANGE.pdf",
+    "fileId": "663e190c44e5c3794827a383",
+    "billable": true,
+    "quantity": 15115.0,
+    "notes": "OIL CHANGE AT JIFFY LUBE",
+    },
+        "archived": false
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unit": "",
+        "priceInCents": 0,
+        "hasUnitPrice": false,
+        "name": "Other",
+        "id": "65c2522effbbb676c5e010b4",
+    "category": {
+    },
+        "clientName": "ANSN"
+        "clientId": "65c25a26c642257db282938b",
+        "color": "#00BCD4",
+        "name": "A23-010 - CMHC Rapid Housing Intiative Phase 3",
+        "id": "65c25bc5ffbbb676c5e212cf",
+    "project": {
+    "date": "2024-05-10T00:00:00Z",
+    "userId": "65dcdd57ea15ab53ab7b14dc",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "id": "663e190c44e5c3794827a38c",
+{
+2024-05-13 11:30:55,196 - background_tasks - INFO - Expense added for timesheet 6642303f59593b0ef8054c03
+2024-05-13 11:35:54,207 - background_tasks - INFO - Create Entry Called
+2024-05-13 11:37:01,279 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:37:01,280 - background_tasks - WARNING - UnknownError: "'timesheetId'"
+2024-05-13 11:44:56,510 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:44:56,510 - background_tasks - WARNING - UnknownError: "'timesheetId'"
+2024-05-13 11:47:20,601 - background_tasks - INFO - Update Entry Called
+2024-05-13 11:47:20,602 - background_tasks - WARNING - UnknownError: "'timesheetId'"

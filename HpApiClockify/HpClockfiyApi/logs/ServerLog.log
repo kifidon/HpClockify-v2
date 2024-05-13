@@ -894,3 +894,398 @@
 2024-05-13 09:32:15,520 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
 2024-05-13 09:32:39,623 - server - INFO - POST: updateTimesheet
 2024-05-13 09:32:42,354 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 10:27:35,396 - server - INFO - newEntry view called
+2024-05-13 10:28:34,925 - server - INFO - newEntry view called
+2024-05-13 10:29:15,364 - server - INFO - newEntry view called
+2024-05-13 10:33:15,974 - server - INFO - newEntry view called
+2024-05-13 10:33:19,356 - server - INFO - Insert path taken for Entry
+2024-05-13 10:33:19,359 - server - WARNING - Serializer could not be saved: {'approvalRequestId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 10:33:19,361 - server - INFO - {
+    "Error Key": "approvalRequestId",
+    "Error Value": [
+        "This field is required."
+    ]
+}
+2024-05-13 10:33:31,218 - server - INFO - newEntry view called
+2024-05-13 10:33:34,261 - server - INFO - Insert path taken for Entry
+2024-05-13 10:33:34,264 - server - WARNING - Serializer could not be saved: {'approvalRequestId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 10:33:34,265 - server - INFO - {
+    "Error Key": "approvalRequestId",
+    "Error Value": [
+        "This field is required."
+    ]
+}
+2024-05-13 10:34:27,986 - server - INFO - newEntry view called
+2024-05-13 10:34:30,170 - server - INFO - Insert path taken for Entry
+2024-05-13 10:34:53,847 - server - INFO - newEntry view called
+2024-05-13 10:34:55,967 - server - INFO - Insert path taken for Entry
+2024-05-13 10:35:09,687 - server - INFO - newEntry view called
+2024-05-13 10:35:14,051 - server - INFO - Insert path taken for Entry
+2024-05-13 10:35:42,130 - server - INFO - newEntry view called
+2024-05-13 10:35:44,291 - server - INFO - Insert path taken for Entry
+2024-05-13 10:35:45,303 - server - WARNING - Serializer could not be saved: {'project': [ErrorDetail(string='Invalid pk "{\'name\': \'000-000 - Overhead (Non Billable)\', \'clientId\': \'65c25ae977682a2076d96d49\', \'workspaceId\': \'65c249bfedeea53ae19d7dad\', \'billable\': False, \'estimate\': {\'estimate\': \'PT0S\', \'type\': \'AUTO\'}, \'color\': \'#03A9F4\', \'archived\': False, \'clientName\': \'Hill Plain Internal\', \'duration\': \'PT7687H45M\', \'note\': \'\', \'activeEstimate\': \'NONE\', \'timeEstimate\': {\'includeNonBillable\': True, \'estimate\': 0, \'type\': \'AUTO\', \'resetOption\': None}, \'budgetEstimate\': None, \'estimateReset\': None, \'id\': \'65c262c0edeea53ae1a27b84\', \'public\': True, \'template\': False}" - object does not exist.', code='does_not_exist')]}
+2024-05-13 10:35:45,305 - server - INFO - {
+    "Error Key": "project",
+    "Error Value": [
+        "Invalid pk \"{'name': '000-000 - Overhead (Non Billable)', 'clientId': '65c25ae977682a2076d96d49', 'workspaceId': '65c249bfedeea53ae19d7dad', 'billable': False, 'estimate': {'estimate': 'PT0S', 'type': 'AUTO'}, 'color': '#03A9F4', 'archived': False, 'clientName': 'Hill Plain Internal', 'duration': 'PT7687H45M', 'note': '', 'activeEstimate': 'NONE', 'timeEstimate': {'includeNonBillable': True, 'estimate': 0, 'type': 'AUTO', 'resetOption': None}, 'budgetEstimate': None, 'estimateReset': None, 'id': '65c262c0edeea53ae1a27b84', 'public': True, 'template': False}\" - object does not exist."
+    ]
+}
+2024-05-13 10:42:06,809 - server - INFO - newEntry view called
+2024-05-13 10:42:09,879 - server - INFO - Insert path taken for Entry
+2024-05-13 10:42:11,305 - server - WARNING - Serializer could not be saved: {'project': [ErrorDetail(string='Invalid pk "{\'name\': \'000-000 - Overhead (Non Billable)\', \'clientId\': \'65c25ae977682a2076d96d49\', \'workspaceId\': \'65c249bfedeea53ae19d7dad\', \'billable\': False, \'estimate\': {\'estimate\': \'PT0S\', \'type\': \'AUTO\'}, \'color\': \'#03A9F4\', \'archived\': False, \'clientName\': \'Hill Plain Internal\', \'duration\': \'PT7687H45M\', \'note\': \'\', \'activeEstimate\': \'NONE\', \'timeEstimate\': {\'includeNonBillable\': True, \'estimate\': 0, \'type\': \'AUTO\', \'resetOption\': None}, \'budgetEstimate\': None, \'estimateReset\': None, \'id\': \'65c262c0edeea53ae1a27b84\', \'public\': True, \'template\': False}" - object does not exist.', code='does_not_exist')]}
+2024-05-13 10:42:11,308 - server - INFO - {
+    "Error Key": "project",
+    "Error Value": [
+        "Invalid pk \"{'name': '000-000 - Overhead (Non Billable)', 'clientId': '65c25ae977682a2076d96d49', 'workspaceId': '65c249bfedeea53ae19d7dad', 'billable': False, 'estimate': {'estimate': 'PT0S', 'type': 'AUTO'}, 'color': '#03A9F4', 'archived': False, 'clientName': 'Hill Plain Internal', 'duration': 'PT7687H45M', 'note': '', 'activeEstimate': 'NONE', 'timeEstimate': {'includeNonBillable': True, 'estimate': 0, 'type': 'AUTO', 'resetOption': None}, 'budgetEstimate': None, 'estimateReset': None, 'id': '65c262c0edeea53ae1a27b84', 'public': True, 'template': False}\" - object does not exist."
+    ]
+}
+2024-05-13 10:46:22,966 - server - INFO - newEntry view called
+2024-05-13 10:46:25,244 - server - INFO - Insert path taken for Entry
+2024-05-13 10:47:25,864 - server - INFO - newEntry view called
+2024-05-13 10:47:28,026 - server - INFO - Insert path taken for Entry
+2024-05-13 10:47:33,664 - server - INFO - newEntry view called
+2024-05-13 10:47:34,302 - server - INFO - Insert path taken for Entry
+2024-05-13 10:48:19,568 - server - INFO - newEntry view called
+2024-05-13 10:48:20,193 - server - INFO - Insert path taken for Entry
+2024-05-13 10:48:27,573 - server - INFO - newEntry view called
+2024-05-13 10:48:29,794 - server - INFO - Insert path taken for Entry
+2024-05-13 10:48:30,815 - server - WARNING - Serializer could not be saved: {'project': [ErrorDetail(string='Invalid pk "{\'name\': \'000-000 - Overhead (Non Billable)\', \'clientId\': \'65c25ae977682a2076d96d49\', \'workspaceId\': \'65c249bfedeea53ae19d7dad\', \'billable\': False, \'estimate\': {\'estimate\': \'PT0S\', \'type\': \'AUTO\'}, \'color\': \'#03A9F4\', \'archived\': False, \'clientName\': \'Hill Plain Internal\', \'duration\': \'PT7687H45M\', \'note\': \'\', \'activeEstimate\': \'NONE\', \'timeEstimate\': {\'includeNonBillable\': True, \'estimate\': 0, \'type\': \'AUTO\', \'resetOption\': None}, \'budgetEstimate\': None, \'estimateReset\': None, \'id\': \'65c262c0edeea53ae1a27b84\', \'public\': True, \'template\': False}" - object does not exist.', code='does_not_exist')]}
+2024-05-13 10:48:30,817 - server - INFO - {
+    "Error Key": "project",
+    "Error Value": [
+        "Invalid pk \"{'name': '000-000 - Overhead (Non Billable)', 'clientId': '65c25ae977682a2076d96d49', 'workspaceId': '65c249bfedeea53ae19d7dad', 'billable': False, 'estimate': {'estimate': 'PT0S', 'type': 'AUTO'}, 'color': '#03A9F4', 'archived': False, 'clientName': 'Hill Plain Internal', 'duration': 'PT7687H45M', 'note': '', 'activeEstimate': 'NONE', 'timeEstimate': {'includeNonBillable': True, 'estimate': 0, 'type': 'AUTO', 'resetOption': None}, 'budgetEstimate': None, 'estimateReset': None, 'id': '65c262c0edeea53ae1a27b84', 'public': True, 'template': False}\" - object does not exist."
+    ]
+}
+2024-05-13 10:50:15,111 - server - INFO - newEntry view called
+2024-05-13 10:50:17,212 - server - INFO - Insert path taken for Entry
+2024-05-13 10:50:18,189 - server - WARNING - Serializer could not be saved: {'project': [ErrorDetail(string='Invalid pk "{\'name\': \'000-000 - Overhead (Non Billable)\', \'clientId\': \'65c25ae977682a2076d96d49\', \'workspaceId\': \'65c249bfedeea53ae19d7dad\', \'billable\': False, \'estimate\': {\'estimate\': \'PT0S\', \'type\': \'AUTO\'}, \'color\': \'#03A9F4\', \'archived\': False, \'clientName\': \'Hill Plain Internal\', \'duration\': \'PT7687H45M\', \'note\': \'\', \'activeEstimate\': \'NONE\', \'timeEstimate\': {\'includeNonBillable\': True, \'estimate\': 0, \'type\': \'AUTO\', \'resetOption\': None}, \'budgetEstimate\': None, \'estimateReset\': None, \'id\': \'65c262c0edeea53ae1a27b84\', \'public\': True, \'template\': False}" - object does not exist.', code='does_not_exist')]}
+2024-05-13 10:50:18,193 - server - INFO - {
+    "Error Key": "project",
+    "Error Value": [
+        "Invalid pk \"{'name': '000-000 - Overhead (Non Billable)', 'clientId': '65c25ae977682a2076d96d49', 'workspaceId': '65c249bfedeea53ae19d7dad', 'billable': False, 'estimate': {'estimate': 'PT0S', 'type': 'AUTO'}, 'color': '#03A9F4', 'archived': False, 'clientName': 'Hill Plain Internal', 'duration': 'PT7687H45M', 'note': '', 'activeEstimate': 'NONE', 'timeEstimate': {'includeNonBillable': True, 'estimate': 0, 'type': 'AUTO', 'resetOption': None}, 'budgetEstimate': None, 'estimateReset': None, 'id': '65c262c0edeea53ae1a27b84', 'public': True, 'template': False}\" - object does not exist."
+    ]
+}
+2024-05-13 10:55:09,616 - server - INFO - newEntry view called
+2024-05-13 10:55:16,442 - server - INFO - Insert path taken for Entry
+2024-05-13 10:56:40,593 - server - INFO - newEntry view called
+2024-05-13 10:56:42,921 - server - INFO - Insert path taken for Entry
+2024-05-13 10:57:07,942 - server - INFO - newEntry view called
+2024-05-13 10:57:10,097 - server - INFO - Insert path taken for Entry
+2024-05-13 10:57:48,693 - server - INFO - newEntry view called
+2024-05-13 10:57:51,000 - server - INFO - Insert path taken for Entry
+2024-05-13 10:59:22,822 - server - INFO - newEntry view called
+2024-05-13 10:59:25,189 - server - INFO - Insert path taken for Entry
+2024-05-13 11:08:48,544 - server - INFO - newEntry view called
+2024-05-13 11:08:50,702 - server - INFO - Insert path taken for Entry
+2024-05-13 11:08:50,857 - server - WARNING - Serializer could not be saved: {'timesheetId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:08:50,859 - server - INFO - {
+    "Error Key": "timesheetId",
+    "Error Value": [
+        "This field is required."
+    ]
+}
+2024-05-13 11:09:17,567 - server - INFO - newEntry view called
+2024-05-13 11:09:19,763 - server - INFO - Insert path taken for Entry
+2024-05-13 11:09:19,919 - server - WARNING - Serializer could not be saved: {'timesheetId': [ErrorDetail(string='This field is required.', code='required')]}
+2024-05-13 11:09:19,920 - server - INFO - {
+    "Error Key": "timesheetId",
+    "Error Value": [
+        "This field is required."
+    ]
+}
+2024-05-13 11:10:01,164 - server - INFO - newEntry view called
+2024-05-13 11:10:03,382 - server - INFO - Insert path taken for Entry
+2024-05-13 11:11:15,294 - server - INFO - newEntry view called
+2024-05-13 11:11:17,994 - server - INFO - Insert path taken for Entry
+2024-05-13 11:12:19,406 - server - INFO - newEntry view called
+2024-05-13 11:12:21,939 - server - INFO - Insert path taken for Entry
+2024-05-13 11:14:34,460 - server - INFO - newEntry view called
+2024-05-13 11:14:36,693 - server - INFO - Insert path taken for Entry
+2024-05-13 11:15:56,417 - server - INFO - newEntry view called
+2024-05-13 11:16:02,061 - server - INFO - Insert path taken for Entry
+2024-05-13 11:16:34,156 - server - INFO - newEntry view called
+2024-05-13 11:16:36,371 - server - INFO - Insert path taken for Entry
+2024-05-13 11:17:58,816 - server - INFO - newEntry view called
+2024-05-13 11:17:59,990 - server - INFO - Insert path taken for Entry
+2024-05-13 11:19:40,989 - server - INFO - POST: updateTimesheet
+2024-05-13 11:19:42,865 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:19:53,873 - server - INFO - POST: updateTimesheet
+2024-05-13 11:19:55,157 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:22:34,426 - server - INFO - POST: updateTimesheet
+2024-05-13 11:22:37,378 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:26:02,296 - server - INFO - POST: updateTimesheet
+2024-05-13 11:26:04,976 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:28:28,775 - server - INFO - POST: updateTimesheet
+2024-05-13 11:28:31,553 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:30:16,585 - server - INFO - POST: updateTimesheet
+2024-05-13 11:30:19,683 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:30:32,105 - server - INFO - POST: updateTimesheet
+2024-05-13 11:30:33,428 - server - INFO - UpdateTimesheet:"6642303f59593b0ef8054c03"202
+2024-05-13 11:35:51,715 - server - INFO - newEntry view called
+2024-05-13 11:35:54,011 - server - INFO - Insert path taken for Entry
+2024-05-13 11:35:58,881 - server - INFO - newEntry view called
+2024-05-13 11:35:59,577 - server - INFO - Update path taken for Entry
+2024-05-13 11:35:59,577 - server - WARNING - Serializer could not be saved: {'non_field_errors': [ErrorDetail(string='Invalid data. Expected a dictionary, but got Entry.', code='invalid')]}
+2024-05-13 11:35:59,579 - server - INFO - {
+    "Error Key": "non_field_errors",
+    "Error Value": [
+        "Invalid data. Expected a dictionary, but got Entry."
+    ]
+}
+2024-05-13 11:36:09,188 - server - INFO - newEntry view called
+2024-05-13 11:36:09,895 - server - INFO - Update path taken for Entry
+2024-05-13 11:36:09,895 - server - WARNING - Serializer could not be saved: {'non_field_errors': [ErrorDetail(string='Invalid data. Expected a dictionary, but got Entry.', code='invalid')]}
+2024-05-13 11:36:09,896 - server - INFO - {
+    "Error Key": "non_field_errors",
+    "Error Value": [
+        "Invalid data. Expected a dictionary, but got Entry."
+    ]
+}
+2024-05-13 11:36:58,861 - server - INFO - newEntry view called
+2024-05-13 11:37:01,085 - server - INFO - Update path taken for Entry
+2024-05-13 11:37:39,585 - server - INFO - Delete Expense Function called
+2024-05-13 11:38:10,328 - server - INFO - Delete Entry Function called
+2024-05-13 11:39:34,328 - server - INFO - Delete Entry Function called
+2024-05-13 11:39:36,428 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:41:12,984 - server - INFO - Delete Entry Function called
+2024-05-13 11:41:15,937 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:42:30,945 - server - INFO - Delete Entry Function called
+2024-05-13 11:42:34,434 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:44:53,127 - server - INFO - newEntry view called
+2024-05-13 11:44:56,278 - server - INFO - Update path taken for Entry
+2024-05-13 11:44:59,812 - server - INFO - Delete Entry Function called
+2024-05-13 11:45:00,996 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:46:52,854 - server - INFO - Delete Entry Function called
+2024-05-13 11:46:52,855 - server - DEBUG - Input data: 
+{
+    "id": "66423c558b23134e5619e0a5",
+    "description": "",
+    "userId": "659d63f583e8651e8c336e02",
+    "billable": false,
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "timeInterval": {
+        "start": "2024-05-13T15:00:00Z",
+        "end": "2024-05-13T16:00:00Z",
+        "duration": "PT1H"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "hourlyRate": null,
+    "costRate": null,
+    "customFieldValues": [],
+    "type": "REGULAR",
+    "kioskId": null,
+    "projectCurrency": null,
+    "currentlyRunning": false,
+    "project": {
+        "name": "000-000 - Overhead (Non Billable)",
+        "clientId": "65c25ae977682a2076d96d49",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "billable": false,
+        "estimate": {
+            "estimate": "PT0S",
+            "type": "AUTO"
+        },
+        "color": "#03A9F4",
+        "archived": false,
+        "clientName": "Hill Plain Internal",
+        "duration": "PT7687H45M",
+        "note": "",
+        "activeEstimate": "NONE",
+        "timeEstimate": {
+            "includeNonBillable": true,
+            "estimate": 0,
+            "type": "AUTO",
+            "resetOption": null
+        },
+        "budgetEstimate": null,
+        "estimateReset": null,
+        "id": "65c262c0edeea53ae1a27b84",
+        "public": true,
+        "template": false
+    },
+    "task": null,
+    "user": {
+        "id": "659d63f583e8651e8c336e02",
+        "name": "Matthew Dixon",
+        "status": "ACTIVE"
+    },
+    "tags": []
+}
+2024-05-13 11:46:55,723 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:46:55,726 - server - DEBUG - <JsonResponse status_code=204, "application/json">
+2024-05-13 11:47:19,268 - server - INFO - newEntry view called
+2024-05-13 11:47:19,269 - server - DEBUG - }
+    "tags": []
+    },
+        "status": "ACTIVE"
+        "name": "Matthew Dixon",
+        "id": "659d63f583e8651e8c336e02",
+    "user": {
+    "task": null,
+    },
+        "template": false
+        "public": true,
+        "id": "65c262c0edeea53ae1a27b84",
+        "estimateReset": null,
+        "budgetEstimate": null,
+        },
+            "resetOption": null
+            "type": "AUTO",
+            "estimate": 0,
+            "includeNonBillable": true,
+        "timeEstimate": {
+        "activeEstimate": "NONE",
+        "note": "",
+        "duration": "PT7687H45M",
+        "clientName": "Hill Plain Internal",
+        "archived": false,
+        "color": "#03A9F4",
+        },
+            "type": "AUTO"
+            "estimate": "PT0S",
+        "estimate": {
+        "billable": false,
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "clientId": "65c25ae977682a2076d96d49",
+        "name": "000-000 - Overhead (Non Billable)",
+    "project": {
+    "currentlyRunning": false,
+    "projectCurrency": null,
+    "kioskId": null,
+    "type": "REGULAR",
+    "customFieldValues": [],
+    "costRate": null,
+    "hourlyRate": null,
+    "isLocked": false,
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    },
+        "duration": "PT1H"
+        "end": "2024-05-13T16:00:00Z",
+        "start": "2024-05-13T15:00:00Z",
+    "timeInterval": {
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "billable": false,
+    "userId": "659d63f583e8651e8c336e02",
+    "description": "",
+    "id": "66423c558b23134e5619e0a5",
+{
+2024-05-13 11:47:20,338 - server - INFO - Update path taken for Entry
+2024-05-13 11:48:26,276 - server - INFO - Delete Entry Function called
+2024-05-13 11:48:26,277 - server - DEBUG - Input data: 
+{
+    "id": "66423c558b23134e5619e0a5",
+    "description": "",
+    "userId": "659d63f583e8651e8c336e02",
+    "billable": false,
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "timeInterval": {
+        "start": "2024-05-13T15:00:00Z",
+        "end": "2024-05-13T16:00:00Z",
+        "duration": "PT1H"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "hourlyRate": null,
+    "costRate": null,
+    "customFieldValues": [],
+    "type": "REGULAR",
+    "kioskId": null,
+    "projectCurrency": null,
+    "currentlyRunning": false,
+    "project": {
+        "name": "000-000 - Overhead (Non Billable)",
+        "clientId": "65c25ae977682a2076d96d49",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "billable": false,
+        "estimate": {
+            "estimate": "PT0S",
+            "type": "AUTO"
+        },
+        "color": "#03A9F4",
+        "archived": false,
+        "clientName": "Hill Plain Internal",
+        "duration": "PT7687H45M",
+        "note": "",
+        "activeEstimate": "NONE",
+        "timeEstimate": {
+            "includeNonBillable": true,
+            "estimate": 0,
+            "type": "AUTO",
+            "resetOption": null
+        },
+        "budgetEstimate": null,
+        "estimateReset": null,
+        "id": "65c262c0edeea53ae1a27b84",
+        "public": true,
+        "template": false
+    },
+    "task": null,
+    "user": {
+        "id": "659d63f583e8651e8c336e02",
+        "name": "Matthew Dixon",
+        "status": "ACTIVE"
+    },
+    "tags": []
+}
+2024-05-13 11:48:26,983 - server - WARNING - Entry was not deleted successfully
+2024-05-13 11:48:26,984 - server - DEBUG - <JsonResponse status_code=204, "application/json">
+2024-05-13 11:49:32,336 - server - INFO - Delete Entry Function called
+2024-05-13 11:49:32,337 - server - DEBUG - Input data: 
+{
+    "id": "66423c558b23134e5619e0a5",
+    "description": "",
+    "userId": "659d63f583e8651e8c336e02",
+    "billable": false,
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "timeInterval": {
+        "start": "2024-05-13T15:00:00Z",
+        "end": "2024-05-13T16:00:00Z",
+        "duration": "PT1H"
+    },
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "hourlyRate": null,
+    "costRate": null,
+    "customFieldValues": [],
+    "type": "REGULAR",
+    "kioskId": null,
+    "projectCurrency": null,
+    "currentlyRunning": false,
+    "project": {
+        "name": "000-000 - Overhead (Non Billable)",
+        "clientId": "65c25ae977682a2076d96d49",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "billable": false,
+        "estimate": {
+            "estimate": "PT0S",
+            "type": "AUTO"
+        },
+        "color": "#03A9F4",
+        "archived": false,
+        "clientName": "Hill Plain Internal",
+        "duration": "PT7687H45M",
+        "note": "",
+        "activeEstimate": "NONE",
+        "timeEstimate": {
+            "includeNonBillable": true,
+            "estimate": 0,
+            "type": "AUTO",
+            "resetOption": null
+        },
+        "budgetEstimate": null,
+        "estimateReset": null,
+        "id": "65c262c0edeea53ae1a27b84",
+        "public": true,
+        "template": false
+    },
+    "task": null,
+    "user": {
+        "id": "659d63f583e8651e8c336e02",
+        "name": "Matthew Dixon",
+        "status": "ACTIVE"
+    },
+    "tags": []
+}
+2024-05-13 11:49:42,095 - server - INFO - Entry Deleted...
+2024-05-13 11:49:42,098 - server - DEBUG - <JsonResponse status_code=200, "application/json">

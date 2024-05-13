@@ -179,11 +179,13 @@ async def approvedEntries(request: ASGIRequest):
 
             def syncUpdateEntries(entries): # create thread 
                 try: 
+                    #refactoring 
+                    entries['workspaceId']= workspaceId
+                    entries['timesheetId'] = entries['approvalRequestId']
                     try: # try and update if exists, otherwise create
-                        approvalID = entries['approvalRequestId'] if entries['approvalRequestId'] is not None else timeId
-    
-                        entry = Entry.objects.get(id = entries['id'], workspace = workspaceId )
-                        serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+                
+                        entry = Entry.objects.get(id = entries['id'], workspaceId = workspaceId )
+                        serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
                         logger.info(f'Updating Entry {entries['id']}')
                     except Entry.DoesNotExist:
                         serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
