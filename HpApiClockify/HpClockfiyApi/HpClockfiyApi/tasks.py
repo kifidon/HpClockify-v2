@@ -177,6 +177,7 @@ async def approvedEntries(request: ASGIRequest):
         if stat == 'APPROVED':
             allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
             if len(allEntries) == 0:
+                logger.warning('No Content. Is this expected?')
                 return JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
 
             def syncUpdateEntries(entries): # create thread 
@@ -252,6 +253,7 @@ async def approvedExpenses(request:ASGIRequest):
         if stat =='APPROVED':
             allExpenses = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, expenseFlag=True)
             if len(allExpenses) == 0:
+                logger.warning('No Content. Is this expected?')
                 return JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
 
             def syncUpdateExpense(expense):
