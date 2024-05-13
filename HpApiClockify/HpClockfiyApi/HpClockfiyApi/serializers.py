@@ -65,7 +65,7 @@ class EntrySerializer(serializers.Serializer): # missing update
         else: Rate = -1
         try: 
             timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
-        except Timesheet.DoesNotExist:
+        except Exception as e:
             timesheet = None 
         entry = Entry.objects.create(
             id= validated_data['id'],
