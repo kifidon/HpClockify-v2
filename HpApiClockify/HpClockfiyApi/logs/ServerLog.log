@@ -1869,3 +1869,32 @@
 }
 2024-05-13 13:38:32,136 - server - INFO - Entry Deleted...
 2024-05-13 13:38:32,138 - server - DEBUG - <JsonResponse status_code=200, "application/json">
+2024-05-13 13:45:23,536 - server - INFO - newExpense view called
+2024-05-13 13:45:23,537 - server - DEBUG - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-13 13:45:25,802 - server - INFO - Inserting New Expense 
+2024-05-13 13:45:27,067 - server - INFO - {
+    "id": "663a63c05e8ef3683b304b85",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "date": "2024-05-07T00:00:00Z",
+    "projectId": "65c262c0edeea53ae1a27b84",
+    "categoryId": "65c2522effbbb676c5e010b4",
+    "notes": "test",
+    "quantity": 1,
+    "billable": false,
+    "fileId": "663a63c05e8ef3683b304b83",
+    "total": 12300
+}
+2024-05-13 13:45:27,069 - server - INFO - Saved Expense with Id - 663a63c05e8ef3683b304b85

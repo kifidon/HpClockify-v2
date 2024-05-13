@@ -77,7 +77,7 @@ class EntrySerializer(serializers.Serializer): # missing update
             hourlyRate = Rate,
             start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
             end = timeZoneConvert(validated_data.get('timeInterval').get('end')),
-            workspaceId = validated_data.get('workspaceId') or self.context.get('workspaceId'),
+            workspaceId = Workspace.objects.get(id=validated_data.get('workspaceId')) ,
         )
         return entry
     
@@ -100,7 +100,7 @@ class EntrySerializer(serializers.Serializer): # missing update
             else: instance.hourlyRate =  -1
             instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
             instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
-            instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
+            # instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
             instance.save(force_update=True)
             return instance
         except Exception as e:
