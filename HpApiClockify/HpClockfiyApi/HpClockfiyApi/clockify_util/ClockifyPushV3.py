@@ -238,7 +238,7 @@ def updateProjects(conn, cursor, count, update, exists, pID, pCode, pTitle, pNam
             return (count, update, exists, True)
         else: # record is unchanged 
             exists += 1
-            logger.error(f"\tLoading..........{str(round((exists+update+count)/len(projects),2)*100)[:5]}%")
+            logger.info(f"\tLoading..........{str(round((exists+update+count)/len(projects),2)*100)[:5]}%")
             return (count, update, exists, True)
     except pyodbc.IntegrityError as ex: # error in updating or checking for update 
         if 'FOREIGN KEY constraint' in str(ex):

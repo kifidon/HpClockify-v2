@@ -167,6 +167,16 @@ class Expense(models.Model):
     def __str__(self):
         return self.id or ""
     
+class BackGroundTaskResult(models.Model):
+    status_code = models.IntegerField(default=404)
+    message = models.CharField( max_length=250)
+    data = models.TextField(blank=False, null=False )
+    time = models.DateTimeField(blank=False, null=False)
+    caller = models.CharField(max_length=50 )
+    class Meta:
+        managed = False
+        db_table = 'BackGroundTaskDjango'
+
 ##################################################################################################################################################################################################
 class AuthGroup(models.Model):
     name = models.CharField(max_length=150)

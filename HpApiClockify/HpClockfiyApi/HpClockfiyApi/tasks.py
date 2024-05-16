@@ -9,26 +9,43 @@ from .models import (
     Category,
     Entry,
     Tagsfor, 
-    Expense
+    Expense,
+    BackGroundTaskResult
 )
+from django.utils import timezone
 from django.core.handlers.asgi import ASGIRequest
-from rest_framework.exceptions import ValidationError
-import requests
-import asyncio
 from django.http import HttpRequest, JsonResponse, HttpResponse
-from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-from .Loggers import setup_background_logger
-from json import loads, dumps
+from rest_framework.exceptions import ValidationError
+from rest_framework import status
 from asgiref.sync import sync_to_async
+
+from json import loads, dumps
+from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
-from .clockify_util.hpUtil import bytes_to_dict, check_category_for_deletion, reverseForOutput
-import httpx
+from .clockify_util.hpUtil import bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
+
+import requests
+import asyncio
 
 
 loggerLevel = 'WARNING'
 logger = setup_background_logger(loggerLevel) #pass level argument 
+
+def taskResult(response: JsonResponse, inputData, caller: str):
+    logger = setup_background_logger(loggerLevel)
+    logger.info('Saving task result')
+    BackGroundTaskResult.objects.create(
+        status_code = response.status_code,
+        message = response.content.decode() or None,
+        data = inputData,
+        caller = caller,
+        time = timeZoneConvert(get_current_time(), '%Y-%m-%d %H:%M:%S')
+    )
+
+saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
+
 
 def deleteCategory(newCategories):
     logger = setup_background_logger(loggerLevel)
@@ -40,13 +57,15 @@ def deleteCategory(newCategories):
             category.delete
             deleted += 1
     return deleted 
+
     
 
 @csrf_exempt
 async def retryExpenses(request):   
     logger = setup_background_logger(loggerLevel)
     if request.method == 'POST':
-        logger.info(f'Pulling Expense Category and trying again')
+        caller = 'Pulling Expense Category and trying again'
+        logger.info(caller)
         inputData = request.POST
         logger.debug(reverseForOutput(inputData))
         categories = getCategories(inputData['workspaceId'], 1)
@@ -82,16 +101,21 @@ async def retryExpenses(request):
             logger.info(f'Categories updated')
             url =  'http://localhost:8000/HpClockifyApi/newExpense'
             requests.post(url=url, data=inputData)
-            return JsonResponse(data = [inputData, categories], status=status.HTTP_201_CREATED, safe = False)
-
+            response = JsonResponse(data = 'Retry Expense Event Completed Succesfully', status=status.HTTP_201_CREATED, safe = False)
+            await saveTaskResult(response, inputData, caller)
+            return response
         except Exception as e:
-            raise e
+            response = JsonResponse(data = 'Error Occured in retry', status=status.HTTP_400_BAD_REQUEST, safe = False)
+            await saveTaskResult(response, inputData, caller)
+            return response
     else:
-        return JsonResponse(
+        response =  JsonResponse(
             data={
                 'Message': 'Method Not Suported'
             }, status= status.HTTP_405_METHOD_NOT_ALLOWED
         )
+        await saveTaskResult(response, inputData, caller)
+        return response
 
 @csrf_exempt
 def updateTags(inputdata: dict):
@@ -162,7 +186,8 @@ def updateTags(inputdata: dict):
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest):  
     logger = setup_background_logger(loggerLevel)
-    logger.info(f'updateEntries Function called')
+    caller = 'Approved Entry Function Called'
+    logger.info(caller)
     logger.debug(type(request))
     if request.method == 'POST':
         logger.debug(type(request.body))
@@ -178,8 +203,9 @@ async def approvedEntries(request: ASGIRequest):
             allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
             if len(allEntries) == 0:
                 logger.warning('No Content. Is this expected?')
-                return JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-
+                response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+                await saveTaskResult(response, inputData, caller)
+                return response
             def syncUpdateEntries(entries): # create thread 
                 try: 
                     #refactoring 
@@ -222,26 +248,36 @@ async def approvedEntries(request: ASGIRequest):
                 try:
                     await asyncio.gather(*tasks)
                     logger.info(f'Entries added for timesheet {timeId}') 
-                    return JsonResponse(data = allEntries, status=status.HTTP_201_CREATED, safe=False)
+                    response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
+                    await saveTaskResult(response, inputData, caller)
+                    return response
 
                 except Exception as e:
                     logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                    return JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
-
+                    response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                    await saveTaskResult(response, inputData, caller)
+                    return response
             else: 
                 logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                return JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                await saveTaskResult(response, inputData, caller)
+                return response
         else:
                 logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-                return JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                await saveTaskResult(response, inputData, caller)
+                return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
+        await saveTaskResult(response, inputData, caller)
+        return response
         return response
 
 @csrf_exempt
 async def approvedExpenses(request:ASGIRequest):
     logger = setup_background_logger()
-    logger.info(f'Approved Expense function called')
+    caller = 'Approved Expense function called'
+    logger.info(caller)
     if request.method == 'POST':
         inputData = bytes_to_dict(request.body)
         logger.debug(f'InputData\n{reverseForOutput(inputData)}')
@@ -254,8 +290,9 @@ async def approvedExpenses(request:ASGIRequest):
             allExpenses = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, expenseFlag=True)
             if len(allExpenses) == 0:
                 logger.warning('No Content. Is this expected?')
-                return JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-
+                response =  JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+                await saveTaskResult(response, inputData, caller)
+                return response
             def syncUpdateExpense(expense):
                 #refactoring 
                 expense['categoryId'] = expense['category']['id']
@@ -292,15 +329,22 @@ async def approvedExpenses(request:ASGIRequest):
             try:
                 await asyncio.gather(*tasks)
                 logger.info(f'Expense added for timesheet {timeId}') 
-                return JsonResponse(data = allExpenses, status=status.HTTP_201_CREATED, safe=False)
-
+                response =  JsonResponse(data = 'Approved Expense Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
+                await saveTaskResult(response, inputData, caller)
+                return response
             except Exception as e:
                 logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                return JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                response =  JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                await saveTaskResult(response, inputData, caller)
+                return response
 
         else:
             logger.info(f'UpdateExpense on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-            return JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+            response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+            await saveTaskResult(response, inputData, caller)
+            return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
+        await saveTaskResult(response, inputData, caller)
         return response
+        

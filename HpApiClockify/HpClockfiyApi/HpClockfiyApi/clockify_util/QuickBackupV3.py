@@ -52,6 +52,7 @@ def ProjectEvent(wkSpaceName = 'Hill Plain'):
     logger.info(ClockifyPushV3.pushProjects(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
+
 def PolicyEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
@@ -66,6 +67,7 @@ def PolicyEvent(wkSpaceName = 'Hill Plain'):
     logger.info(ClockifyPushV3.pushPolicies(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
+
 def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()

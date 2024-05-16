@@ -142,25 +142,26 @@ AUTH_PASSWORD_VALIDATORS = [
 # Celery Configuration
 # Celery Configuration
 # CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
-task_ignore_result = False
+# task_ignore_result = False
 # SQL Server result backend
 # CELERY_RESULT_BACKEND = 'django-db'
 
 # CELERY_RESULT_BACKEND = 'mssql+pyodbc://hpUser:0153HP!!@hpcs.database.windows.net:1433/hpdb?driver=ODBC+Driver+18+for+SQL+Server'
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-# App to discover tasks
-CELERY_APP = 'HpClockfiyApi'
-CELERY_WORKER_CONCURRENCY = 4
+# CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+# # App to discover tasks
+# CELERY_APP = 'HpClockfiyApi'
+# CELERY_WORKER_CONCURRENCY = 4
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
+USE_TZ = True
+
 TIME_ZONE = 'America/Edmonton'
 
 USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
