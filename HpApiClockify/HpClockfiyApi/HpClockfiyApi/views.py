@@ -38,21 +38,21 @@ loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
-def aunthenticateRequst(request: ASGIRequest, secret: str):
-    logger.debug(request.headers)
-    if loggerLevel == 'DEBUG':
-        for key, value in request.headers.items():
-            logger.debug(f"{key}: {value}")
-    signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    payload = request.body
-    auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    if hmac.compare_digest(auth, signature): 
+def aunthenticateRequst(request: ASGIRequest, secret: str): 
+    '''
+    Impliment HMAC validation in a future update 
+    '''
+    logger.info('Validating Request...')
+    signature = request.headers.get('Clockify-Signature') 
+    if secret == signature:
+        logger.debug('Request Validated')
         return True
+    logger.warning('Invalid Request')
     return False
 
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
-    secret = b'me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy'
+    secret = 'me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy'
     if aunthenticateRequst(request, secret):
         if request.method == 'POST':
             logger = setup_server_logger(loggerLevel)
@@ -110,48 +110,58 @@ async def updateTimesheets(request:ASGIRequest):
         else:
             response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        await saveTaskResult(response, dumps(loads(request.body)), 'UpdateTimesheet Function')
+        return response
 
 @api_view(['POST'])
 def newTimeSheets(request: ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info(f'{request.method}: newTimesheet')
-    if request.method == 'POST':
-        logger = setup_server_logger(loggerLevel)
-        try:
-            data = loads(request.body)
-            serializer = TimesheetSerializer(data= data)
-            if serializer.is_valid():
-                serializer.save()
-                response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
-                logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
-                return response
-            else:
-                response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                logger.error(f'{response}')
-                return response
-        except utils.IntegrityError as e:
-            if 'PRIMARY KEY constraint' in str(e): 
-                response = JsonResponse(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT, safe=False)
-                logger.error(f'Cannot create new Timesheet because id {request.data["id"]} already exists')
+    secret = 'Qzotb4tVT5QRlXc3HUjwZmkgIk58uUyK'
+    if aunthenticateRequst(request, secret):
+        if request.method == 'POST':
+            logger = setup_server_logger(loggerLevel)
+            try:
+                data = loads(request.body)
+                serializer = TimesheetSerializer(data= data)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
+                    logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
+                    return response
+                else:
+                    response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
+                    logger.error(f'{response}')
+                    return response
+            except utils.IntegrityError as e:
+                if 'PRIMARY KEY constraint' in str(e): 
+                    response = JsonResponse(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT, safe=False)
+                    logger.error(f'Cannot create new Timesheet because id {request.data["id"]} already exists')
+                    taskResult(response, data, 'New Timesheet Function')
+                    return response
+                elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
+                    response = JsonResponse(data={'Message': f'Cannot create new Timesheet data includes Foregin Constraint Violation'}, status=status.HTTP_406_NOT_ACCEPTABLE, safe=False)
+                    logger.error(response.content)
+                    taskResult(response, data, 'New Timesheet Function')
+                    return response
+                else:
+                    response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
+                    logger.error(f"on timesheet {request.data['id']}")
+                    logger.error(f'{response}')
+                    return response
+            except Exception as e:
+                logger.error(f"On timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
+                response = JsonResponse(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE, safe= False)
                 taskResult(response, data, 'New Timesheet Function')
                 return response
-            elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
-                response = JsonResponse(data={'Message': f'Cannot create new Timesheet data includes Foregin Constraint Violation'}, status=status.HTTP_406_NOT_ACCEPTABLE, safe=False)
-                logger.error(response.content)
-                taskResult(response, data, 'New Timesheet Function')
-                return response
-            else:
-                response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
-                logger.error(f"on timesheet {request.data['id']}")
-                logger.error(f'{response}')
-                return response
-        except Exception as e:
-            logger.error(f"On timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
-            response = JsonResponse(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE, safe= False)
-            taskResult(response, data, 'New Timesheet Function')
+        else:
+            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
     else:
-        response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
         return response
 
 @api_view(['GET'])
@@ -234,15 +244,21 @@ def viewTaskLog(request):
     else:
         return HttpResponse('logger file not found', status=404)
     
+@api_view(['GET', 'POST'])
+def bankedHrs(request: ASGIRequest):
+    logger.info(f'{request.method}: bankedHours ')
+    try:
+        SqlClockPull.main()
+        return Response(data='Operation Completed', status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f'{str(e)}')
+        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 @api_view(['POST'])
 def getClients(request: ASGIRequest):
-    # for security 
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
+    secret = 'vCCa0DuhCfNnxeb3lnoXaRXE4SKcWlxi'
+    secret2 = 'ITrV2e8fOhQ9nC0jXPyDXJQeZGeVtoCV'
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):  
         ''' 
         Make a get method in future updates 
         if request.method == 'GET':
@@ -260,14 +276,16 @@ def getClients(request: ASGIRequest):
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'Client Function')
+        return response
 
 @api_view(['POST'])
-def getEmployeeUsers(request: ASGIRequest, format = None):
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
+def getEmployeeUsers(request: ASGIRequest):
+    secret = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V'
+    secret2 = 'TSnab31ks1Ml1oXkZHMIzp7R33SRSedz'
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):  
         '''
         if request.method == 'GET':
             user = Employeeuser.objects.all()
@@ -283,17 +301,11 @@ def getEmployeeUsers(request: ASGIRequest, format = None):
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-        
-@api_view(['GET', 'POST'])
-def bankedHrs(request: ASGIRequest):
-    logger.info(f'{request.method}: bankedHours ')
-    try:
-        SqlClockPull.main()
-        return Response(data='Operation Completed', status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f'{str(e)}')
-        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
-
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'EmployeeUser Function')
+        return response
+   
 '''
 @api_view(['GET', 'POST'])
 def getWorkspaces(request: ASGIRequest, format = None):
@@ -321,63 +333,11 @@ def getWorkspaces(request: ASGIRequest, format = None):
     #     Response(data = None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
    ''' 
 
-@api_view(['POST'])
-def getClients(request: ASGIRequest):
-    # for security 
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
-        ''' 
-        Make a get method in future updates 
-        if request.method == 'GET':
-            clients = Client.objects.all()
-            serializer = ClientSerializer(clients, many=True)
-            response = Response(serializer.data )
-        '''    
-        if request.method == 'POST':
-            logger = setup_server_logger(loggerLevel)
-            stat = ClientEvent()
-            logger.info(f'Client Event: Add Client')
-            if stat:
-                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-            else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-        else:
-            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
-            return response
-
-@api_view(['POST'])
-def getEmployeeUsers(request: ASGIRequest, format = None):
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
-        '''
-        if request.method == 'GET':
-            user = Employeeuser.objects.all()
-            serializer = EmployeeUserSerializer(user, many=True)
-            response = Response(serializer.data )
-        '''
-        if request.method == 'POST' or request.method=='GET':
-            stat = UserEvent()
-            logger.info(f'User Event: Add User')
-            if stat:
-                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-            else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-        else:
-            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
-            return response
-        
 @api_view(['GET', 'POST',])
 def getProjects(request: ASGIRequest, format = None):
-        logger.info(f'POST: getProjects')
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
+    secret = 'obEJDmaQEgIrhBhLVpUO4pXO6aXgWEK3'
+    logger.info(f'POST: getProjects')
+    if aunthenticateRequst(request, secret):  
         '''
         elif request.method == 'GET':
             projects = Project.objects.all()
@@ -393,14 +353,15 @@ def getProjects(request: ASGIRequest, format = None):
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-        
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def getTimeOffRequests(request: ASGIRequest, format = None):
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'Project Function')
+        return response  
+
+@api_view(['GET', 'POST'])
+def getTimeOffRequests(request: ASGIRequest, ):
+    secret = 'W7Lc7BGRq1wvIC0eQS5Bik5m05JF8RkZ'
+    if aunthenticateRequst(request, secret): 
         '''
         
         elif request.method == 'GET':
@@ -417,14 +378,14 @@ def getTimeOffRequests(request: ASGIRequest, format = None):
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-        w
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'TimeOff Function')
+        return response  
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getTimeOffPolicies(request: ASGIRequest, format = None):
-    # signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
-    # payload = request.body
-    # secret = b'' # input signing secret here 
-    # auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
-    # if hmac.compare_digest(auth, signature):   
+ 
         ''' 
         elif request.method == 'GET':
             policy = Timeoffpolicies.objects.all()
@@ -445,34 +406,119 @@ def getTimeOffPolicies(request: ASGIRequest, format = None):
 async def newExpense(request: ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info('newExpense view called')
-    if request.method == 'POST':
-        try:
-            inputData = loads(request.body)
-            RetryFlag = False
-        except JSONDecodeError:
-            logger.info('Called Internally')
-            inputData = request.POST
-            RetryFlag = True
-        except Exception as e:
-            logger.warning('Unknown Exception, attempting to handle')
-            inputData = request.POST
-            RetryFlag = True
-        logger.debug(dumps(inputData, indent=4))
-        
-        def processExpense(inputData):
+    secret = 'CiLrAry1UiEZb4OnPmX67T8un5GuYw24' #newExpense
+    secret2 = 'l7Zqmv1BMxNPsTKKtWYEsjsHNpSfnUrj' #UpdateExpene
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+        if request.method == 'POST':
             try:
-                expense = Expense.objects.get(id=inputData['id'])
-                serializer = ExpenseSerializer(data= inputData, instance=expense)
-                logger.info('Updating Expense')
-            except Expense.DoesNotExist:
-                logger.info('Inserting New Expense ')
-                serializer = ExpenseSerializer(data = inputData)
+                inputData = loads(request.body)
+                RetryFlag = False
+            except JSONDecodeError:
+                logger.info('Called Internally')
+                inputData = request.POST
+                RetryFlag = True
+            except Exception as e:
+                logger.warning('Unknown Exception, attempting to handle')
+                inputData = request.POST
+                RetryFlag = True
+            logger.debug(dumps(inputData, indent=4))
+            
+            def processExpense(inputData):
+                try:
+                    expense = Expense.objects.get(id=inputData['id'])
+                    serializer = ExpenseSerializer(data= inputData, instance=expense)
+                    logger.info('Updating Expense')
+                except Expense.DoesNotExist:
+                    logger.info('Inserting New Expense ')
+                    serializer = ExpenseSerializer(data = inputData)
+                try:
+                    if serializer.is_valid():
+                        serializer.save()
+                        logger.info(dumps(inputData, indent= 4))
+                        logger.info(f'Saved Expense with Id - {inputData['id']}')
+                        return True, 'V' # V for valid 
+                    else:
+                        #force backgroung task 
+                        logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                        for key, value in serializer.errors.items():
+                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            # Check if the value is an instance of ErrorDetail
+                            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                                # Print the key and each error code and message
+                                for error_detail in value:
+                                    code = error_detail.code
+                                    field = key
+                                    '''
+                                    include check for other foreign keys to know which foreign key 
+                                    constraint is violated and which function should handle it
+                                    '''
+                                    if code == 'does_not_exist': 
+                                        return False, 'C' # C for category P for Project, F for file in later updates 
+                        return False, 'X' # Unknown, Raise error (BAD Request)
+                except Exception as e:
+                    logger.error(f'Unknown Error Caught -{e} at {e.__traceback__.tb_lineno}')
+                    return False, 'X'
+
+            async def callBackgroungCategory():
+                if not RetryFlag:
+                    url =  'http://localhost:5000/HpClockifyApi/task/retryExpense'
+                    async with httpx.AsyncClient(timeout=300) as client:
+                        await client.post(url=url, data=inputData)
+                else: 
+                    logger.error('Max retries reached. Failing task')
+                        
+            processExpenseAsync = sync_to_async(processExpense)
+            result = await processExpenseAsync(inputData)
+            if result[0]:
+                return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) # validated data later
+            elif result[1] == 'C':
+                # Enqueue a background task to retry the operation
+                asyncio.create_task(callBackgroungCategory()) 
+                return JsonResponse(
+                    data={
+                        'Message': 'Foreign Key Constraint on Category. Calling background task and trying again. Review Logs for result '
+                        }, status=status.HTTP_307_TEMPORARY_REDIRECT)
+            elif result[1] == 'X':
+                return JsonResponse(
+                    data= {
+                        'Message': 'Post Data could not be validated. Review Logs'
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                )
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'NewExpense Function')
+        return response
+
+@csrf_exempt
+async def newEntry(request:ASGIRequest):
+    logger = setup_server_logger()
+    logger.info('newEntry view called')
+    secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
+    secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+        if request.method == 'POST':
             try:
+                inputData = loads(request.body)
+                RetryFlag = False 
+            except Exception:
+                logger.warning('Unknown Exception, attempting to handle')
+                inputData = request.POST
+                RetryFlag = True
+            logger.debug(reverseForOutput(inputData))
+
+            def processEntry(inputData):
+                try:
+                    entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+                    serializer = EntrySerializer(instance=entry, data= inputData )
+                    logger.info(f'Update path taken for Entry')
+                except Entry.DoesNotExist:
+                    serializer = EntrySerializer(data = inputData )
+                    logger.info(f'Insert path taken for Entry')
                 if serializer.is_valid():
                     serializer.save()
-                    logger.info(dumps(inputData, indent= 4))
-                    logger.info(f'Saved Expense with Id - {inputData['id']}')
-                    return True, 'V' # V for valid 
+                    # do the rest 
+                    return True, 'V'
                 else:
                     #force backgroung task 
                     logger.warning(f'Serializer could not be saved: {serializer.errors}')
@@ -491,152 +537,90 @@ async def newExpense(request: ASGIRequest):
                                 if code == 'does_not_exist': 
                                     return False, 'C' # C for category P for Project, F for file in later updates 
                     return False, 'X' # Unknown, Raise error (BAD Request)
-            except Exception as e:
-                logger.error(f'Unknown Error Caught -{e} at {e.__traceback__.tb_lineno}')
-                return False, 'X'
-
-        async def callBackgroungCategory():
-            if not RetryFlag:
-                url =  'http://localhost:5000/HpClockifyApi/task/retryExpense'
-                async with httpx.AsyncClient(timeout=300) as client:
-                    await client.post(url=url, data=inputData)
-            else: 
-                logger.error('Max retries reached. Failing task')
-                      
-        processExpenseAsync = sync_to_async(processExpense)
-        result = await processExpenseAsync(inputData)
-        if result[0]:
-            return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) # validated data later
-        elif result[1] == 'C':
-            # Enqueue a background task to retry the operation
-            asyncio.create_task(callBackgroungCategory()) 
-            return JsonResponse(
-                data={
-                    'Message': 'Foreign Key Constraint on Category. Calling background task and trying again. Review Logs for result '
-                    }, status=status.HTTP_307_TEMPORARY_REDIRECT)
-        elif result[1] == 'X':
-            return JsonResponse(
-                data= {
-                    'Message': 'Post Data could not be validated. Review Logs'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-            )
-
-@csrf_exempt
-async def newEntry(request:ASGIRequest):
-    logger = setup_server_logger()
-    logger.info('newEntry view called')
-    if request.method == 'POST':
-        try:
-            inputData = loads(request.body)
-            RetryFlag = False 
-        except Exception:
-            logger.warning('Unknown Exception, attempting to handle')
-            inputData = request.POST
-            RetryFlag = True
-        logger.debug(reverseForOutput(inputData))
-
-        def processEntry(inputData):
-            try:
-                entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                serializer = EntrySerializer(instance=entry, data= inputData )
-                logger.info(f'Update path taken for Entry')
-            except Entry.DoesNotExist:
-                serializer = EntrySerializer(data = inputData )
-                logger.info(f'Insert path taken for Entry')
-            if serializer.is_valid():
-                serializer.save()
-                # do the rest 
-                return True, 'V'
+            
+            processEntryAsync = sync_to_async(processEntry)
+            result = await processEntryAsync(inputData)
+            if result[0]:
+                return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
             else:
-                #force backgroung task 
-                logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                for key, value in serializer.errors.items():
-                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                    # Check if the value is an instance of ErrorDetail
-                    if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                        # Print the key and each error code and message
-                        for error_detail in value:
-                            code = error_detail.code
-                            field = key
-                            '''
-                            include check for other foreign keys to know which foreign key 
-                            constraint is violated and which function should handle it
-                            '''
-                            if code == 'does_not_exist': 
-                                return False, 'C' # C for category P for Project, F for file in later updates 
-                return False, 'X' # Unknown, Raise error (BAD Request)
-        
-        processEntryAsync = sync_to_async(processEntry)
-        result = await processEntryAsync(inputData)
-        if result[0]:
-            return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
-        else:
-            return JsonResponse(
-                data= {
-                    'Message': 'Post Data could not be validated. Review Logs'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-            )
+                return JsonResponse(
+                    data= {
+                        'Message': 'Post Data could not be validated. Review Logs'
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                )
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+        return response
 
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Entry Function called')
-    inputData = loads(request.body)
-    
-    logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
-    
-    if request.method == 'POST':
+    secret = '0IQNBiGEAejNMlFmdQc8NWEiMe1Uzg01'
+    if aunthenticateRequst(request, secret):
+        inputData = loads(request.body)
+        logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
         
-        def deleteEntry():
-            try:
-                expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
-                expense.delete()
-                logger.info('Entry Deleted...')
-                return True
-            except Entry.DoesNotExist:
-                logger.warning('Entry was not deleted successfully')
-                return False
-        
-        deleteAsync =  sync_to_async(deleteEntry)
-        result = await deleteAsync()
-        
-        if result:
-            response = JsonResponse(data = {
-                    'Message': 'Expense Deleted',
-                    'data': inputData
-                }, status=status.HTTP_200_OK)
-            logger.debug(response)
-            return response
-        else: 
-            response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
-            logger.debug(response)
-            return response
+        if request.method == 'POST':
+            
+            def deleteEntry():
+                try:
+                    expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
+                    expense.delete()
+                    logger.info('Entry Deleted...')
+                    return True
+                except Entry.DoesNotExist:
+                    logger.warning('Entry was not deleted successfully')
+                    return False
+            
+            deleteAsync =  sync_to_async(deleteEntry)
+            result = await deleteAsync()
+            
+            if result:
+                response = JsonResponse(data = {
+                        'Message': 'Expense Deleted',
+                        'data': inputData
+                    }, status=status.HTTP_200_OK)
+                logger.debug(response)
+                return response
+            else: 
+                response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+                logger.debug(response)
+                return response
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
+        return response
 
-    
+        
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Expense Function called')
-    inputData = loads(request.body)
-    
-    logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
-    
-    if request.method == 'POST':
-        def deleteExpense():
-            try:
-                expense = Expense.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
-                expense.delete()
-                response = JsonResponse(data = {
-                    'Message': 'Expense Deleted',
-                    'data': inputData
-                }, status=status.HTTP_200_OK)
-                return response
-            except Expense.DoesNotExist:
-                response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
-                return response
-        deleteAsync =  sync_to_async(deleteExpense)
-        response = await deleteAsync()
+    secret = 'a0gfeY49Wka0HVb97DT8eYsqDo3cZIiZ'
+    if aunthenticateRequst(request, secret):
+        inputData = loads(request.body)
+        logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+        
+        if request.method == 'POST':
+            def deleteExpense():
+                try:
+                    expense = Expense.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
+                    expense.delete()
+                    response = JsonResponse(data = {
+                        'Message': 'Expense Deleted',
+                        'data': inputData
+                    }, status=status.HTTP_200_OK)
+                    return response
+                except Expense.DoesNotExist:
+                    response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+                    return response
+            deleteAsync =  sync_to_async(deleteExpense)
+            response = await deleteAsync()
+            return response
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        taskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
         return response
-    

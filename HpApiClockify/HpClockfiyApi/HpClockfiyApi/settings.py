@@ -6,7 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOG_LEVEL = 'DEBUG'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 LOGGING = {

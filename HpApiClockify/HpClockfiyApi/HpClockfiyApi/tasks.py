@@ -88,6 +88,9 @@ async def retryExpenses(request):
         try:
             await asyncio.gather(*tasks)
             logger.info(f'Categories updated')
+            headers = {
+                'Clockify-Signature': 'CiLrAry1UiEZb4OnPmX67T8un5GuYw24'
+            }
             url =  'http://localhost:8000/HpClockifyApi/newExpense'
             requests.post(url=url, data=inputData)
             response = JsonResponse(data = 'Retry Expense Event Completed Succesfully', status=status.HTTP_201_CREATED, safe = False)
