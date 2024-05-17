@@ -6,6 +6,21 @@ import pyodbc
 from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs
 import ast
+from ..models import BackGroundTaskResult
+from django.http import JsonResponse
+
+
+def taskResult(response: JsonResponse, inputData, caller: str):
+    logger = setup_background_logger()
+    logger.info('Saving task result')
+    BackGroundTaskResult.objects.create(
+        status_code = response.status_code,
+        message = response.content.decode() or None,
+        data = inputData,
+        caller = caller,
+        time = timeZoneConvert(get_current_time(), '%Y-%m-%d %H:%M:%S')
+    )
+
 
 def reverseForOutput(data:dict):
     data_lines = dumps(data, indent=4).split('\n')

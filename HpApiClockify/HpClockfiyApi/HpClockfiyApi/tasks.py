@@ -24,7 +24,7 @@ from json import loads, dumps
 from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
-from .clockify_util.hpUtil import bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
+from .clockify_util.hpUtil import taskResult, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
 
 import requests
 import asyncio
@@ -32,17 +32,6 @@ import asyncio
 
 loggerLevel = 'WARNING'
 logger = setup_background_logger(loggerLevel) #pass level argument 
-
-def taskResult(response: JsonResponse, inputData, caller: str):
-    logger = setup_background_logger(loggerLevel)
-    logger.info('Saving task result')
-    BackGroundTaskResult.objects.create(
-        status_code = response.status_code,
-        message = response.content.decode() or None,
-        data = inputData,
-        caller = caller,
-        time = timeZoneConvert(get_current_time(), '%Y-%m-%d %H:%M:%S')
-    )
 
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 

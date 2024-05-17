@@ -24,27 +24,26 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
 import shutil
-from .clockify_util.hpUtil import bytes_to_dict
-from .clockify_util import ClockifyPullV3
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, UserEvent, ProjectEvent, TimeOffEvent, PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, dumps, loads, reverseForOutput
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput
 from . import settings
-import time
+
 import httpx
 from . Loggers import setup_server_logger
 from json.decoder import JSONDecodeError
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
+saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
     if request.method == 'POST':
         logger = setup_server_logger(loggerLevel)
-        inputData = loads(request.body)
         logger.info(f'{request.method}: updateTimesheet')
         try: 
+            inputData = loads(request.body)
             def updateApproval():
                 # with transaction.atomic(): # if any error occurs then rollback 
                     try:
@@ -90,7 +89,7 @@ async def updateTimesheets(request:ASGIRequest):
         except Exception as e:
             # transaction.rollback()
             response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
-            logger.error(f'{str(e)}')
+            await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
             logger.error(f'{dumps(inputData["id"])} - {response.status_code}')
             return response
     else:
@@ -117,14 +116,14 @@ def newTimeSheets(request: ASGIRequest):
                 return response
         except utils.IntegrityError as e:
             if 'PRIMARY KEY constraint' in str(e): 
-                response = Response(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT)
-                logger.error(f"on timesheet {request.data['id']}")
-                logger.error(f'{response}')
+                response = JsonResponse(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT, safe=False)
+                logger.error(f'Cannot create new Timesheet because id {request.data["id"]} already exists')
+                taskResult(response, data, 'New Timesheet Function')
                 return response
             elif('FOREIGN KEY') in str(e): # maybe include calls to update and try again in the future 
-                response = Response(data=str(e), status=status.HTTP_406_NOT_ACCEPTABLE)
-                logger.error(f"on timesheet {request.data['id']}")
-                logger.error(f'{response}')
+                response = JsonResponse(data={'Message': f'Cannot create new Timesheet data includes Foregin Constraint Violation'}, status=status.HTTP_406_NOT_ACCEPTABLE, safe=False)
+                logger.error(response.content)
+                taskResult(response, data, 'New Timesheet Function')
                 return response
             else:
                 response = Response(data=str(e), status = status.HTTP_400_BAD_REQUEST) 
@@ -132,9 +131,9 @@ def newTimeSheets(request: ASGIRequest):
                 logger.error(f'{response}')
                 return response
         except Exception as e:
-            logger.error(f"on timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
-            response = Response(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
-            logger.error(f'{response}')
+            logger.error(f"On timesheet {request.data['id']}: {str(e)} at {e.__traceback__.tb_lineno}")
+            response = JsonResponse(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE, safe= False)
+            taskResult(response, data, 'New Timesheet Function')
             return response
     else:
         response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -179,6 +178,7 @@ def monthlyBillableReport(request, start_date = None, end_date= None):
     folder_path = monthlyBillable(start_date, end_date )
     return download_text_file(folder_path)
 
+@api_view(['GET'])
 def weeklyPayrollReport(request, start_date=None, end_date= None):
     logger.info(f'Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
