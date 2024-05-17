@@ -29,6 +29,7 @@ from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput
 from . import settings
 
+import hmac, hashlib
 import httpx
 from . Loggers import setup_server_logger
 from json.decoder import JSONDecodeError
@@ -37,64 +38,78 @@ loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
+def aunthenticateRequst(request: ASGIRequest, secret: str):
+    logger.debug(request.headers)
+    if loggerLevel == 'DEBUG':
+        for key, value in request.headers.items():
+            logger.debug(f"{key}: {value}")
+    signature = request.headers.get('X-Clockify-Signature') # or wherever the signing secret is held 
+    payload = request.body
+    auth = hmac.compare_digest(secret,payload,hashlib.sha256).hexdigest()
+    if hmac.compare_digest(auth, signature): 
+        return True
+    return False
+
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
-    if request.method == 'POST':
-        logger = setup_server_logger(loggerLevel)
-        logger.info(f'{request.method}: updateTimesheet')
-        try: 
-            inputData = loads(request.body)
-            def updateApproval():
-                # with transaction.atomic(): # if any error occurs then rollback 
-                    try:
-                        timesheet = Timesheet.objects.get(pk=inputData['id'])
-                        serializer = TimesheetSerializer(instance= timesheet, data = inputData)
-                    except Timesheet.DoesNotExist:
-                        serializer = TimesheetSerializer(data=inputData)
-                        logger.warning(f'Adding new timesheet on update function. Timesheet { inputData["id"] }')
-                    if serializer.is_valid():
-                        serializer.save()
-                        # task = asyncio.ensure_future(updateEntries(request, serializer))
-                        # await asyncio.wait([task])
-                        response = JsonResponse(data={
-                                                'timesheet':serializer.validated_data
-                                            }, status = status.HTTP_202_ACCEPTED)
-                        logger.info(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
-                        return [response, serializer]
-                    else: 
-                        response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-                        logger.error(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
-                        return [response, None]
+    secret = b'me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy'
+    if aunthenticateRequst(request, secret):
+        if request.method == 'POST':
+            logger = setup_server_logger(loggerLevel)
+            logger.info(f'{request.method}: updateTimesheet')
+            try: 
+                inputData = loads(request.body)
+                def updateApproval():
+                    # with transaction.atomic(): # if any error occurs then rollback 
+                        try:
+                            timesheet = Timesheet.objects.get(pk=inputData['id'])
+                            serializer = TimesheetSerializer(instance= timesheet, data = inputData)
+                        except Timesheet.DoesNotExist:
+                            serializer = TimesheetSerializer(data=inputData)
+                            logger.warning(f'Adding new timesheet on update function. Timesheet { inputData["id"] }')
+                        if serializer.is_valid():
+                            serializer.save()
+                            # task = asyncio.ensure_future(updateEntries(request, serializer))
+                            # await asyncio.wait([task])
+                            response = JsonResponse(data={
+                                                    'timesheet':serializer.validated_data
+                                                }, status = status.HTTP_202_ACCEPTED)
+                            logger.info(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
+                            return [response, serializer]
+                        else: 
+                            response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
+                            logger.error(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
+                            return [response, None]
 
-            async def callBackgroungEntry():
-                url =  'http://localhost:5000/HpClockifyApi/task/Entry'
-                async with httpx.AsyncClient(timeout=300) as client:
-                    await client.post(url=url, data=inputData)
-            async def callBackgroungExpense():
-                url =  'http://localhost:5000/HpClockifyApi/task/Expense'
-                async with httpx.AsyncClient(timeout=300) as client:
-                    await client.post(url=url, data=inputData)
+                async def callBackgroungEntry():
+                    url =  'http://localhost:5000/HpClockifyApi/task/Entry'
+                    async with httpx.AsyncClient(timeout=300) as client:
+                        await client.post(url=url, data=inputData)
+                async def callBackgroungExpense():
+                    url =  'http://localhost:5000/HpClockifyApi/task/Expense'
+                    async with httpx.AsyncClient(timeout=300) as client:
+                        await client.post(url=url, data=inputData)
 
-            async def createTask(): # handles Entries and Expenses Once at a time
-                await callBackgroungEntry()
-                await callBackgroungExpense()
-                
-            updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
-            result = await updateAsync()
-            if result[1]:
-                asyncio.create_task(createTask()) 
-            else: 
-                raise ValidationError('Unknown Error occured. Timesheet Serializer not created.')
-            return result[0]
-        except Exception as e:
-            # transaction.rollback()
-            response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
-            await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
-            logger.error(f'{dumps(inputData["id"])} - {response.status_code}')
+                async def createTask(): # handles Entries and Expenses Once at a time
+                    await callBackgroungEntry()
+                    await callBackgroungExpense()
+                    
+                updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
+                result = await updateAsync()
+                if result[1]:
+                    asyncio.create_task(createTask()) 
+                else: 
+                    raise ValidationError('Unknown Error occured. Timesheet Serializer not created.')
+                return result[0]
+            except Exception as e:
+                # transaction.rollback()
+                response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
+                await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
+                logger.error(f'{dumps(inputData["id"])} - {response.status_code}')
+                return response
+        else:
+            response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-    else:
-        response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
-        return response
 
 @api_view(['POST'])
 def newTimeSheets(request: ASGIRequest):
