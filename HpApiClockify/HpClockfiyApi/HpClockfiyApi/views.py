@@ -6,15 +6,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction , utils
 from .serializers import (
     TimesheetSerializer,
+    TimeOffSerializer,
     ExpenseSerializer,
-    EntrySerializer
-    # CategorySerializer
+    EntrySerializer,
 
 )
 from .models import(
+    TimeOffRequests,
     Timesheet,
     Expense,
-    Entry
+    Entry,
 )
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
@@ -44,10 +45,11 @@ def aunthenticateRequst(request: ASGIRequest, secret: str):
     logger.info('Validating Request...')
     signature = request.headers.get('Clockify-Signature') 
     if secret == signature:
-        logger.debug('Request Validated')
+        logger.info('Request Validated!')
         return True
-    logger.warning('Invalid Request')
-    return False
+    else: 
+        logger.warning('Invalid Request')
+        return False
 
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
@@ -357,29 +359,62 @@ def getProjects(request: ASGIRequest, format = None):
         taskResult(response, dumps(loads(request.body)), 'Project Function')
         return response  
 
-@api_view(['GET', 'POST'])
-def getTimeOffRequests(request: ASGIRequest, ):
+@csrf_exempt
+async def getTimeOffRequests(request: ASGIRequest):
     secret = 'W7Lc7BGRq1wvIC0eQS5Bik5m05JF8RkZ'
+    logger = setup_server_logger()
+    logger.info('Approved Time Off Request function called ')
+    caller = 'getTimeOffRequests'
     if aunthenticateRequst(request, secret): 
-        '''
-        
-        elif request.method == 'GET':
-            timeOff = Timeoffrequests.objects.all()
-            serializer = TimeOffRequestsSerializer(timeOff, many=True)
-            response = Response(serializer.data, status= status.HTTP_200_OK)
-        '''
-        if request.method == 'POST' or request.method == 'GET':
-            stat = TimeOffEvent()
-            logger.info(f'Time Off  Event: Add Time Off')
-            if stat:
-                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-            else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'POST':
+            inputData = loads(request.body)
+            logger.debug(f'Input is  - {reverseForOutput(inputData)}')
+            
+            def updateSync(inputData):
+                try:
+                    # logger = setup_server_logger()
+                    try:
+                        timeoff = TimeOffRequests.objects.get(pk=inputData['id'])
+                        serializer = TimeOffSerializer(instance=timeoff, data = inputData)
+                        logger.info('Update Request Path taken')
+                    except TimeOffRequests.DoesNotExist:
+                        serializer = TimeOffSerializer(data= inputData)
+                    if serializer.is_valid():
+                            serializer.save()
+                            logger.info(f'Saved Time Off Request with id {inputData['id']}')
+                            return True
+                    else: 
+                        logger.warning(f'Serializer could not be saved: {serializer.errors} ')
+                        return False
+                except Exception as e:
+                    logger.error(f'Exception Caught  {e.__traceback__.tb_lineno}: ({str(e)})')
+                    raise e
+            saveTimeOff = sync_to_async(updateSync)
+            try: 
+                result = await saveTimeOff(inputData)
+                if result: 
+                    response =JsonResponse(data={'Message': f'Operation Complete for Time off Request {inputData["id"]}'},
+                                    status=status.HTTP_201_CREATED)  # maybe include a different response for updates   
+                    logger.info( response.content.decode('utf-8'))
+                    return response
+                else: 
+                    response = JsonResponse(data = {'Message': f'Opperation failed do to invalid Request'},
+                                            status = status.HTTP_400_BAD_REQUEST)
+                    await saveTaskResult(response,inputData, caller)
+                    return response
+            
+            except Exception as e:
+                logger.error(str(e))
+                response = JsonResponse(data= {'Message': f'Error of type {type(e)} at {e.__traceback__.tb_lineno}'},
+                                        status=status.HTTP_503_SERVICE_UNAVAILABLE)
+                await saveTaskResult(response, inputData, caller)
+                return response
         else:
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'TimeOff Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'TimeOff Function')
         return response  
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -433,7 +468,7 @@ async def newExpense(request: ASGIRequest):
                 try:
                     if serializer.is_valid():
                         serializer.save()
-                        logger.info(dumps(inputData, indent= 4))
+                        logger.info(reverseForOutput(inputData))
                         logger.info(f'Saved Expense with Id - {inputData['id']}')
                         return True, 'V' # V for valid 
                     else:

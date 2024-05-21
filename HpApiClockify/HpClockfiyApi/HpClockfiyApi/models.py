@@ -46,7 +46,6 @@ class Client(models.Model):
     def __str__(self):
         return self.name or ""
     
-
 class Employeeuser(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
     email = models.CharField(max_length=255, blank=True, null=True)
@@ -166,7 +165,23 @@ class Expense(models.Model):
 
     def __str__(self):
         return self.id or ""
-    
+
+class TimeOffRequests(models.Model):
+    id = models.CharField(primary_key =True, max_length =50)
+    userId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='eID')
+    policyId = models.CharField(blank=False, null = False, max_length=50, db_column= 'pID')
+    start = models.DateTimeField(blank = False, null = False, db_column='startDate')
+    end = models.DateTimeField(blank = False, null = False, db_column='end_date')
+    duration = models.FloatField(default = 0)
+    balanceDiff = models.FloatField(default = 0, db_column='paidTimeOff')
+    status = models.CharField(max_length=50)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspace_id')
+
+    class Meta:
+        managed = False
+        db_table = 'TimeOffRequests'
+        unique_together = (('id', 'workspaceId'))
+
 class BackGroundTaskResult(models.Model):
     status_code = models.IntegerField(default=404)
     message = models.CharField( max_length=250)

@@ -10,6 +10,37 @@ from ..models import BackGroundTaskResult
 from django.http import JsonResponse
 
 
+def count_working_days(start_date:datetime, end_date: datetime, excludeDays=[] ):
+    """
+    Count the number of working days between two given dates, excluding weekends (Saturday and Sunday)
+    and holidays fetched from the 'Holidays' table in the database.
+
+    Args:
+        start_date (datetime.date): The start date.
+        end_date (datetime.date): The end date.
+        
+
+    Returns:
+        int: The number of working days between start_date and end_date.
+    """
+    # Define a list of weekdays (Monday = 0, Sunday = 6)
+    weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
+    
+    # Initialize a counter for working days
+    working_days = 0
+    
+    # Iterate through each date between start_date and end_date
+    current_date = start_date
+    
+    while current_date <= end_date:
+        # Check if the current date is a weekday
+        if current_date.weekday() in weekdays and current_date not in excludeDays:
+            working_days += 1
+        # Move to the next day
+        current_date += timedelta(days=1)
+    return working_days
+
+
 def taskResult(response: JsonResponse, inputData, caller: str):
     logger = setup_background_logger()
     logger.info('Saving task result')

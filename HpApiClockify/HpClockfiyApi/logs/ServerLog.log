@@ -1950,3 +1950,118 @@
 2024-05-16 11:06:04,360 - server - INFO - UpdateTimesheet:"6642427b7bda321cc6659c6d"202
 2024-05-16 11:06:15,520 - server - INFO - POST: updateTimesheet
 2024-05-16 11:06:16,616 - server - INFO - UpdateTimesheet:"6642427b7bda321cc6659c6d"202
+2024-05-17 16:48:42,393 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:48:42,394 - server - INFO - Validating Request...
+2024-05-17 16:48:42,395 - server - WARNING - Invalid Request
+2024-05-17 16:49:10,142 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:49:10,143 - server - INFO - Validating Request...
+2024-05-17 16:49:10,143 - server - WARNING - Invalid Request
+2024-05-17 16:49:19,848 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:49:19,849 - server - INFO - Validating Request...
+2024-05-17 16:49:19,849 - server - WARNING - Invalid Request
+2024-05-17 16:50:24,444 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:50:24,445 - server - INFO - Validating Request...
+2024-05-17 16:51:42,900 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:51:42,901 - server - INFO - Validating Request...
+2024-05-17 16:51:42,901 - server - INFO - b'{"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}'
+2024-05-17 16:52:28,124 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:52:28,125 - server - INFO - Validating Request...
+2024-05-17 16:52:28,125 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:53:08,945 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:53:08,945 - server - INFO - Validating Request...
+2024-05-17 16:53:08,945 - server - INFO - "{\"Message\": \"Operation Complete for Time off Request 6642556df7acb11a4bd6ee68\"}"
+2024-05-17 16:54:34,360 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:54:34,360 - server - INFO - Validating Request...
+2024-05-17 16:54:34,361 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:56:40,340 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:56:40,340 - server - INFO - Validating Request...
+2024-05-17 16:56:40,341 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:57:11,222 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:57:11,223 - server - INFO - Validating Request...
+2024-05-17 16:57:11,224 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:58:27,060 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:58:27,060 - server - INFO - Validating Request...
+2024-05-17 16:58:27,060 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:58:32,039 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:58:32,039 - server - INFO - Validating Request...
+2024-05-17 16:58:32,040 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 16:58:36,470 - server - INFO - Approved Time Off Request function called 
+2024-05-17 16:58:36,471 - server - INFO - Validating Request...
+2024-05-17 16:58:36,472 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:00:57,901 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:00:57,901 - server - INFO - Validating Request...
+2024-05-17 17:00:57,902 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:01:45,654 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:01:45,655 - server - INFO - Validating Request...
+2024-05-17 17:01:45,656 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:01:50,388 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:01:50,388 - server - INFO - Validating Request...
+2024-05-17 17:01:50,388 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:01:55,096 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:01:55,096 - server - INFO - Validating Request...
+2024-05-17 17:01:55,098 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:01:56,429 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:01:56,430 - server - INFO - Validating Request...
+2024-05-17 17:01:56,431 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:02:26,583 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:02:26,583 - server - INFO - Validating Request...
+2024-05-17 17:02:26,583 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:03:41,757 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:03:41,757 - server - INFO - Validating Request...
+2024-05-17 17:03:41,757 - server - INFO - {"Message": "Operation Complete for Time off Request 6642556df7acb11a4bd6ee68"}
+2024-05-17 17:03:54,887 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:03:54,887 - server - INFO - Validating Request...
+2024-05-17 17:04:56,788 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:04:56,788 - server - INFO - Validating Request...
+2024-05-17 17:08:34,483 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:08:34,485 - server - INFO - Validating Request...
+2024-05-17 17:10:42,653 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:10:42,654 - server - INFO - Validating Request...
+2024-05-17 17:10:44,902 - server - ERROR - ('42S02', "[42S02] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'HpClockfiyApi_timeoffrequests'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2024-05-17 17:12:04,011 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:12:04,011 - server - INFO - Validating Request...
+2024-05-17 17:12:06,173 - server - INFO - Update Request Path taken
+2024-05-17 17:12:06,726 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:12:47,838 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:12:47,839 - server - INFO - Validating Request...
+2024-05-17 17:12:49,971 - server - INFO - Update Request Path taken
+2024-05-17 17:12:50,452 - server - ERROR - 394
+2024-05-17 17:14:37,588 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:14:37,589 - server - INFO - Validating Request...
+2024-05-17 17:14:39,865 - server - INFO - Update Request Path taken
+2024-05-17 17:14:40,363 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:17:42,977 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:17:42,978 - server - INFO - Validating Request...
+2024-05-17 17:17:44,245 - server - INFO - Update Request Path taken
+2024-05-17 17:17:44,746 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:17:52,809 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:17:52,809 - server - INFO - Validating Request...
+2024-05-17 17:17:54,983 - server - INFO - Update Request Path taken
+2024-05-17 17:17:55,477 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:19:18,664 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:19:18,664 - server - INFO - Validating Request...
+2024-05-17 17:19:20,744 - server - INFO - Update Request Path taken
+2024-05-17 17:19:21,208 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:20:28,888 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:20:28,888 - server - INFO - Validating Request...
+2024-05-17 17:20:31,034 - server - INFO - Update Request Path taken
+2024-05-17 17:20:31,529 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:21:47,540 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:21:47,541 - server - INFO - Validating Request...
+2024-05-17 17:21:49,640 - server - INFO - <class 'HpClockfiyApi.serializers.TimeOffSerializer'>
+2024-05-17 17:21:49,642 - server - INFO - Update Request Path taken
+2024-05-17 17:21:50,107 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:24:26,985 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:24:26,986 - server - INFO - Validating Request...
+2024-05-17 17:24:29,182 - server - INFO - Update Request Path taken
+2024-05-17 17:24:29,663 - server - ERROR - Exception Caught  386: ('ReturnDict' object is not callable)
+2024-05-17 17:24:29,665 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:25:05,500 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:25:05,501 - server - INFO - Validating Request...
+2024-05-17 17:25:06,134 - server - INFO - Update Request Path taken
+2024-05-17 17:25:06,627 - server - ERROR - Exception Caught  386: ('ReturnDict' object is not callable)
+2024-05-17 17:25:06,628 - server - ERROR - 'ReturnDict' object is not callable
+2024-05-17 17:25:13,669 - server - INFO - Approved Time Off Request function called 
+2024-05-17 17:25:13,669 - server - INFO - Validating Request...
+2024-05-17 17:25:15,816 - server - INFO - Update Request Path taken
+2024-05-17 17:25:16,294 - server - WARNING - Serializer could not be saved: {'status': [ErrorDetail(string='Not a valid string.', code='invalid')], 'start': [ErrorDetail(string='This field is required.', code='required')], 'end': [ErrorDetail(string='This field is required.', code='required')]} 
