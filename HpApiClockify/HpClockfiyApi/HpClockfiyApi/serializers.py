@@ -170,7 +170,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
         fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']
         
 class TimeOffSerializer(serializers.ModelSerializer): 
-    status = serializers.DictField()
+    status = serializers.SerializerMethodField()
     start = serializers.SerializerMethodField()
     end = serializers.SerializerMethodField()
     
@@ -188,18 +188,14 @@ class TimeOffSerializer(serializers.ModelSerializer):
             logger.error(f'Error during status validation: {e}')
             raise serializers.ValidationError(f"Error during status validation: {e}")
             
-    class Meta: 
-        model = TimeOffRequests
-        fields = '__all__'
-
-
     def create(self, validated_data):
+        logger = setup_background_logger()
         start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('start'))
         end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('end'))
         status = self.initial_data.get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
-        
+        logger.debug(status)
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
@@ -217,6 +213,7 @@ class TimeOffSerializer(serializers.ModelSerializer):
         status = self.initial_data.get('status').get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
+        logger.debug('status')
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
@@ -231,3 +228,7 @@ class TimeOffSerializer(serializers.ModelSerializer):
         return updated_instance
         
     
+    class Meta: 
+        model = TimeOffRequests
+        fields = '__all__'
+

@@ -57,3 +57,200 @@
 2024-05-21 12:01:40,168 - server - INFO - POST: bankedHours 
 2024-05-21 12:05:02,316 - server - INFO - POST: bankedHours 
 2024-05-21 12:06:07,699 - server - INFO - POST: bankedHours 
+2024-05-21 12:19:25,083 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:19:25,083 - server - INFO - Validating Request...
+2024-05-21 12:19:25,084 - server - WARNING - Invalid Request
+2024-05-21 12:19:59,998 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:19:59,999 - server - INFO - Validating Request...
+2024-05-21 12:19:59,999 - server - WARNING - Invalid Request
+2024-05-21 12:20:54,027 - server - INFO - POST: bankedHours 
+2024-05-21 12:21:10,200 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:21:10,201 - server - INFO - Validating Request...
+2024-05-21 12:21:10,202 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:21:10,204 - server - WARNING - Invalid Request
+2024-05-21 12:21:10,205 - server - INFO - Validating Request...
+2024-05-21 12:21:10,208 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:21:10,209 - server - INFO - Request Validated!
+2024-05-21 12:21:10,211 - server - DEBUG - Input is  - }
+    "id": "664ce4d8c8a2333cfdc245cc"
+    "balanceValueAtRequest": 15,
+    "negativeBalanceUsed": 0,
+    "excludeDays": [],
+    "requesterUserId": "65bd6a6077682a20767a6c0b",
+    "createdAt": "2024-05-21T18:15:52.889302519Z",
+    "balanceDiff": 8,
+    },
+        "note": null
+        "changedAt": null,
+        "changedByUserName": "Timmy Ifidon",
+        "changedByUserId": null,
+        "statusType": "PENDING",
+    "status": {
+    "note": null,
+    },
+        "halfDayPeriod": "NOT_DEFINED"
+        "halfDay": false,
+        },
+            "end": "2024-05-14T22:00:00Z"
+            "start": "2024-05-14T14:00:00Z",
+        "period": {
+    "timeOffPeriod": {
+    "timeZone": "America/Edmonton",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "policyId": "65fc91ca17e548286f7bc026",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+{
+2024-05-21 12:21:14,190 - server - ERROR - Exception Caught  385: (('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)"))
+2024-05-21 12:21:14,193 - server - ERROR - ('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+2024-05-21 12:23:12,817 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:23:12,817 - server - INFO - Validating Request...
+2024-05-21 12:23:12,818 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:23:12,818 - server - WARNING - Invalid Request
+2024-05-21 12:23:12,818 - server - INFO - Validating Request...
+2024-05-21 12:23:12,818 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:23:12,818 - server - INFO - Request Validated!
+2024-05-21 12:23:12,820 - server - DEBUG - Input is  - }
+    "id": "664ce4d8c8a2333cfdc245cc"
+    "balanceValueAtRequest": 15,
+    "negativeBalanceUsed": 0,
+    "excludeDays": [],
+    "requesterUserId": "65bd6a6077682a20767a6c0b",
+    "createdAt": "2024-05-21T18:15:52.889302519Z",
+    "balanceDiff": 8,
+    },
+        "note": null
+        "changedAt": null,
+        "changedByUserName": "Timmy Ifidon",
+        "changedByUserId": null,
+        "statusType": "PENDING",
+    "status": {
+    "note": null,
+    },
+        "halfDayPeriod": "NOT_DEFINED"
+        "halfDay": false,
+        },
+            "end": "2024-05-14T22:00:00Z"
+            "start": "2024-05-14T14:00:00Z",
+        "period": {
+    "timeOffPeriod": {
+    "timeZone": "America/Edmonton",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "policyId": "65fc91ca17e548286f7bc026",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+{
+2024-05-21 12:23:16,373 - server - ERROR - Exception Caught  385: (('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)"))
+2024-05-21 12:23:16,376 - server - ERROR - ('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+2024-05-21 12:24:52,562 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:24:52,566 - server - INFO - Validating Request...
+2024-05-21 12:24:52,566 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:24:52,566 - server - WARNING - Invalid Request
+2024-05-21 12:24:52,566 - server - INFO - Validating Request...
+2024-05-21 12:24:52,566 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:24:52,566 - server - INFO - Request Validated!
+2024-05-21 12:24:52,566 - server - DEBUG - Input is  - }
+    "id": "664ce4d8c8a2333cfdc245cc"
+    "balanceValueAtRequest": 15,
+    "negativeBalanceUsed": 0,
+    "excludeDays": [],
+    "requesterUserId": "65bd6a6077682a20767a6c0b",
+    "createdAt": "2024-05-21T18:15:52.889302519Z",
+    "balanceDiff": 8,
+    },
+        "note": null
+        "changedAt": null,
+        "changedByUserName": "Timmy Ifidon",
+        "changedByUserId": null,
+        "statusType": "PENDING",
+    "status": {
+    "note": null,
+    },
+        "halfDayPeriod": "NOT_DEFINED"
+        "halfDay": false,
+        },
+            "end": "2024-05-14T22:00:00Z"
+            "start": "2024-05-14T14:00:00Z",
+        "period": {
+    "timeOffPeriod": {
+    "timeZone": "America/Edmonton",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "policyId": "65fc91ca17e548286f7bc026",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+{
+2024-05-21 12:24:56,417 - server - ERROR - Exception Caught  385: (('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)"))
+2024-05-21 12:24:56,420 - server - ERROR - ('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+2024-05-21 12:25:47,562 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:25:47,562 - server - INFO - Validating Request...
+2024-05-21 12:25:47,562 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:25:47,562 - server - WARNING - Invalid Request
+2024-05-21 12:25:47,562 - server - INFO - Validating Request...
+2024-05-21 12:25:47,562 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:25:47,562 - server - INFO - Request Validated!
+2024-05-21 12:25:47,566 - server - DEBUG - Input is  - }
+    "id": "664ce4d8c8a2333cfdc245cc"
+    "balanceValueAtRequest": 15,
+    "negativeBalanceUsed": 0,
+    "excludeDays": [],
+    "requesterUserId": "65bd6a6077682a20767a6c0b",
+    "createdAt": "2024-05-21T18:15:52.889302519Z",
+    "balanceDiff": 8,
+    },
+        "note": null
+        "changedAt": null,
+        "changedByUserName": "Timmy Ifidon",
+        "changedByUserId": null,
+        "statusType": "PENDING",
+    "status": {
+    "note": null,
+    },
+        "halfDayPeriod": "NOT_DEFINED"
+        "halfDay": false,
+        },
+            "end": "2024-05-14T22:00:00Z"
+            "start": "2024-05-14T14:00:00Z",
+        "period": {
+    "timeOffPeriod": {
+    "timeZone": "America/Edmonton",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "policyId": "65fc91ca17e548286f7bc026",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+{
+2024-05-21 12:25:50,862 - server - ERROR - Exception Caught  385: (('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)"))
+2024-05-21 12:25:50,865 - server - ERROR - ('42000', "[42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]String or binary data would be truncated in table 'hpdb.dbo.TimeOffRequests', column 'status'. Truncated value: '{''statusType'': ''PENDING'', ''changedByUserId'': None,'. (2628) (SQLExecDirectW); [42000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+2024-05-21 12:26:41,779 - server - INFO - Approved Time Off Request function called 
+2024-05-21 12:26:41,780 - server - INFO - Validating Request...
+2024-05-21 12:26:41,780 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:26:41,780 - server - WARNING - Invalid Request
+2024-05-21 12:26:41,780 - server - INFO - Validating Request...
+2024-05-21 12:26:41,781 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-21 12:26:41,781 - server - INFO - Request Validated!
+2024-05-21 12:26:41,781 - server - DEBUG - Input is  - }
+    "id": "664ce4d8c8a2333cfdc245cc"
+    "balanceValueAtRequest": 15,
+    "negativeBalanceUsed": 0,
+    "excludeDays": [],
+    "requesterUserId": "65bd6a6077682a20767a6c0b",
+    "createdAt": "2024-05-21T18:15:52.889302519Z",
+    "balanceDiff": 8,
+    },
+        "note": null
+        "changedAt": null,
+        "changedByUserName": "Timmy Ifidon",
+        "changedByUserId": null,
+        "statusType": "PENDING",
+    "status": {
+    "note": null,
+    },
+        "halfDayPeriod": "NOT_DEFINED"
+        "halfDay": false,
+        },
+            "end": "2024-05-14T22:00:00Z"
+            "start": "2024-05-14T14:00:00Z",
+        "period": {
+    "timeOffPeriod": {
+    "timeZone": "America/Edmonton",
+    "userId": "65bd6a6077682a20767a6c0b",
+    "policyId": "65fc91ca17e548286f7bc026",
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+{
+2024-05-21 12:26:45,433 - server - INFO - Saved Time Off Request with id 664ce4d8c8a2333cfdc245cc
+2024-05-21 12:26:45,436 - server - INFO - {"Message": "Operation Complete for Time off Request 664ce4d8c8a2333cfdc245cc"}

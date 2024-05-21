@@ -44,6 +44,7 @@ def aunthenticateRequst(request: ASGIRequest, secret: str):
     '''
     logger.info('Validating Request...')
     signature = request.headers.get('Clockify-Signature') 
+    logger.debug(signature)
     if secret == signature:
         logger.info('Request Validated!')
         return True
