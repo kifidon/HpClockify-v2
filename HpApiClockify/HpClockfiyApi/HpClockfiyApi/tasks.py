@@ -181,7 +181,8 @@ def updateTags(inputdata: dict):
             raise e
 
 @csrf_exempt
-async def approvedEntries(request: ASGIRequest):  
+async def approvedEntries(request: ASGIRequest): 
+    #entry Function  
     logger = setup_background_logger(loggerLevel)
     caller = 'Approved Entry Function Called'
     logger.info(caller)
