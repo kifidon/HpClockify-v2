@@ -362,10 +362,11 @@ def getProjects(request: ASGIRequest, format = None):
 @csrf_exempt
 async def getTimeOffRequests(request: ASGIRequest):
     secret = 'W7Lc7BGRq1wvIC0eQS5Bik5m05JF8RkZ'
+    secret2 = 'I7DOlIagZOjUBhHS0HObcvyaBiz7covJ'
     logger = setup_server_logger()
     logger.info('Approved Time Off Request function called ')
     caller = 'getTimeOffRequests'
-    if aunthenticateRequst(request, secret): 
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2): 
         if request.method == 'POST':
             inputData = loads(request.body)
             logger.debug(f'Input is  - {reverseForOutput(inputData)}')
