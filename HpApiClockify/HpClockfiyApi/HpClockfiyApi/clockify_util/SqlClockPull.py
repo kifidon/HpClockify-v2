@@ -2,6 +2,7 @@ from . import ClockifyPullV3
 from . import ClockifyPushV3
 from ..Loggers import setup_background_logger
 import time
+from .hpUtil import reverseForOutput
 
 def getUsrBallances(conn, cursor):
     logger = setup_background_logger('DEBUG')
@@ -50,7 +51,8 @@ def checkBalanceUpdate(usrBalances, polID, page):
         logger.error(f"({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         raise
     else:
-        logger.info(f" Updating User Balances: {{Employee ID: [New Balance, Old Balance]}}, updateBalances")
+        logger.info(reverseForOutput(updateBalances))
+        logger.info(f"Updating User Balances: {{Employee ID: [New Balance, Old Balance]}}, updateBalances")
         return updateBalances
     
 def updateUsrBalances(updateBalances, polID):
@@ -92,7 +94,6 @@ def main():
     page = 1
     updateBalances= checkBalanceUpdate(usrBalances, polID, page)
     while len(updateBalances) != 0 :
-        logger.info(updateBalances)
         updateUsrBalances(updateBalances, polID)
         page += 1
         updateBalances= checkBalanceUpdate(usrBalances, polID, page)

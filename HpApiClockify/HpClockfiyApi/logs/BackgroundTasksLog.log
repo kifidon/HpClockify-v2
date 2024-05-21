@@ -1,0 +1,269 @@
+2024-05-21 11:51:13,353 - background_tasks - INFO - Approved Entry Function Called
+2024-05-21 11:51:14,367 - background_tasks - INFO - FindTimesheet called for 664cda427abd9f73f791a16d on page 1 
+2024-05-21 11:51:16,300 - background_tasks - INFO - Timesheet found on page 1
+2024-05-21 11:51:18,523 - background_tasks - INFO - Updating Entry 664cd2587abd9f73f7908317
+2024-05-21 11:51:18,524 - background_tasks - INFO - Update Entry Called
+2024-05-21 11:51:19,205 - background_tasks - INFO - UpdateEntries on timesheet(664cda427abd9f73f791a16d): E-664cd2587abd9f73f7908317 202 ACCEPTED
+2024-05-21 11:51:19,206 - background_tasks - INFO - }
+    "timesheetId": "664cda427abd9f73f791a16d"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 0
+    "hourlyRate": {
+    "approvalRequestId": "664cda427abd9f73f791a16d",
+    "customFieldValues": [],
+    },
+        "duration": "PT3H"
+        "end": "2024-05-18T17:00:00Z",
+        "start": "2024-05-18T14:00:00Z",
+    "timeInterval": {
+    },
+        "clientName": "Hill Plain Internal"
+        "clientId": "65c25ae977682a2076d96d49",
+        "color": "#03A9F4",
+        "name": "000-000 - Overhead (Non Billable)",
+        "id": "65c262c0edeea53ae1a27b84",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": false,
+    ],
+        }
+            "archived": false
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "name": "BANKED",
+            "id": "65fc6ca1285fff3064c4bce7",
+        {
+    "tags": [
+    "description": "Improved Code readability, started on workflow",
+    "id": "664cd2587abd9f73f7908317",
+{
+2024-05-21 11:51:19,206 - background_tasks - INFO - updateTags Function called
+2024-05-21 11:51:19,734 - background_tasks - INFO - Deleting old tags...set()
+2024-05-21 11:51:19,902 - background_tasks - INFO - Creating new tag
+2024-05-21 11:51:19,903 - background_tasks - INFO - Create Tag Called
+2024-05-21 11:51:20,590 - background_tasks - INFO - UpdateTags on timesheet(664cda427abd9f73f791a16d): E-664cd2587abd9f73f7908317-T-65fc6ca1285fff3064c4bce7 202 ACCEPTED
+2024-05-21 11:51:20,591 - background_tasks - INFO - }
+    "workspaceId": "65c249bfedeea53ae19d7dad"
+    "name": "BANKED",
+    "id": "65fc6ca1285fff3064c4bce7",
+{
+2024-05-21 11:51:20,591 - background_tasks - INFO - Update TagsFor on Timesheet664cda427abd9f73f791a16d: Complete 
+2024-05-21 11:51:20,760 - background_tasks - INFO - Updating Entry 664cd1e86c802f0391647d50
+2024-05-21 11:51:20,761 - background_tasks - INFO - Update Entry Called
+2024-05-21 11:51:21,342 - background_tasks - INFO - UpdateEntries on timesheet(664cda427abd9f73f791a16d): E-664cd1e86c802f0391647d50 202 ACCEPTED
+2024-05-21 11:51:21,342 - background_tasks - INFO - }
+    "timesheetId": "664cda427abd9f73f791a16d"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 0
+    "hourlyRate": {
+    "approvalRequestId": "664cda427abd9f73f791a16d",
+    "customFieldValues": [],
+    },
+        "duration": "PT10H"
+        "end": "2024-05-18T00:00:00Z",
+        "start": "2024-05-17T14:00:00Z",
+    "timeInterval": {
+    },
+        "clientName": "Hill Plain Internal"
+        "clientId": "65c25ae977682a2076d96d49",
+        "color": "#03A9F4",
+        "name": "000-000 - Overhead (Non Billable)",
+        "id": "65c262c0edeea53ae1a27b84",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": false,
+    ],
+        }
+            "archived": false
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "name": "BANKED",
+            "id": "65fc6ca1285fff3064c4bce7",
+        {
+    "tags": [
+    "description": "Created TimeOff Request models for storing data in databse. Debugging and performance improvements",
+    "id": "664cd1e86c802f0391647d50",
+{
+2024-05-21 11:51:21,342 - background_tasks - INFO - updateTags Function called
+2024-05-21 11:51:21,889 - background_tasks - INFO - Deleting old tags...set()
+2024-05-21 11:51:22,062 - background_tasks - INFO - Creating new tag
+2024-05-21 11:51:22,063 - background_tasks - INFO - Create Tag Called
+2024-05-21 11:51:22,824 - background_tasks - INFO - UpdateTags on timesheet(664cda427abd9f73f791a16d): E-664cd1e86c802f0391647d50-T-65fc6ca1285fff3064c4bce7 202 ACCEPTED
+2024-05-21 11:51:22,824 - background_tasks - INFO - }
+    "workspaceId": "65c249bfedeea53ae19d7dad"
+    "name": "BANKED",
+    "id": "65fc6ca1285fff3064c4bce7",
+{
+2024-05-21 11:51:22,824 - background_tasks - INFO - Update TagsFor on Timesheet664cda427abd9f73f791a16d: Complete 
+2024-05-21 11:51:23,000 - background_tasks - INFO - Updating Entry 6646881e01feae75dcca566f
+2024-05-21 11:51:23,001 - background_tasks - INFO - Update Entry Called
+2024-05-21 11:51:24,102 - background_tasks - INFO - UpdateEntries on timesheet(664cda427abd9f73f791a16d): E-6646881e01feae75dcca566f 202 ACCEPTED
+2024-05-21 11:51:24,102 - background_tasks - INFO - }
+    "timesheetId": "664cda427abd9f73f791a16d"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 0
+    "hourlyRate": {
+    "approvalRequestId": "664cda427abd9f73f791a16d",
+    "customFieldValues": [],
+    },
+        "duration": "PT10H"
+        "end": "2024-05-17T00:00:00Z",
+        "start": "2024-05-16T14:00:00Z",
+    "timeInterval": {
+    },
+        "clientName": "Hill Plain Internal"
+        "clientId": "65c25ae977682a2076d96d49",
+        "color": "#03A9F4",
+        "name": "000-000 - Overhead (Non Billable)",
+        "id": "65c262c0edeea53ae1a27b84",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": false,
+    ],
+        }
+            "archived": false
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "name": "BANKED",
+            "id": "65fc6ca1285fff3064c4bce7",
+        {
+    "tags": [
+    "description": "Background task dynamic loggings system for server maintenance\n  ExpenseClaim Database view and power BI report \n  Handled uncaught Exceptions on the server.\n  Reasearch on BLOB datatypes for storing recipt images in the database",
+    "id": "6646881e01feae75dcca566f",
+{
+2024-05-21 11:51:24,102 - background_tasks - INFO - updateTags Function called
+2024-05-21 11:51:24,635 - background_tasks - INFO - Deleting old tags...set()
+2024-05-21 11:51:24,807 - background_tasks - INFO - Creating new tag
+2024-05-21 11:51:24,808 - background_tasks - INFO - Create Tag Called
+2024-05-21 11:51:25,491 - background_tasks - INFO - UpdateTags on timesheet(664cda427abd9f73f791a16d): E-6646881e01feae75dcca566f-T-65fc6ca1285fff3064c4bce7 202 ACCEPTED
+2024-05-21 11:51:25,491 - background_tasks - INFO - }
+    "workspaceId": "65c249bfedeea53ae19d7dad"
+    "name": "BANKED",
+    "id": "65fc6ca1285fff3064c4bce7",
+{
+2024-05-21 11:51:25,491 - background_tasks - INFO - Update TagsFor on Timesheet664cda427abd9f73f791a16d: Complete 
+2024-05-21 11:51:25,660 - background_tasks - INFO - Updating Entry 66463f100554e846403f9be2
+2024-05-21 11:51:25,660 - background_tasks - INFO - Update Entry Called
+2024-05-21 11:51:26,219 - background_tasks - INFO - UpdateEntries on timesheet(664cda427abd9f73f791a16d): E-66463f100554e846403f9be2 202 ACCEPTED
+2024-05-21 11:51:26,219 - background_tasks - INFO - }
+    "timesheetId": "664cda427abd9f73f791a16d"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 0
+    "hourlyRate": {
+    "approvalRequestId": "664cda427abd9f73f791a16d",
+    "customFieldValues": [],
+    },
+        "duration": "PT6H30M"
+        "end": "2024-05-15T23:30:00Z",
+        "start": "2024-05-15T17:00:00Z",
+    "timeInterval": {
+    },
+        "clientName": "Hill Plain Internal"
+        "clientId": "65c25ae977682a2076d96d49",
+        "color": "#03A9F4",
+        "name": "000-000 - Overhead (Non Billable)",
+        "id": "65c262c0edeea53ae1a27b84",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": false,
+    "tags": [],
+    "description": "Server performance upgrades, Fixed bug on Timezones, implemented task manager",
+    "id": "66463f100554e846403f9be2",
+{
+2024-05-21 11:51:26,387 - background_tasks - INFO - Updating Entry 66425f3c7bda321cc6699a91
+2024-05-21 11:51:26,388 - background_tasks - INFO - Update Entry Called
+2024-05-21 11:51:26,961 - background_tasks - INFO - UpdateEntries on timesheet(664cda427abd9f73f791a16d): E-66425f3c7bda321cc6699a91 202 ACCEPTED
+2024-05-21 11:51:26,962 - background_tasks - INFO - }
+    "timesheetId": "664cda427abd9f73f791a16d"
+    "workspaceId": "65c249bfedeea53ae19d7dad",
+    "isLocked": false,
+    "type": "REGULAR",
+    },
+        "amount": 0
+    "costRate": {
+    },
+        "amount": 0
+    "hourlyRate": {
+    "approvalRequestId": "664cda427abd9f73f791a16d",
+    "customFieldValues": [],
+    },
+        "duration": "PT8H"
+        "end": "2024-05-14T06:00:00Z",
+        "start": "2024-05-13T22:00:00Z",
+    "timeInterval": {
+    },
+        "clientName": "Hill Plain Internal"
+        "clientId": "65c25ae977682a2076d96d49",
+        "color": "#03A9F4",
+        "name": "000-000 - Overhead (Non Billable)",
+        "id": "65c262c0edeea53ae1a27b84",
+    "project": {
+    },
+        "name": null
+        "id": null,
+    "task": {
+    "billable": false,
+    "tags": [],
+    "description": "Redifiend Entry-Timesheet Relational schema. Stablized expense functions for deployment.",
+    "id": "66425f3c7bda321cc6699a91",
+{
+2024-05-21 11:51:26,962 - background_tasks - INFO - Entries added for timesheet 664cda427abd9f73f791a16d
+2024-05-21 11:51:26,962 - background_tasks - INFO - Saving task result
+2024-05-21 11:51:28,107 - background_tasks - INFO - Approved Expense function called
+2024-05-21 11:51:29,118 - background_tasks - INFO - FindTimesheet called for 664cda427abd9f73f791a16d on page 1 
+2024-05-21 11:51:30,963 - background_tasks - INFO - Timesheet found on page 1
+2024-05-21 11:51:30,964 - background_tasks - WARNING - No Content. Is this expected?
+2024-05-21 11:51:30,964 - background_tasks - INFO - Saving task result
+2024-05-21 11:52:57,884 - background_tasks - INFO -  Checking User Balances
+2024-05-21 11:53:00,060 - background_tasks - INFO -  Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 11:53:00,063 - background_tasks - INFO - {'65bd6a6077682a20767a6c0b': [4.0, 0.0]}
+2024-05-21 11:53:01,388 - background_tasks - INFO - Updated Banked Time
+2024-05-21 11:53:02,723 - background_tasks - INFO -  Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 11:53:02,724 - background_tasks - INFO - SqlClockPull: Banked Time
+2024-05-21 12:01:40,969 - background_tasks - INFO -  Checking User Balances
+2024-05-21 12:01:42,965 - background_tasks - INFO -  Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 12:01:42,967 - background_tasks - INFO - {'661451116b82d163d3d322d8': [0.0, -4.0], '65dcdd57ea15ab53ab7b14e2': [6.5, 3.5], '65bd6a6077682a20767a6c0b': [7.0, 4.0]}
+2024-05-21 12:01:46,145 - background_tasks - INFO - Updated Banked Time
+2024-05-21 12:01:47,499 - background_tasks - INFO -  Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 12:01:47,501 - background_tasks - INFO - SqlClockPull: Banked Time
+2024-05-21 12:05:03,659 - background_tasks - INFO -  Checking User Balances
+2024-05-21 12:05:05,761 - background_tasks - INFO - {}
+2024-05-21 12:05:05,761 - background_tasks - INFO - Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 12:05:05,763 - background_tasks - INFO - SqlClockPull: Banked Time
+2024-05-21 12:06:08,790 - background_tasks - INFO -  Checking User Balances
+2024-05-21 12:06:10,813 - background_tasks - INFO - {}
+2024-05-21 12:06:10,814 - background_tasks - INFO - Updating User Balances: {Employee ID: [New Balance, Old Balance]}, updateBalances
+2024-05-21 12:06:10,816 - background_tasks - INFO - SqlClockPull: Banked Time

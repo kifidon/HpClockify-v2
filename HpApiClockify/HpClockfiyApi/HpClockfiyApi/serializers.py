@@ -116,26 +116,25 @@ class TagsForSerializer(serializers.Serializer):
     entryid = serializers.SerializerMethodField(method_name='get_entryid')
 
     def create(self,validated_data:dict):
-        logger = setup_background_logger('DEBUG')
-        logger.info('Create Tag Called')
-        entry =  Entry.objects.get(
-                id=self.context.get('entryid'),
-                time_sheet= self.context.get('timeid') , 
-                workspace=validated_data.get('workspaceId')
+        try: 
+            logger = setup_background_logger('DEBUG')
+            logger.info('Create Tag Called')
+            
+            tag = Tagsfor.objects.create(
+                id = validated_data.get('id'),
+                entryid = Entry.objects.get(
+                    id=self.context.get('entryid'),
+                    timesheetId= self.context.get('timeid') , 
+                    workspaceId=validated_data.get('workspaceId')
+                ),
+                timeid = Timesheet.objects.get(id=self.context.get('timeid')),
+                workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
+                name = validated_data.get('name')
             )
-        print(entry)
-        tag = Tagsfor.objects.create(
-            id = validated_data.get('id'),
-            entryid = Entry.objects.get(
-                id=self.context.get('entryid'),
-                time_sheet= self.context.get('timeid') , 
-                workspace=validated_data.get('workspaceId')
-            ),
-            timeid = Timesheet.objects.get(id=self.context.get('timeid')),
-            workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
-            name = validated_data.get('name')
-        )
-        return tag
+            return tag
+        except Exception as e:
+            logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
+            raise e 
     
     def update( self , instance: Tagsfor, validated_data):
         logger = setup_background_logger('DEBUG')

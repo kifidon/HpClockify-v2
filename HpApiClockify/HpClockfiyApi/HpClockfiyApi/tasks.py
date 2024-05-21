@@ -111,69 +111,74 @@ async def retryExpenses(request):
 
 @csrf_exempt
 def updateTags(inputdata: dict):
-    logger = setup_background_logger(loggerLevel)
-    logger.info(f'updateTags Function called')
+    try:
+        logger = setup_background_logger(loggerLevel)
+        logger.info(f'updateTags Function called')
 
-    workspaceId = inputdata.get('timesheet').get('workspaceId')
-    timeId = inputdata.get('timesheet').get('id')
-    tags_data = inputdata.get('entry').get('tags')
-    entry_id = inputdata.get('entry').get('id')
-    # Get existing tags associated with the entry
-    def deleteOldTags():
-        try: 
-            existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspace=workspaceId))
-                # Extract tag ids from the existing tags
-            existing_tag_ids = []
-            for tag in existing_tags: 
-                existing_tag_ids.append(tag.id) 
-            existing_tag_ids = set(existing_tag_ids)
-                # Extract tag ids from the request payload
-            request_tag_ids = set(tag['id'] for tag in tags_data)
-                # Find tags to delete
-            tags_to_delete = existing_tag_ids - request_tag_ids
-            Tagsfor.objects.filter(id__in=tags_to_delete).delete()
-            logger.info(f'Deleting old tags...{tags_to_delete}')
-        except Tagsfor.DoesNotExist: 
-            logger.info('No tags to delete')
-            pass
-            # Find new tags to create
+        workspaceId = inputdata.get('timesheet').get('workspaceId')
+        timeId = inputdata.get('timesheet').get('id')
+        tags_data = inputdata.get('entry').get('tags')
+        entry_id = inputdata.get('entry').get('id')
+        # Get existing tags associated with the entry
+        def deleteOldTags():
+            try: 
+                existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspace=workspaceId))
+                    # Extract tag ids from the existing tags
+                existing_tag_ids = []
+                for tag in existing_tags: 
+                    existing_tag_ids.append(tag.id) 
+                existing_tag_ids = set(existing_tag_ids)
+                    # Extract tag ids from the request payload
+                request_tag_ids = set(tag['id'] for tag in tags_data)
+                    # Find tags to delete
+                tags_to_delete = existing_tag_ids - request_tag_ids
+                Tagsfor.objects.filter(id__in=tags_to_delete).delete()
+                logger.info(f'Deleting old tags...{tags_to_delete}')
+            except Tagsfor.DoesNotExist: 
+                logger.info('No tags to delete')
+                pass
+                # Find new tags to create
 
-    def updateTagSync(tag): # as thread 
-        # Create new tags
-        logger.debug(dumps(tags_data, indent= 4))
-        try: 
-            tagObj = Tagsfor.objects.get(id=tag['id'], entryid = entry_id, workspace = workspaceId)
-            serializer = TagsForSerializer(data=tag, instance=tagObj, context={
-                'workspaceId': workspaceId,
-                'timeid': timeId,
-                'entryid': entry_id
-            })
-            logger.warning('Updating Tag')
-        except Tagsfor.DoesNotExist:
-            serializer = TagsForSerializer(data=tag, context={
-                'workspaceId': workspaceId,
-                'timeid': timeId,
-                'entryid': entry_id
-            })
-            logger.info(f'Creating new tag')
-        if serializer.is_valid():
-            serializer.save()
-            logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag['id']} 202 ACCEPTED') 
-            data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-            reversed_data = '\n'.join(data_lines[::-1])
-            logger.info(f'{reversed_data}')
-            return tags_data
-        else: 
-            #  (serializer.validated_data)
-            logger.error(f'Could not validate data\n{dumps(serializer.errors, indent=4)}')
+        def updateTagSync(tag): # as thread 
+            # Create new tags
+            logger.debug(dumps(tags_data, indent= 4))
+            try: 
+                tagObj = Tagsfor.objects.get(id=tag['id'], entryid = entry_id, workspace = workspaceId)
+                serializer = TagsForSerializer(data=tag, instance=tagObj, context={
+                    'workspaceId': workspaceId,
+                    'timeid': timeId,
+                    'entryid': entry_id
+                })
+                logger.warning('Updating Tag')
+            except Tagsfor.DoesNotExist:
+                serializer = TagsForSerializer(data=tag, context={
+                    'workspaceId': workspaceId,
+                    'timeid': timeId,
+                    'entryid': entry_id
+                })
+                logger.info(f'Creating new tag')
+            if serializer.is_valid():
+                serializer.save()
+                logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag['id']} 202 ACCEPTED') 
+                data_lines = dumps(serializer.validated_data, indent=4).split('\n')
+                reversed_data = '\n'.join(data_lines[::-1])
+                logger.info(f'{reversed_data}')
+                return tags_data
+            else: 
+                #  (serializer.validated_data)
+                logger.error(f'Could not validate data\n{dumps(serializer.errors, indent=4)}')
 
-            raise ValidationError(serializer.errors)
-    
-    deleteOldTags()
-    for i in range(0, len(tags_data)):
-        updateTagSync(tags_data[i])
-        logger.info(f'Update TagsFor on Timesheet{timeId}: Complete ')
-    return tags_data
+                raise ValidationError(serializer.errors)
+        
+        deleteOldTags()
+        for i in range(0, len(tags_data)):
+            updateTagSync(tags_data[i])
+            logger.info(f'Update TagsFor on Timesheet{timeId}: Complete ')
+        return tags_data
+    except Exception as e: 
+        if not  isinstance(e, ValidationError):
+            logger.info(f'Unhandled Exception ({e.__traceback__.tb_lineno}): {str(e)} ')
+            raise e
 
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest):  
