@@ -10,7 +10,7 @@ from ..models import BackGroundTaskResult
 from django.http import JsonResponse
 
 
-def count_working_days(start_date:datetime, end_date: datetime, excludeDays=[] ):
+def count_working_daysV2(start_date:datetime, end_date: datetime, excludeDays=[] ):
     """
     Count the number of working days between two given dates, excluding weekends (Saturday and Sunday)
     and holidays fetched from the 'Holidays' table in the database.

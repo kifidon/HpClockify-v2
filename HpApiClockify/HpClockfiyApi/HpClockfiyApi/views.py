@@ -384,7 +384,7 @@ async def getTimeOffRequests(request: ASGIRequest):
                             logger.info(f'Saved Time Off Request with id {inputData['id']}')
                             return True
                     else: 
-                        logger.warning(f'Serializer could not be saved: {serializer.errors} ')
+                        logger.warning(f'Serializer could not be saved: {reverseForOutput(serializer.errors)} ')
                         return False
                 except Exception as e:
                     logger.error(f'Exception Caught  {e.__traceback__.tb_lineno}: ({str(e)})')
@@ -410,7 +410,7 @@ async def getTimeOffRequests(request: ASGIRequest):
                 await saveTaskResult(response, inputData, caller)
                 return response
         else:
-            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
+            response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe=False)
             return response
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)

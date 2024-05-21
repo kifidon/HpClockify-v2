@@ -11,7 +11,7 @@ from .models import(
     Category,
     TimeOffRequests
 )
-from .clockify_util.hpUtil import count_working_days, timeZoneConvert, timeDuration, get_current_time
+from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
 class TimesheetSerializer(serializers.Serializer):
     id = serializers.CharField()
@@ -171,43 +171,61 @@ class ExpenseSerializer(serializers.ModelSerializer):
         fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']
         
 class TimeOffSerializer(serializers.ModelSerializer): 
-    status = serializers.CharField(max_length = 50)
+    status = serializers.DictField()
+    start = serializers.SerializerMethodField()
+    end = serializers.SerializerMethodField()
+    
+    def validate_status(self, value):
+        logger = setup_background_logger()  # Assuming setup_background_logger is defined elsewhere
+        try: 
+            if value.get('statusType'): 
+                return value
+            else:
+                raise serializers.ValidationError("Missing 'statusType' in status")
+        except KeyError as e:
+            logger.info(f'Key Error: {e}')
+            raise serializers.ValidationError(f"Key Error: {e}")
+        except Exception as e: 
+            logger.error(f'Error during status validation: {e}')
+            raise serializers.ValidationError(f"Error during status validation: {e}")
+            
     class Meta: 
         model = TimeOffRequests
         fields = '__all__'
 
+
     def create(self, validated_data):
-        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('start'))
-        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('end'))
-        status = self.initial_data.get('status').get('statusType')
+        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('start'))
+        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('end'))
+        status = self.initial_data.get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
-        duration = count_working_days(start, end, excludeDays)
+        duration = count_working_daysV2(start, end, excludeDays)
+        
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
             validated_data['status'] = status 
             validated_data['duration'] = duration
         # handle FK objects 
-        validated_data['userId'] = Employeeuser.objects.get(pk=validated_data['userId'])
-        validated_data['workspaceId'] = Workspace.objects.get(pk=validated_data['workspaceId'])
+        validated_data['userId'] = Employeeuser.objects.get(id=validated_data['userId'].id)
+        validated_data['workspaceId'] = Workspace.objects.get(pk=validated_data['workspaceId'].id)
         return super().create(validated_data=validated_data)
 
     def update(self, instance, validated_data): 
         logger = setup_background_logger()
-
-        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('start'))
-        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('end'))
+        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('start'))
+        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('end'))
         status = self.initial_data.get('status').get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
-        duration = count_working_days(start, end, excludeDays)
+        duration = count_working_daysV2(start, end, excludeDays)
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
             validated_data['status'] = status 
             validated_data['duration'] = duration
         # handle FK objects 
-        validated_data['userId'] = Employeeuser.objects.get(pk=validated_data['userId'])
-        validated_data['workspaceId'] = Workspace.objects.get(pk=validated_data['workspaceId'])
+        validated_data['userId'] = Employeeuser.objects.get(id=validated_data['userId'].id)
+        validated_data['workspaceId'] = Workspace.objects.get(id=validated_data['workspaceId'].id)
         updated_instance =  super().update(instance=instance, validated_data=validated_data)
         # Then, save the instance with force_update=True
         updated_instance.save(force_update=True)
