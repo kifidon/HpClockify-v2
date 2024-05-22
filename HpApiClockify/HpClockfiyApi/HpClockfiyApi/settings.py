@@ -44,7 +44,7 @@ LOGGING = {
         'background_tasks': {  # Create a logger for background tasks
             'handlers': ['background_file'],  # Use the 'background_file' handler
             'level': LOG_LEVEL,  # Set the logging level for background tasks
-            'propagate': False,  # Do not propagate to root logger
+            'propagate': True,
         },
     },
 }

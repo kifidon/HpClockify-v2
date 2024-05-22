@@ -86,7 +86,10 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
-        return field['Role']
+        try:
+            return field['Role']
+        except Exception: 
+            return 'No Role Specified'
     
     def get_start_date(sekf, obj): 
         field = dict()
