@@ -1,10 +1,14 @@
+'''
+When a perminant url landing page is established it should be included in the ALLOWED HOST variable 
+'''
+
 
 from pathlib import Path
 import os 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = 'INFO'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
