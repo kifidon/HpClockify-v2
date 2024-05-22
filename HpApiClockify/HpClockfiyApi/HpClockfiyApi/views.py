@@ -1,7 +1,22 @@
 '''
+PERFORMANCE CONSIDERATIONS 
+
+More consistent error logging scheme needs to be done. Code should be cleaned up so that the logic is more consistent accross similar opperations.
+Currently some of the functions use slightly different logging messages and flag diffferent operations as INFO/DEBUG/ERROR which may cause confusion 
+when debugging and error handling.
+
 Besides the Update approval and new Expense functions, no retry logic has been put into place for FK or PK constraints. A simple solution is to 
 return a result to the client, offload the constraint handling to secondary server/port, and then resubmit the request to the endpoint. Include
 a flag so infinite loops do not occur.
+
+csrf_exempt on async functions is not secure. Should be implimented in a future version and decorated using @api_view as for sycnchronous methods.
+The secondary server rouritng system is feture complemete but should be switched out instead to use celery with raddis or rabbitmq message brokers 
+for better logging and completion of background tasks. 
+
+ASGI server deployment needs to be optimized for scaling. I noticed when 10+ requests are sent to specifically the approvalUpdate function at once
+(User pressed the Approval All button on clockify) some data may get lost or transient errors arrise.
+
+Clockify sends all requests as POST thus seprate views are used to handle different methods
 '''
 
 from django.http import JsonResponse, HttpResponse
@@ -376,6 +391,15 @@ def bankedHrs(request: ASGIRequest):
 
 @api_view(['POST'])
 def getClients(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls Client Event function to pull and update all client data from clockify to the database. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
     secret = 'vCCa0DuhCfNnxeb3lnoXaRXE4SKcWlxi'
     secret2 = 'ITrV2e8fOhQ9nC0jXPyDXJQeZGeVtoCV'
     if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):  
@@ -403,6 +427,21 @@ def getClients(request: ASGIRequest):
 
 @csrf_exempt
 async def getEmployeeUsers(request: ASGIRequest):
+    '''
+    Function Description: 
+        Asynchronously inserts/updates Employee's into the database. Never deletes users from the database but rather turns them to INACTIVE 
+
+        Reads custom user fields to get the role and start date for each user. Start date must be in the form YYYY-MM-DD or exception will be raised 
+
+        If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+        atomic 
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     caller = 'EmployeeUser Function '
     secret  = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V'
     secret2 = 'TSnab31ks1Ml1oXkZHMIzp7R33SRSedz'
@@ -461,6 +500,7 @@ async def getEmployeeUsers(request: ASGIRequest):
         saveTaskResult(response, dumps(loads(request.body)), 'User  Function')
         return response  
 
+# impliment this function if this application is to be used over multiple workspaces. As of May 22 2024 it is not needed 
 '''
 @api_view(['GET', 'POST'])
 def getWorkspaces(request: ASGIRequest, format = None):
@@ -489,7 +529,23 @@ def getWorkspaces(request: ASGIRequest, format = None):
    ''' 
 
 @api_view(['GET', 'POST',])
-def getProjects(request: ASGIRequest, format = None):
+def getProjects(request: ASGIRequest):
+    '''
+    Function Description: 
+        Synchronous call for the server to pull all projects and apply CRUD for all records. 
+
+        Method is inefficient as are most of the Event functions. a Django Model/Serializer approach should be used instead to apply changes 
+        only to the record passed in the request 
+        
+        If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+        atomic 
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     secret = 'obEJDmaQEgIrhBhLVpUO4pXO6aXgWEK3'
     logger.info(f'POST: getProjects')
     if aunthenticateRequst(request, secret):  
@@ -515,6 +571,24 @@ def getProjects(request: ASGIRequest, format = None):
 
 @csrf_exempt
 async def getTimeOffRequests(request: ASGIRequest):
+    '''
+    Function Description: 
+        Asyncrhonous CU on timeoff requests. 
+
+        Sometimes transient Integrity errors are raised on timesheets. Due to the try/except block which should decipher whether a update or insert is necessary
+        this behaviour is unexpected. This behaviour should be reviewed and updated.
+        yet to develop a method for confirming the data in the databse is consistent with that in clockify. Since implimentation of this function,
+        switching from an Event algorithm on May 22 2024 data should be in better aggreement. A database audit for time off requests is needed.
+
+        If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+        atomic 
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     secret = 'W7Lc7BGRq1wvIC0eQS5Bik5m05JF8RkZ'
     secret2 = 'I7DOlIagZOjUBhHS0HObcvyaBiz7covJ'
     logger = setup_server_logger()
@@ -574,6 +648,19 @@ async def getTimeOffRequests(request: ASGIRequest):
 
 @csrf_exempt
 async def removeTimeOffRequests(request:ASGIRequest):
+    '''
+    Function Description: 
+       Asynchronous removal of TimeoffRequests whenever they are rejected or withdrawn.
+       
+       If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+       atomic
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     secret = 'VlEXsrENOWzsbglJZFLXZWqadeGcBcwl'
     secret2 = 'ucE6pl2renvPrqEi49KDNS1SWq8NiDld'
     if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
@@ -608,6 +695,7 @@ async def removeTimeOffRequests(request:ASGIRequest):
         return response
     
 #depreciated 
+# Should combine this function into the quickbackup function 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getTimeOffPolicies(request: ASGIRequest, format = None):
  
@@ -629,6 +717,23 @@ def getTimeOffPolicies(request: ASGIRequest, format = None):
 
 @csrf_exempt
 async def newExpense(request: ASGIRequest):
+    '''
+    Function Description: 
+       Creates/updates expense records on the database.
+
+       FK constraint may be raised on expense categories since clockify has no way of retrieving that data first. In that case then return a 
+       failed response and offload the retry logic to a secondary server at port (localhost:5000). Secondary server will then return to retry 
+       the insertion/update. 
+       
+       If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+       atomic
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     logger = setup_server_logger(loggerLevel)
     logger.info('newExpense view called')
     secret = 'CiLrAry1UiEZb4OnPmX67T8un5GuYw24' #newExpense
@@ -638,17 +743,17 @@ async def newExpense(request: ASGIRequest):
             try:
                 inputData = loads(request.body)
                 RetryFlag = False
-            except JSONDecodeError:
+            except JSONDecodeError: # if request comes from internal secondary server then the inputData must be accesed differently
                 logger.info('Called Internally')
-                inputData = request.POST
+                inputData = request.POST  
                 RetryFlag = True
-            except Exception as e:
+            except Exception:
                 logger.warning('Unknown Exception, attempting to handle')
                 inputData = request.POST
                 RetryFlag = True
             logger.debug(dumps(inputData, indent=4))
             
-            def processExpense(inputData):
+            def processExpense(inputData): # returns a flag for each possible FK or PK constraint raised. Only handles C flag as of May 22 2024
                 try:
                     expense = Expense.objects.get(id=inputData['id'])
                     serializer = ExpenseSerializer(data= inputData, instance=expense)
@@ -663,6 +768,7 @@ async def newExpense(request: ASGIRequest):
                         logger.info(f'Saved Expense with Id - {inputData['id']}')
                         return True, 'V' # V for valid 
                     else:
+        # Possibly turn this into another thread 
                         #force backgroung task 
                         logger.warning(f'Serializer could not be saved: {serializer.errors}')
                         for key, value in serializer.errors.items():
@@ -717,70 +823,106 @@ async def newExpense(request: ASGIRequest):
 
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
+    '''
+    Function Description: 
+       Creates/updates entry records on the database. Includes robust logging on database exceptions
+       
+       Observed one exception where entry request has null duration which should not be allowed. Investigation into why/how this happend is 
+       needed. 
+
+       If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+       atomic
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
+    caller = 'New Entry view called'
     logger = setup_server_logger()
-    logger.info('newEntry view called')
+    logger.info(caller)
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
-    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
-        if request.method == 'POST':
-            try:
-                inputData = loads(request.body)
-                RetryFlag = False 
-            except Exception:
-                logger.warning('Unknown Exception, attempting to handle')
-                inputData = request.POST
-                RetryFlag = True
-            logger.debug(reverseForOutput(inputData))
-
-            def processEntry(inputData):
+    try:
+        if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+            if request.method == 'POST':
                 try:
-                    entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                    serializer = EntrySerializer(instance=entry, data= inputData )
-                    logger.info(f'Update path taken for Entry')
-                except Entry.DoesNotExist:
-                    serializer = EntrySerializer(data = inputData )
-                    logger.info(f'Insert path taken for Entry')
-                if serializer.is_valid():
-                    serializer.save()
-                    # do the rest 
-                    return True, 'V'
-                else:
-                    #force backgroung task 
-                    logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                    for key, value in serializer.errors.items():
-                        logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                        # Check if the value is an instance of ErrorDetail
-                        if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                            # Print the key and each error code and message
-                            for error_detail in value:
-                                code = error_detail.code
-                                field = key
-                                '''
-                                include check for other foreign keys to know which foreign key 
-                                constraint is violated and which function should handle it
-                                '''
-                                if code == 'does_not_exist': 
-                                    return False, 'C' # C for category P for Project, F for file in later updates 
-                    return False, 'X' # Unknown, Raise error (BAD Request)
-            
-            processEntryAsync = sync_to_async(processEntry)
-            result = await processEntryAsync(inputData)
-            if result[0]:
-                return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
-            else:
-                return JsonResponse(
-                    data= {
-                        'Message': 'Post Data could not be validated. Review Logs'
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                )
-    else:
-        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'NewEntry Function')
-        return response
+                    inputData = loads(request.body)
+                    RetryFlag = False 
+                except Exception:
+                    logger.warning('Unknown Exception, attempting to handle')
+                    inputData = request.POST
+                    RetryFlag = True
+                logger.debug(reverseForOutput(inputData))
 
+                def processEntry(inputData):
+                    try:
+                        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+                        serializer = EntrySerializer(instance=entry, data= inputData )
+                        logger.info(f'Update path taken for Entry')
+                    except Entry.DoesNotExist:
+                        serializer = EntrySerializer(data = inputData )
+                        logger.info(f'Insert path taken for Entry')
+                    if serializer.is_valid():
+                        serializer.save()
+                        # do the rest 
+                        return True, 'V'
+                    else:
+                        #force backgroung task 
+                        logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                        for key, value in serializer.errors.items():
+                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                            # Check if the value is an instance of ErrorDetail
+                            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                                # Print the key and each error code and message
+                                for error_detail in value:
+                                    code = error_detail.code
+                                    field = key
+                                    '''
+                                    include check for other foreign keys to know which foreign key 
+                                    constraint is violated and which function should handle it
+                                    '''
+                                    if code == 'does_not_exist': 
+                                        return False, 'C' # C for category P for Project, F for file in later updates 
+                        return False, 'X' # Unknown, Raise error (BAD Request)
+                
+                processEntryAsync = sync_to_async(processEntry)
+                result = await processEntryAsync(inputData)
+                if result[0]:
+                    return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                else:
+                    return JsonResponse(
+                        data= {
+                            'Message': 'Post Data could not be validated. Review Logs'
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                    )
+        else:
+            response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+            taskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+            return response
+    except Exception as e: 
+        response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+        logger.error(response.content.decode('utf-8'))
+        await saveTaskResult(response, loads(request.body), caller )
+        return response
+    
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
+    '''
+    Function Description: 
+       Deletes entry records from the database on user request. 
+
+       If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+       atomic
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Entry Function called')
     secret = '0IQNBiGEAejNMlFmdQc8NWEiMe1Uzg01'
@@ -822,6 +964,19 @@ async def deleteEntry(request:ASGIRequest):
 
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
+    '''
+    Function Description: 
+       Deletes Expense records from the database on user request. 
+
+       If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not 
+       atomic
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Expense Function called')
     secret = 'a0gfeY49Wka0HVb97DT8eYsqDo3cZIiZ'
