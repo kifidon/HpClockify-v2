@@ -1,9 +1,15 @@
+'''
+Besides the Update approval and new Expense functions, no retry logic has been put into place for FK or PK constraints. A simple solution is to 
+return a result to the client, offload the constraint handling to secondary server/port, and then resubmit the request to the endpoint. Include
+a flag so infinite loops do not occur.
+'''
+
 from django.http import JsonResponse, HttpResponse
 from django.core.handlers.asgi import ASGIRequest
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from django.db import transaction , utils
+from django.db import  utils  #, transaction
 from .serializers import (
     EmployeeUserSerializer,
     TimesheetSerializer,
@@ -22,14 +28,12 @@ from .models import(
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response 
-from rest_framework.request import Request 
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-import shutil
-from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, UserEvent, ProjectEvent, TimeOffEvent, PolicyEvent
+from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file
 from . import settings
 
 import httpx
@@ -42,7 +46,16 @@ saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
 def aunthenticateRequst(request: ASGIRequest, secret: str): 
     '''
-    Impliment HMAC validation in a future update 
+    Function Description: 
+        Authenticates the secret key given from clockify with the one stored in this file. This impliments a minimum security layer to the databse.
+        Impliment HMAC validation in a future update
+
+    Param: 
+        request(ASGIRequest): request sent to endpoint where this function is called 
+        secret(str): secret key used to authenticate the request 
+    
+    Returns: 
+        Boolean (True/False) on authentication 
     '''
     logger.info('Validating Request...')
     signature = request.headers.get('Clockify-Signature') 
@@ -56,6 +69,21 @@ def aunthenticateRequst(request: ASGIRequest, secret: str):
 
 @csrf_exempt
 async def updateTimesheets(request:ASGIRequest):
+    '''
+    Function Description: 
+        Updates the status of an approval timesheet. Asyncrhonously calls the update/insert functions for Entry's and, sequentially, Expenses while
+        Timesheet update is being done. the Entry and Expense functions can be offloaded to a different host server or a different port on the same 
+        server. This keeps the repsonse time of this function under 8000ms. Due to Clockify rate limiting, Entry and Expense functions are cascaded
+        to avoid crashing or lost data.
+
+        If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not atomic 
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     secret = 'me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy'
     if aunthenticateRequst(request, secret):
         if request.method == 'POST':
@@ -63,12 +91,13 @@ async def updateTimesheets(request:ASGIRequest):
             logger.info(f'{request.method}: updateTimesheet')
             try: 
                 inputData = loads(request.body)
-                def updateApproval():
-                    # with transaction.atomic(): # if any error occurs then rollback 
+                def updateApproval(): # create thread 
+                    # with transaction.atomic(): # impliment this in the future
+                    try: 
                         try:
                             timesheet = Timesheet.objects.get(pk=inputData['id'])
                             serializer = TimesheetSerializer(instance= timesheet, data = inputData)
-                        except Timesheet.DoesNotExist:
+                        except Timesheet.DoesNotExist: # this means the timesheet failed in the newTimeSheet function 
                             serializer = TimesheetSerializer(data=inputData)
                             logger.warning(f'Adding new timesheet on update function. Timesheet { inputData["id"] }')
                         if serializer.is_valid():
@@ -84,6 +113,9 @@ async def updateTimesheets(request:ASGIRequest):
                             response = JsonResponse(data=serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
                             logger.error(f'UpdateTimesheet:{dumps(inputData["id"])}{response.status_code}')
                             return [response, None]
+                    except Exception as e: 
+                        logger.error(f'Unknown error ({e.__traceback__.tb_lineno}): {str(e)}')
+                        raise e
 
                 async def callBackgroungEntry():
                     url =  'http://localhost:5000/HpClockifyApi/task/Entry'
@@ -100,8 +132,8 @@ async def updateTimesheets(request:ASGIRequest):
                     
                 updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
                 result = await updateAsync()
-                if result[1]:
-                    asyncio.create_task(createTask()) 
+                if result[1]: 
+                    asyncio.create_task(createTask()) # allows for Fire and Forget call of tasks  
                 else: 
                     raise ValidationError('Unknown Error occured. Timesheet Serializer not created.')
                 return result[0]
@@ -109,10 +141,11 @@ async def updateTimesheets(request:ASGIRequest):
                 # transaction.rollback()
                 response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
                 await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
-                logger.error(f'{dumps(inputData["id"])} - {response.status_code}')
+                logger.error(f'Caught Exception ({e.__traceback__.tb_lineno}): {str(e)}')
                 return response
         else:
-            response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
+            response = JsonResponse(data={'Message': f'Method {request.method} not allowed'}, status = status.HTTP_405_METHOD_NOT_ALLOWED)
+            await saveTaskResult(response, dumps(loads(request.body)), 'UpdateTimesheet Function')
             return response
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
@@ -121,6 +154,20 @@ async def updateTimesheets(request:ASGIRequest):
 
 @api_view(['POST'])
 def newTimeSheets(request: ASGIRequest):
+    '''
+    Function Description: 
+        Syncrhonosuly inserts a timesheet as a pending approval request. Does not search for entries or Expenses yet. In a future version move the entry/expense
+        functions to this function (since new timesheets happen 1 at a time and updates can be done in batches) in conjuction with the newEntry and 
+        newExpense function for better data management.
+
+        If any error occurs then save the status code and optional message in the database table 'BackGroundTaskDjango'. Transactions are not atomic 
+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
+    '''
     logger = setup_server_logger(loggerLevel)
     logger.info(f'{request.method}: newTimesheet')
     secret = 'Qzotb4tVT5QRlXc3HUjwZmkgIk58uUyK'
@@ -168,40 +215,64 @@ def newTimeSheets(request: ASGIRequest):
         taskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
         return response
 
+#depreciated 
 @api_view(['GET'])
 def quickBackup(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls every Clockify pull and Push Event syncrhonsously. takes Approx 10 min.
+
+        In a future version, impliment the data pull for non sync attribute ( policies, Holidays, files/reciepts) through this endpoint. 
+        this will maintain data integrity on a more specific scale to avoid any possible FK constraints 
+        
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response)
+    '''
     result = main() # General String for return output
     response = Response(data = result, status=status.HTTP_200_OK)
     logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     return response
 
+#depreciated
 @api_view(['GET'])
 def timesheets(request: ASGIRequest):
+    '''
+    Function Description: 
+       Pulls all timesheets from Clockify and updates/inserts them into the database. Also check for insert/updates on Time Entries in the same iteration.
+       Performance is slow and takes approx (10 min).
+
+       In future versions change the clockify pull api request to sort-by=UPDATED_AT to only iterate through ~= 54 ( number of timesheets per week)
+       recently updated timesheets instead of all 1000+
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response)
+    '''
     result = TimesheetEvent(status='APPROVED')
     response = Response(data = result, status=status.HTTP_200_OK)
     logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     
     return response
 
-def download_text_file(folder_path = None):
-    if folder_path:
-        temp_dir = f'{folder_path}_tmp'
-        os.makedirs(temp_dir, exist_ok=True)
-        # Compress the folder into a zip file
-        shutil.make_archive(temp_dir, 'zip', folder_path)
-        # Get the zip file path
-        zip_file_path = f'{temp_dir}.zip'
-
-        with open(zip_file_path, 'rb') as file:
-            response = HttpResponse(file.read(), content_type='application/zip')
-            response['Content-Disposition'] = f'attachment; filename="{os.path.basename(zip_file_path)}"'
-        shutil.rmtree(temp_dir)
-        os.remove(zip_file_path)
-        return response
-    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (YYYY-MM-DD)\nReview Logs for more detail @ https://hpclockifyapi.azurewebsites.net/')
 
 @api_view(['GET'])
 def monthlyBillableReport(request, start_date = None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
     logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called')
     folder_path = monthlyBillable(start_date, end_date )
@@ -209,13 +280,37 @@ def monthlyBillableReport(request, start_date = None, end_date= None):
 
 @api_view(['GET'])
 def weeklyPayrollReport(request, start_date=None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger()
     logger.info(f'Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
-    (folder_path)
     return download_text_file(folder_path)
 
 @api_view(['GET'])
 def viewServerLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
     log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
@@ -227,12 +322,24 @@ def viewServerLog(request):
             reversed_lines = reversed(last_1000_lines)
             # Join the lines into a single string
             log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='text/plain')
+        return HttpResponse(log_contents, content_type='application/json')
     else:
         return HttpResponse('logger file not found', status=404)
 
 @api_view(['GET'])
 def viewTaskLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
     log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
@@ -244,12 +351,21 @@ def viewTaskLog(request):
             reversed_lines = reversed(last_1000_lines)
             # Join the lines into a single string
             log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='text/plain')
+        return HttpResponse(log_contents, content_type='application/json')
     else:
         return HttpResponse('logger file not found', status=404)
     
 @api_view(['GET', 'POST'])
 def bankedHrs(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
     logger.info(f'{request.method}: bankedHours ')
     try:
         SqlClockPull.main()
@@ -456,6 +572,42 @@ async def getTimeOffRequests(request: ASGIRequest):
         await saveTaskResult(response, dumps(loads(request.body)), 'TimeOff Function')
         return response  
 
+@csrf_exempt
+async def removeTimeOffRequests(request:ASGIRequest):
+    secret = 'VlEXsrENOWzsbglJZFLXZWqadeGcBcwl'
+    secret2 = 'ucE6pl2renvPrqEi49KDNS1SWq8NiDld'
+    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+        if request.method == 'POST':
+            try:
+                inputData = loads(request.body)
+                def deleteTime(inputData):
+                    try:
+                        timeoff = TimeOffRequests.objects.get(id = inputData['id'])
+                        timeoff.delete()
+                        logger.info('TimeOff Request removed')
+                        return True 
+                    except TimeOffRequests.DoesNotExist as e: 
+                        logger.warning(f'Time off request with id {inputData['id']} was not found to delete')
+                        raise e 
+                
+                remove = sync_to_async(deleteTime)
+                await remove()
+                return JsonResponse(data= {'Message': f'Deleted Time off request {inputData['id']}'}, status = status.HTTP_200_OK)
+            except Exception as e: 
+                response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'})
+                logger.error(response.data['Message'])
+                await saveTaskResult(response, dumps(loads(request.body)), 'TimeOff delete Function')
+                return response  
+        else: 
+            response = JsonResponse(data={'Message': f'Method {request.method} not allowed'}, status = status.HTTP_405_METHOD_NOT_ALLOWED)
+            await saveTaskResult(response, dumps(loads(request.body)), 'UpdateTimesheet Function')
+            return response
+    else:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        await saveTaskResult(response, dumps(loads(request.body)), 'TimeOff Function')
+        return response
+    
+#depreciated 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def getTimeOffPolicies(request: ASGIRequest, format = None):
  
@@ -667,7 +819,7 @@ async def deleteEntry(request:ASGIRequest):
         taskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
         return response
 
-        
+
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
     logger = setup_server_logger(loggerLevel)
