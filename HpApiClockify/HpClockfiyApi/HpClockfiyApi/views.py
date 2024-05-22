@@ -295,10 +295,10 @@ async def getEmployeeUsers(request: ASGIRequest):
     if aunthenticateRequst(request, secret): 
         stat = 'ACTIVE' 
         Flag = True 
-    elif aunthenticateRequst(request, secret2):
+    elif not Flag and aunthenticateRequst(request, secret2):
         stat = 'ACTIVE'  
         Flag = True 
-    elif aunthenticateRequst(request, secret3): 
+    elif not Flag and aunthenticateRequst(request, secret3): 
         stat = 'INACTIVE'
         Flag = True
     if Flag: 
