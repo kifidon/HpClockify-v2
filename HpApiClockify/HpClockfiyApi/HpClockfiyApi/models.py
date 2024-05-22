@@ -51,7 +51,7 @@ class Employeeuser(models.Model):
     email = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
-    baserate = models.DecimalField(db_column='baseRate', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+    role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
 
     class Meta:

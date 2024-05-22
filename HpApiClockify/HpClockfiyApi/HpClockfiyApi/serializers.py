@@ -13,6 +13,57 @@ from .models import(
 )
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
+
+class EmployeeUserSerializer(serializers.ModelSerializer):
+    status = serializers.SerializerMethodField()
+    role = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()  # validate this later 
+
+    def get_status(self, obj):
+        status = obj['status']
+        return status 
+
+    def get_role(self, obj):
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+        return field['Role']
+    
+    def get_start_date(sekf, obj): 
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+
+        return field['Start Date']
+    
+    def create(self, validated_data):
+        logger = setup_background_logger() 
+        try:
+            validated_data['status'] = self.get_status(self.initial_data)
+            validated_data['role'] = self.get_role(self.initial_data)
+            validated_data['start_date'] = self.get_start_date(self.initial_data) 
+            logger.info(dumps(validated_data, indent = 4))
+            return super().create(validated_data=validated_data)
+        except Exception as e: 
+            logger.error(f'Problem inserting User Data {e.__traceback__.tb_lineno}: ({str(e)})')
+
+    def update(self, instance, validated_data):
+        logger = setup_background_logger() 
+        try:
+            validated_data['status'] = self.get_status(self.context)
+            validated_data['role'] = self.get_role(self.initial_data)
+            validated_data['start_date'] = self.get_start_date(self.initial_data)
+            logger.debug(dumps(validated_data, indent = 4))
+            updated = super().update(instance= instance, validated_data=validated_data)
+            updated.save(force_update= True )
+            return updated 
+        except Exception as e: 
+            logger.error(f'Problem Updating User Data {e.__traceback__.tb_lineno}: ({str(e)})')
+            raise e
+    class Meta:
+        model = Employeeuser
+        fields = '__all__'
+
 class TimesheetSerializer(serializers.Serializer):
     id = serializers.CharField()
     owner = serializers.DictField()
