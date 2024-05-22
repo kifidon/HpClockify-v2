@@ -15,10 +15,69 @@ from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDur
 from json import dumps
 
 class EmployeeUserSerializer(serializers.ModelSerializer):
+    '''
+    Serialized to the EmployeeUser Model fields. 
+    Input Data is of the form: 
+        {
+            "id": "65dcdd57ea15ab53ab7b14db",
+            "email": "kendal.cruz@hillplain.com",
+            "name": "Kendal Cruz",
+            "profilePicture": "https://img.clockify.me/no-user-image.png",
+            "settings": {
+                "weekStart": "SUNDAY",
+                "timeZone": "America/Edmonton",
+                "timeFormat": "HOUR12",
+                "dateFormat": "MM/DD/YYYY",
+                "sendNewsletter": false,
+                "weeklyUpdates": false,
+                "longRunning": false,
+                "scheduledReports": true,
+                "approval": true,
+                "pto": true,
+                "alerts": true,
+                "reminders": true,
+                "onboarding": true,
+                "timeTrackingManual": false,
+                "summaryReportSettings": {
+                    "group": "Project",
+                    "subgroup": "Time Entry"
+                },
+                "isCompactViewOn": false,
+                "dashboardSelection": "ME",
+                "dashboardViewType": "PROJECT",
+                "dashboardPinToTop": false,
+                "projectListCollapse": 50,
+                "collapseAllProjectLists": false,
+                "groupSimilarEntriesDisabled": false,
+                "myStartOfDay": "08:30",
+                "darkTheme": true,
+                "projectPickerSpecialFilter": false,
+                "lang": "EN",
+                "multiFactorEnabled": false,
+                "scheduling": true,
+                "showOnlyWorkingDays": false,
+                "theme": "DARK"
+            },
+            "userCustomFields": [
+                {
+                    "customFieldId": "664d0d0a6a8fa06c786a886e",
+                    "value": "HSEA",
+                    "name": "Role",
+                    "type": "DROPDOWN_SINGLE"
+                },
+                {
+                    "customFieldId": "664d0d56a17be2283ae908ec",
+                    "value": "2024-01-22",
+                    "name": "Start Date",
+                    "type": "TXT"
+                }
+            ]
+        } 
+    '''
     status = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()  # validate this later 
-
+    
     def get_status(self, obj):
         status = obj['status']
         return status 
@@ -65,6 +124,35 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TimesheetSerializer(serializers.Serializer):
+    '''
+    Input is of the form: 
+    {
+        "id": "664d12ce831d3f5360a7c43c",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "dateRange": {
+            "start": "2024-05-12T06:00:00Z",
+            "end": "2024-05-19T05:59:59Z"
+        },
+        "owner": {
+            "userId": "65dcdd57ea15ab53ab7b14d0",
+            "userName": "Mohamad Potts",
+            "timeZone": "America/Denver",
+            "startOfWeek": "SUNDAY"
+        },
+        "status": {
+            "state": "APPROVED",
+            "updatedBy": "65dcdd57ea15ab53ab7b14d0",
+            "updatedByUserName": "Mohamad Potts",
+            "updatedAt": "2024-05-21T21:31:58Z",
+            "note": ""
+        },
+        "creator": {
+            "userId": "65dcdd57ea15ab53ab7b14d0",
+            "userName": "Mohamad Potts",
+            "userEmail": "mohamad.potts@hillplain.com"
+        }
+    }
+    '''
     id = serializers.CharField()
     owner = serializers.DictField()
     workspaceId = serializers.CharField()
@@ -98,7 +186,25 @@ class TimesheetSerializer(serializers.Serializer):
             raise e 
         return instance
 
-class EntrySerializer(serializers.Serializer): # missing update
+class EntrySerializer(serializers.Serializer): 
+    '''
+    Input is of the form: 
+    {
+        "approvalRequestId": "5e4117fe8c625f38930d57b7",
+        "billable": true,
+        "costRate": {},
+        "customFieldValues": [],
+        "description": "This is a sample time entry description.",
+        "hourlyRate": {},
+        "id": "5b715448b0798751107918ab",
+        "isLocked": true,
+        "project": {},
+        "tags": [],
+        "task": {},
+        "timeInterval": {},
+        "type": "REGULAR"
+    }
+    '''
     id = serializers.CharField()
     description = serializers.CharField(allow_blank = True)
     timesheetId = serializers.CharField(allow_null = True, allow_blank=True, required=False)
@@ -160,6 +266,15 @@ class EntrySerializer(serializers.Serializer): # missing update
             return instance
 
 class TagsForSerializer(serializers.Serializer):
+    '''
+    Input is of the form: 
+    {
+        "archived": true,
+        "id": "64c777ddd3fcab07cfbb210c",
+        "name": "Sprint1",
+        "workspaceId": "64a687e29ae1f428e7ebe303"
+    }
+    '''
     id = serializers.CharField()
     name = serializers.CharField()
     workspaceId = serializers.CharField()
@@ -203,11 +318,39 @@ class TagsForSerializer(serializers.Serializer):
             return instance
     
 class CategorySerializer(serializers.ModelSerializer): 
+    '''
+    Input is of the form: 
+        {
+            "archived": true,
+            "hasUnitPrice": true,
+            "id": "89a687e29ae1f428e7ebe303",
+            "name": "Procurement",
+            "priceInCents": 1000,
+            "unit": "piece",
+            "workspaceId": "64a687e29ae1f428e7ebe303"
+        }
+    '''
     class Meta: 
         model = Category
         fields = ['id','hasUnitPrice', 'archived', 'name', 'priceInCents', 'unit', 'workspaceId']
 
 class ExpenseSerializer(serializers.ModelSerializer):
+    '''
+    Input is of the form: 
+        {
+            "id": "66463e0a58c2983f17f453ae",
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "userId": "661d41f8680b5d3887e576e8",
+            "date": "2024-05-16T00:00:00Z",
+            "projectId": "65c5185e824ced2beacffa9a",
+            "categoryId": "65c2522effbbb676c5e010b4",
+            "notes": "Paid Elder for smudge ceremony",
+            "quantity": 1,
+            "billable": true,
+            "fileId": "",
+            "total": 10000
+        }
+    '''
     date = serializers.DateField(input_formats=['%Y-%m-%dT%H:%M:%SZ'])
     
     def to_representation(self, instance):
@@ -221,6 +364,38 @@ class ExpenseSerializer(serializers.ModelSerializer):
         fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']
         
 class TimeOffSerializer(serializers.ModelSerializer): 
+    '''
+    Input is of the form: 
+        {
+            "workspaceId": "65c249bfedeea53ae19d7dad",
+            "policyId": "65fc91ca17e548286f7bc026",
+            "userId": "65bd6a6077682a20767a6c0b",
+            "timeZone": "America/Edmonton",
+            "timeOffPeriod": {
+                "period": {
+                    "start": "2024-05-14T14:00:00Z",
+                    "end": "2024-05-14T22:00:00Z"
+                },
+                "halfDay": false,
+                "halfDayPeriod": "NOT_DEFINED"
+            },
+            "note": null,
+            "status": {
+                "statusType": "PENDING",
+                "changedByUserId": null,
+                "changedByUserName": "Timmy Ifidon",
+                "changedAt": null,
+                "note": null
+            },
+            "balanceDiff": 8,
+            "createdAt": "2024-05-21T18:15:52.889302519Z",
+            "requesterUserId": "65bd6a6077682a20767a6c0b",
+            "excludeDays": [],
+            "negativeBalanceUsed": 0,
+            "balanceValueAtRequest": 15,
+            "id": "664ce4d8c8a2333cfdc245cc"
+        }
+    '''
     status = serializers.SerializerMethodField()
     start = serializers.SerializerMethodField()
     end = serializers.SerializerMethodField()

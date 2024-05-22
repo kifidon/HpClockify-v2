@@ -7,7 +7,28 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs
 import ast
 from ..models import BackGroundTaskResult
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+import os 
+import shutil
+
+
+def download_text_file(folder_path = None):
+    
+    if folder_path:
+        temp_dir = f'{folder_path}_tmp'
+        os.makedirs(temp_dir, exist_ok=True)
+        # Compress the folder into a zip file
+        shutil.make_archive(temp_dir, 'zip', folder_path)
+        # Get the zip file path
+        zip_file_path = f'{temp_dir}.zip'
+
+        with open(zip_file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="{os.path.basename(zip_file_path)}"'
+        shutil.rmtree(temp_dir)
+        os.remove(zip_file_path)
+        return response
+    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (YYYY-MM-DD)\nReview Logs for more detail @ https://hpclockifyapi.azurewebsites.net/')
 
 
 def count_working_daysV2(start_date:datetime, end_date: datetime, excludeDays=[] ):
