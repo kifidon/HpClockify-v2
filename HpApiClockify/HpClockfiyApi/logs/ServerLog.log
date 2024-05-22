@@ -254,3 +254,1157 @@
 {
 2024-05-21 12:26:45,433 - server - INFO - Saved Time Off Request with id 664ce4d8c8a2333cfdc245cc
 2024-05-21 12:26:45,436 - server - INFO - {"Message": "Operation Complete for Time off Request 664ce4d8c8a2333cfdc245cc"}
+2024-05-21 16:19:44,668 - server - INFO - Validating Request...
+2024-05-21 16:19:44,669 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:19:44,669 - server - WARNING - Invalid Request
+2024-05-21 16:19:44,670 - server - INFO - Validating Request...
+2024-05-21 16:19:44,670 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:19:44,671 - server - INFO - Request Validated!
+2024-05-21 16:19:44,672 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:19:46,695 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:19:46,697 - server - ERROR - Unknown Error (309) Class EmployeeUserSerializer missing "Meta" attribute
+2024-05-21 16:19:46,698 - server - INFO - (324) - Class EmployeeUserSerializer missing "Meta" attribute
+2024-05-21 16:20:27,971 - server - INFO - Validating Request...
+2024-05-21 16:20:27,971 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:20:27,971 - server - WARNING - Invalid Request
+2024-05-21 16:20:27,971 - server - INFO - Validating Request...
+2024-05-21 16:20:27,972 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:20:27,972 - server - INFO - Request Validated!
+2024-05-21 16:20:27,972 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:20:30,290 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:20:30,292 - server - ERROR - Unknown Error (309) ("Creating a ModelSerializer without either the 'fields' attribute or the 'exclude' attribute has been deprecated since 3.3.0, and is now disallowed. Add an explicit fields = '__all__' to the EmployeeUserSerializer serializer.",)
+2024-05-21 16:20:30,294 - server - INFO - (324) - ("Creating a ModelSerializer without either the 'fields' attribute or the 'exclude' attribute has been deprecated since 3.3.0, and is now disallowed. Add an explicit fields = '__all__' to the EmployeeUserSerializer serializer.",)
+2024-05-21 16:20:56,634 - server - INFO - Validating Request...
+2024-05-21 16:20:56,635 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:20:56,635 - server - WARNING - Invalid Request
+2024-05-21 16:20:56,635 - server - INFO - Validating Request...
+2024-05-21 16:20:56,635 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:20:56,635 - server - INFO - Request Validated!
+2024-05-21 16:20:56,636 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:20:58,732 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:20:58,893 - server - ERROR - Unknown Error (310) `update()` did not return an object instance.
+2024-05-21 16:20:58,894 - server - INFO - (324) - `update()` did not return an object instance.
+2024-05-21 16:21:49,257 - server - INFO - Validating Request...
+2024-05-21 16:21:49,257 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:21:49,258 - server - WARNING - Invalid Request
+2024-05-21 16:21:49,258 - server - INFO - Validating Request...
+2024-05-21 16:21:49,258 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:21:49,258 - server - INFO - Request Validated!
+2024-05-21 16:21:49,259 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:21:51,500 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:21:51,666 - server - ERROR - Unknown Error (310) `update()` did not return an object instance.
+2024-05-21 16:21:51,667 - server - INFO - (324) - `update()` did not return an object instance.
+2024-05-21 16:23:07,907 - server - INFO - Validating Request...
+2024-05-21 16:23:07,907 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:23:07,908 - server - WARNING - Invalid Request
+2024-05-21 16:23:07,908 - server - INFO - Validating Request...
+2024-05-21 16:23:07,908 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:23:07,908 - server - INFO - Request Validated!
+2024-05-21 16:23:07,909 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:23:10,179 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:23:10,359 - server - ERROR - Unknown Error (310) `update()` did not return an object instance.
+2024-05-21 16:23:10,360 - server - INFO - (324) - `update()` did not return an object instance.
+2024-05-21 16:24:58,459 - server - INFO - Validating Request...
+2024-05-21 16:24:58,459 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:24:58,460 - server - WARNING - Invalid Request
+2024-05-21 16:24:58,461 - server - INFO - Validating Request...
+2024-05-21 16:24:58,461 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:24:58,461 - server - INFO - Request Validated!
+2024-05-21 16:24:58,461 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:24:59,820 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:24:59,997 - server - ERROR - Unknown Error (310) `update()` did not return an object instance.
+2024-05-21 16:24:59,999 - server - INFO - (324) - `update()` did not return an object instance.
+2024-05-21 16:25:10,844 - server - INFO - Validating Request...
+2024-05-21 16:25:10,845 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:25:10,845 - server - WARNING - Invalid Request
+2024-05-21 16:25:10,846 - server - INFO - Validating Request...
+2024-05-21 16:25:10,846 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:25:10,846 - server - INFO - Request Validated!
+2024-05-21 16:25:10,846 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:25:13,024 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:25:13,187 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:28:17,068 - server - INFO - Validating Request...
+2024-05-21 16:28:17,069 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:28:17,069 - server - WARNING - Invalid Request
+2024-05-21 16:28:17,070 - server - INFO - Validating Request...
+2024-05-21 16:28:17,070 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:28:17,071 - server - INFO - Request Validated!
+2024-05-21 16:28:17,071 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:28:19,331 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:28:19,494 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:31:28,570 - server - INFO - Validating Request...
+2024-05-21 16:31:28,571 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:31:28,571 - server - WARNING - Invalid Request
+2024-05-21 16:31:28,571 - server - INFO - Validating Request...
+2024-05-21 16:31:28,571 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:31:28,572 - server - INFO - Request Validated!
+2024-05-21 16:31:28,572 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:31:30,745 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:31:30,910 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:33:08,641 - server - INFO - Validating Request...
+2024-05-21 16:33:08,641 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:33:08,642 - server - WARNING - Invalid Request
+2024-05-21 16:33:08,642 - server - INFO - Validating Request...
+2024-05-21 16:33:08,642 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:33:08,642 - server - INFO - Request Validated!
+2024-05-21 16:33:08,642 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:33:10,820 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:33:10,987 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:33:40,958 - server - INFO - Validating Request...
+2024-05-21 16:33:40,958 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:33:40,958 - server - WARNING - Invalid Request
+2024-05-21 16:33:40,959 - server - INFO - Validating Request...
+2024-05-21 16:33:40,959 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:33:40,959 - server - INFO - Request Validated!
+2024-05-21 16:33:40,960 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:33:43,301 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:33:43,478 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:34:17,825 - server - INFO - Validating Request...
+2024-05-21 16:34:17,825 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:34:17,826 - server - WARNING - Invalid Request
+2024-05-21 16:34:17,826 - server - INFO - Validating Request...
+2024-05-21 16:34:17,826 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:34:17,826 - server - INFO - Request Validated!
+2024-05-21 16:34:17,827 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:34:19,977 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:34:20,139 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:35:22,652 - server - INFO - Validating Request...
+2024-05-21 16:35:22,653 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:35:22,653 - server - WARNING - Invalid Request
+2024-05-21 16:35:22,654 - server - INFO - Validating Request...
+2024-05-21 16:35:22,654 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:35:22,654 - server - INFO - Request Validated!
+2024-05-21 16:35:22,655 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:35:24,826 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:35:24,998 - server - INFO - Saved User: Daniel Murangira 
+2024-05-21 16:35:55,429 - server - INFO - Validating Request...
+2024-05-21 16:35:55,430 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:35:55,430 - server - WARNING - Invalid Request
+2024-05-21 16:35:55,430 - server - INFO - Validating Request...
+2024-05-21 16:35:55,430 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:35:55,430 - server - INFO - Request Validated!
+2024-05-21 16:35:55,431 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "04/02/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:35:57,486 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:35:57,650 - server - ERROR - Unknown Error (310) ['“04/02/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-21 16:35:57,651 - server - INFO - (324) - ['“04/02/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-21 16:36:33,806 - server - INFO - Validating Request...
+2024-05-21 16:36:33,807 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:36:33,807 - server - WARNING - Invalid Request
+2024-05-21 16:36:33,807 - server - INFO - Validating Request...
+2024-05-21 16:36:33,808 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-21 16:36:33,808 - server - INFO - Request Validated!
+2024-05-21 16:36:33,809 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2024-04-02",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "PM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": true,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Daniel Murangira",
+    "email": "daniel.murangira@hillplain.com",
+    "id": "661429f481e45b6da33545e5",
+{
+2024-05-21 16:36:34,441 - server - DEBUG - Update Path taken for User 
+2024-05-21 16:36:34,953 - server - INFO - Saved User: Daniel Murangira 
+2024-05-22 08:48:40,097 - server - INFO - Approved Time Off Request function called 
+2024-05-22 08:48:40,098 - server - INFO - Validating Request...
+2024-05-22 08:48:40,099 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:48:40,100 - server - WARNING - Invalid Request
+2024-05-22 08:48:40,100 - server - INFO - Validating Request...
+2024-05-22 08:48:40,101 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:48:40,102 - server - INFO - Request Validated!
+2024-05-22 08:48:40,103 - server - DEBUG - Input is  - }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "01/29/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "ES",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": false,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Behrouz Ayaz",
+    "email": "behrouz.ayaz@hillplain.com",
+    "id": "65e63758b43c5f3b0dda2dbb",
+{
+2024-05-22 08:48:41,582 - server - WARNING - Serializer could not be saved: }
+    ]
+        "This field is required."
+    "workspaceId": [
+    ],
+        "This field is required."
+    "userId": [
+    ],
+        "This field is required."
+    "policyId": [
+{ 
+2024-05-22 08:49:21,228 - server - INFO - Validating Request...
+2024-05-22 08:49:21,229 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:49:21,229 - server - WARNING - Invalid Request
+2024-05-22 08:49:21,230 - server - INFO - Validating Request...
+2024-05-22 08:49:21,230 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:49:21,230 - server - WARNING - Invalid Request
+2024-05-22 08:50:27,954 - server - INFO - Validating Request...
+2024-05-22 08:50:27,954 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:50:27,955 - server - WARNING - Invalid Request
+2024-05-22 08:50:27,955 - server - INFO - Validating Request...
+2024-05-22 08:50:27,955 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:50:27,955 - server - WARNING - Invalid Request
+2024-05-22 08:50:27,956 - server - INFO - Validating Request...
+2024-05-22 08:50:27,956 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:50:27,956 - server - WARNING - Invalid Request
+2024-05-22 08:51:04,454 - server - INFO - Validating Request...
+2024-05-22 08:51:04,454 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:04,455 - server - WARNING - Invalid Request
+2024-05-22 08:51:04,455 - server - INFO - Validating Request...
+2024-05-22 08:51:04,455 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:04,455 - server - WARNING - Invalid Request
+2024-05-22 08:51:04,455 - server - INFO - Validating Request...
+2024-05-22 08:51:04,456 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:04,456 - server - WARNING - Invalid Request
+2024-05-22 08:51:19,375 - server - INFO - Validating Request...
+2024-05-22 08:51:19,376 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:19,377 - server - WARNING - Invalid Request
+2024-05-22 08:51:19,377 - server - INFO - Validating Request...
+2024-05-22 08:51:19,377 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:19,377 - server - WARNING - Invalid Request
+2024-05-22 08:51:19,377 - server - INFO - Validating Request...
+2024-05-22 08:51:19,378 - server - DEBUG - I7DOlIagZOjUBhHS0HObcvyaBiz7covJ
+2024-05-22 08:51:19,378 - server - WARNING - Invalid Request
+2024-05-22 08:51:54,437 - server - INFO - Validating Request...
+2024-05-22 08:51:54,438 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-22 08:51:54,439 - server - WARNING - Invalid Request
+2024-05-22 08:51:54,440 - server - INFO - Validating Request...
+2024-05-22 08:51:54,440 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
+2024-05-22 08:51:54,442 - server - INFO - Request Validated!
+2024-05-22 08:51:54,442 - server - DEBUG - 
+Input Is 
+ }
+    ]
+        }
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "01/29/2024",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "ES",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": true,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": true,
+        "reminders": true,
+        "alerts": true,
+        "pto": true,
+        "approval": false,
+        "scheduledReports": true,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Edmonton",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Behrouz Ayaz",
+    "email": "behrouz.ayaz@hillplain.com",
+    "id": "65e63758b43c5f3b0dda2dbb",
+{
+2024-05-22 08:51:56,741 - server - DEBUG - Update Path taken for User 
+2024-05-22 08:51:56,909 - server - ERROR - Unknown Error (320) ['“01/29/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-22 08:51:56,911 - server - INFO - (334) - ['“01/29/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']

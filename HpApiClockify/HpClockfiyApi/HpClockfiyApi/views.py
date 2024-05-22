@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction , utils
 from .serializers import (
+    EmployeeUserSerializer,
     TimesheetSerializer,
     TimeOffSerializer,
     ExpenseSerializer,
@@ -13,6 +14,7 @@ from .serializers import (
 )
 from .models import(
     TimeOffRequests,
+    Employeeuser,
     Timesheet,
     Expense,
     Entry,
@@ -283,31 +285,66 @@ def getClients(request: ASGIRequest):
         taskResult(response, dumps(loads(request.body)), 'Client Function')
         return response
 
-@api_view(['POST'])
-def getEmployeeUsers(request: ASGIRequest):
-    secret = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V'
+@csrf_exempt
+async def getEmployeeUsers(request: ASGIRequest):
+    caller = 'EmployeeUser Function '
+    secret  = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V'
     secret2 = 'TSnab31ks1Ml1oXkZHMIzp7R33SRSedz'
-    if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):  
-        '''
-        if request.method == 'GET':
-            user = Employeeuser.objects.all()
-            serializer = EmployeeUserSerializer(user, many=True)
-            response = Response(serializer.data )
-        '''
-        if request.method == 'POST' or request.method=='GET':
-            stat = UserEvent()
-            logger.info(f'User Event: Add User')
-            if stat:
-                return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-            else: Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-        else:
-            response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
-            return response
-    else:
+    secret3 = 'JtyuoJ1ds3tSeXB9vyPIHjRCmb0vmmDx'
+    Flag = False
+    if aunthenticateRequst(request, secret): 
+        stat = 'ACTIVE' 
+        Flag = True 
+    elif aunthenticateRequst(request, secret2):
+        stat = 'ACTIVE'  
+        Flag = True 
+    elif aunthenticateRequst(request, secret3): 
+        stat = 'INACTIVE'
+        Flag = True
+    if Flag: 
+        if request.method == 'POST': 
+            inputData = loads(request.body)
+            logger.debug(f'\nInput Is \n {reverseForOutput(inputData)}')
+# decode secret to find status 
+            def updateSync(inputData):
+                try: 
+                    try: 
+                        emp = Employeeuser.objects.get(id = inputData['id'])
+                        serializer = EmployeeUserSerializer(instance= emp, data = inputData, context = {'status': stat}) # change later 
+                        logger.debug('Update Path taken for User ')
+                    except Employeeuser.DoesNotExist: 
+                        serializer = EmployeeUserSerializer(data=inputData)
+                        logger.debug('Insert Path taken for user ')
+
+                    if serializer.is_valid():
+                        serializer.save()
+                        logger.info(f'Saved User: {inputData['name']} ')
+                        return True 
+                    else: 
+                        logger.error(f'Invalid Data: {reverseForOutput(serializer.errors)}')
+                        raise ValidationError('Serializer could not be saved. Invalid data ')
+                except Exception as e: 
+                    if not isinstance(e, ValidationError): 
+                        logger.error(f'Unknown Error ({e.__traceback__.tb_lineno}) {str(e)}')
+                        raise e
+                    raise e
+
+            saveUser = sync_to_async(updateSync)
+            try: 
+                result = await saveUser(inputData)   
+                if result: 
+                    return JsonResponse(data={'User': inputData['name']}, status = status.HTTP_201_CREATED)  
+                else: raise Exception('Unknown Behavior ')   
+            except Exception as e: 
+                logger.info(f'({e.__traceback__.tb_lineno}) - {str(e)}')    
+                response = JsonResponse(data={'Message': str(e)}, status= status.HTTP_400_BAD_REQUEST)
+                await saveTaskResult(response, inputData, caller)
+                return response
+    else: 
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'EmployeeUser Function')
-        return response
-   
+        saveTaskResult(response, dumps(loads(request.body)), 'User  Function')
+        return response  
+
 '''
 @api_view(['GET', 'POST'])
 def getWorkspaces(request: ASGIRequest, format = None):
