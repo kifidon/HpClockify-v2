@@ -79,7 +79,7 @@ def aunthenticateRequst(request: ASGIRequest, secret: str):
         logger.info('Request Validated!')
         return True
     else: 
-        logger.warning('Invalid Request')
+        logger.debug('Invalid Request')
         return False
 
 @csrf_exempt
