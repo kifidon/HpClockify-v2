@@ -355,3 +355,5 @@
 }
 2024-05-22 08:51:56,908 - background_tasks - ERROR - Problem Updating User Data 57: (['“01/29/2024” value has an invalid date format. It must be in YYYY-MM-DD format.'])
 2024-05-22 08:51:56,914 - background_tasks - INFO - Saving task result
+2024-05-23 09:28:52,784 - background_tasks - INFO - <class 'django.core.handlers.asgi.ASGIRequest'>
+2024-05-23 09:28:52,784 - background_tasks - INFO - Pulling Expense Category and trying again

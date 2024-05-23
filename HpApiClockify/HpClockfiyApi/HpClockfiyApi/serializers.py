@@ -95,8 +95,10 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
-
-        return field['Start Date']
+        try:
+            return field['Start Date']
+        except Exception: 
+            return 'No Start Date Specified'
     
     def create(self, validated_data):
         logger = setup_background_logger() 

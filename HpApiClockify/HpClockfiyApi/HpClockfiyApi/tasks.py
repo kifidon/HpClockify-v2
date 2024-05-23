@@ -37,6 +37,17 @@ saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
 
 def deleteCategory(newCategories):
+    '''
+    Function Description: 
+        Checks all categories in the database against the most recent pull and deletes stall categories.
+
+    Param: 
+        newCategories([dict]): List of category json data recently pulled from clockify  
+    
+    Returns: 
+        deleted(int): Number of categories deleted from the database  
+    '''
+    
     logger = setup_background_logger(loggerLevel)
     deleted = 0
     categories = Category.objects.all()
@@ -50,56 +61,78 @@ def deleteCategory(newCategories):
     
 
 @csrf_exempt
-async def retryExpenses(request):   
+async def retryExpenses(request: ASGIRequest):   
+    '''
+    Function Description: 
+        Handles a FK constraint on Expenses by updating the Category table and redirecting back to the expense function 
+
+        Result of the task fumction is stored in the database table 'BackGroundTaskDjango'. Transactions are not atomic 
+
+    Param: 
+        request(ASGIRequest): contains the the body of the request sent to the main server   
+    
+    Returns: 
+        response(JsonResponse): Required return value that is not accessed later
+    '''
     logger = setup_background_logger(loggerLevel)
     if request.method == 'POST':
-        caller = 'Pulling Expense Category and trying again'
-        logger.info(caller)
-        inputData = request.POST
-        logger.debug(reverseForOutput(inputData))
-        categories = getCategories(inputData['workspaceId'], 1)
-        
-        logger.info('Checking for stale Categories... ')
-        deleteCategoryAsync = sync_to_async(deleteCategory)
-        deleted = deleteCategoryAsync(categories['categories'])
-        logger.info(f'Deleted {deleted} Categories')
-        logger.debug(reverseForOutput(categories))
-        def pushCategories(category:dict):
-            try:
-                categoryInstanece = Category.objects.get(pk=category['id'])
-                serializer = CategorySerializer(data= category, instance=categoryInstanece)
-                logger.info(f'Existing Category... Updatiing')
-            except Category.DoesNotExist:
-                serializer = CategorySerializer(data = category)
-                logger.info(f'New Category... Inserting')
-            if serializer.is_valid():
-                serializer.save()
-                logger.info(f'Changes Saved')
-                return 1
-            else:
-                raise ValidationError
-        
-        tasks = []
-        pushCategoriesAsync = sync_to_async(pushCategories, thread_sensitive=True)
-        for i in range(0,len(categories['categories'])): # updates all entries async 
-            tasks.append(
-                pushCategoriesAsync(categories['categories'][i])
-            )
         try:
-            await asyncio.gather(*tasks)
+            caller = 'Pulling Expense Category and trying again'
+            logger.info(caller)
+            inputData = request.POST
+            logger.debug(reverseForOutput(inputData))
+            
+            categories = getCategories(inputData['workspaceId'], 1) #new data from clockify 
+            
+            logger.info('Checking for stale Categories... ')
+            deleteCategoryAsync = sync_to_async(deleteCategory)
+            deleted = await deleteCategoryAsync(categories['categories']) 
+            logger.info(f'Deleted {deleted} Categories')
+            logger.debug(reverseForOutput(categories))
+            
+            def pushCategories(category:dict):
+                try: 
+                    try: #try update otherwise insert for Categories 
+                        categoryInstanece = Category.objects.get(pk=category['id'])
+                        serializer = CategorySerializer(data= category, instance=categoryInstanece)
+                        logger.info(f'Existing Category... Updatiing')
+                    except Category.DoesNotExist:
+                        serializer = CategorySerializer(data = category)
+                        logger.info(f'New Category... Inserting')
+                    if serializer.is_valid():
+                        serializer.save()
+                        logger.info(f'Changes Saved')
+                        return 1
+                    else:
+                        logger.error(serializer.error_messages)
+                        raise ValidationError(f'Could not serialize data: \n{reverseForOutput(serializer.errors)}')
+                except Exception as e: 
+                    logger.error(f'({e.__traceback__.tb_lineno}) Retry Expenses - ({str(e)})')
+                    raise e
+            
+            tasks = []
+            pushCategoriesAsync = sync_to_async(pushCategories, thread_sensitive=True)
+
+            for i in range(0,len(categories['categories'])): # updates/inserts all Expense categories async  
+                tasks.append(
+                    pushCategoriesAsync(categories['categories'][i]) # returns coroutine function 
+                )
+            await asyncio.gather(*tasks) # calling all async 
             logger.info(f'Categories updated')
             headers = {
                 'Clockify-Signature': 'CiLrAry1UiEZb4OnPmX67T8un5GuYw24'
             }
-            url =  'http://localhost:8000/HpClockifyApi/newExpense'
-            requests.post(url=url, data=inputData)
+            url =  'http://localhost:8000/HpClockifyApi/newExpense' # host url of main server 
+            requests.post(url=url, data=inputData, headers=headers)
             response = JsonResponse(data = 'Retry Expense Event Completed Succesfully', status=status.HTTP_201_CREATED, safe = False)
             await saveTaskResult(response, inputData, caller)
             return response
         except Exception as e:
-            response = JsonResponse(data = 'Error Occured in retry', status=status.HTTP_400_BAD_REQUEST, safe = False)
+            response = JsonResponse(data = {'Message': f'({e.__traceback__.tb_lineno}) - {str(e)}'}, status=status.HTTP_400_BAD_REQUEST, safe = False)
+            logger.critical(response.content.decode('utf-8'))
             await saveTaskResult(response, inputData, caller)
             return response
+    
     else:
         response =  JsonResponse(
             data={
@@ -111,6 +144,22 @@ async def retryExpenses(request):
 
 @csrf_exempt
 def updateTags(inputdata: dict):
+    '''
+    Function Description: 
+        Inserts/Updates tags for a given time entry. Checks to delete any stale tags first  
+
+        Transactions are not atomic 
+
+    Param: 
+        inputData(dict): Input data used in the entry function. required data is taken from this dict  
+    
+    Returns: 
+        tags_data([dict]): List of all the tags_data that was used to update/insert into the  databse 
+
+    Raises: 
+        ValidationError 
+        General Exception  
+    '''
     try:
         logger = setup_background_logger(loggerLevel)
         logger.info(f'updateTags Function called')
@@ -182,93 +231,104 @@ def updateTags(inputdata: dict):
 
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest): 
+    '''
+    Function Description: 
+        Handles updating and inserting Entries  on approved timesheets. Called from updateTimesheet function as a async background task. 
+        Pulls data directly from clockify for the respected timesheet to get data 
+        Result of the task fumction is stored in the database table 'BackGroundTaskDjango'. Transactions are not atomic 
+
+    Param: 
+        request(ASGIRequest): contains the the body of the request sent to the main server in the updateTimesheet function    
+    
+    Returns: 
+        response(JsonResponse): Return value 
+    '''
     #entry Function  
     logger = setup_background_logger(loggerLevel)
     caller = 'Approved Entry Function Called'
     logger.info(caller)
     logger.debug(type(request))
     if request.method == 'POST':
-        logger.debug(type(request.body))
-        inputData = bytes_to_dict(request.body)
-        logger.debug(dumps(inputData,indent=4))
-        key = ClockifyPullV3.getApiKey()
+        try:
+            logger.debug(type(request.body))
+            inputData = bytes_to_dict(request.body)
+            logger.debug(dumps(inputData,indent=4))
+            key = ClockifyPullV3.getApiKey()
+            
+            timeId = inputData.get('id')
+            workspaceId = inputData.get('workspaceId')
+            stat = inputData.get('status').get('state') or None
         
-        timeId = inputData.get('id')
-        workspaceId = inputData.get('workspaceId')
-        stat = inputData.get('status').get('state') or None
-    
-        if stat == 'APPROVED':
-            allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
-            if len(allEntries) == 0:
-                logger.warning('No Content. Is this expected?')
-                response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-                await saveTaskResult(response, inputData, caller)
-                return response
-            def syncUpdateEntries(entries): # create thread 
-                try: 
-                    #refactoring 
-                    entries['workspaceId']= workspaceId
-                    entries['timesheetId'] = entries['approvalRequestId']
-                    try: # try and update if exists, otherwise create
-                
-                        entry = Entry.objects.get(id = entries['id'], workspaceId = workspaceId )
-                        serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
-                        logger.info(f'Updating Entry {entries['id']}')
-                    except Entry.DoesNotExist:
-                        serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                        logger.warning(f'Creating new Entry on timesheet {timeId}')
+            if stat == 'APPROVED':
+                allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+                if len(allEntries) == 0:
+                    logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
+                    response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+                    await saveTaskResult(response, inputData, caller)
+                    return response
+                def syncUpdateEntries(entries): # create thread 
+                    try: 
+                        #refactoring 
+                        entries['workspaceId']= workspaceId
+                        entries['timesheetId'] = entries['approvalRequestId']
+                        try: # try and update if exists, otherwise create
+                            entry = Entry.objects.get(id = entries['id'], workspaceId = workspaceId )
+                            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
+                            logger.info(f'Updating Entry {entries['id']}')
+                        except Entry.DoesNotExist:
+                            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+                            logger.warning(f'Creating new Entry on timesheet {timeId}')
 
-                    if serializer.is_valid():
-                        serializer.save()
-                        logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
-                        reversed_data = reverseForOutput(entries)
-                        logger.info(f'{reversed_data}')
-                        if (len(entries['tags']) != 0):
-                            data = {
-                                'timesheet': inputData,
-                                'entry': entries
-                            }
-                            updateTags(data)
-                        return serializer.validated_data
-                    else: 
-                        logger.error(f'{serializer.errors}')
-                        raise ValidationError(serializer.errors)
-                except Exception as e:
-                    logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
-                    raise  e
-            updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-            tasks = []
-            if len(allEntries) != 0:
-                for i in range(0,len(allEntries)): # updates all entries async 
-                    tasks.append(
-                        asyncio.create_task(updateAsync(allEntries[i]))
-                    )
-                try:
+                        if serializer.is_valid():
+                            serializer.save()
+                            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
+                            reversed_data = reverseForOutput(entries)
+                            logger.info(f'{reversed_data}') 
+                            if (len(entries['tags']) != 0):
+                                data = {
+                                    'timesheet': inputData,
+                                    'entry': entries
+                                }
+                                updateTags(data)
+                            return serializer.validated_data
+                        else: 
+                            logger.error(f'{serializer.errors}')
+                            raise ValidationError(serializer.errors)
+                    except Exception as e:
+                        logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
+                        raise  e
+                    
+                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                tasks = []
+                if len(allEntries) != 0:
+                    for i in range(0,len(allEntries)): # updates all entries async 
+                        tasks.append(
+                            asyncio.create_task(updateAsync(allEntries[i]))
+                        )
                     await asyncio.gather(*tasks)
                     logger.info(f'Entries added for timesheet {timeId}') 
                     response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
                     await saveTaskResult(response, inputData, caller)
                     return response
-
-                except Exception as e:
-                    logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                    response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                else: 
+                    logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
+                    response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
                     await saveTaskResult(response, inputData, caller)
                     return response
-            else: 
-                logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                await saveTaskResult(response, inputData, caller)
-                return response
-        else:
-                logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-                response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                await saveTaskResult(response, inputData, caller)
-                return response
+            else:
+                    logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
+                    response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                    await saveTaskResult(response, inputData, caller)
+                    return response
+    
+        except Exception as e:
+            logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+            response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+            await saveTaskResult(response, inputData, caller)
+            return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         await saveTaskResult(response, inputData, caller)
-        return response
         return response
 
 @csrf_exempt
