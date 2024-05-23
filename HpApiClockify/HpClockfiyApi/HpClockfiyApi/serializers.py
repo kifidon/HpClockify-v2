@@ -13,7 +13,7 @@ from .models import(
 )
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
-
+from datetime import date
 class EmployeeUserSerializer(serializers.ModelSerializer):
     '''
     Serialized to the EmployeeUser Model fields. 
@@ -98,7 +98,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         try:
             return field['Start Date']
         except Exception: 
-            return 'No Start Date Specified'
+            return date.today()
     
     def create(self, validated_data):
         logger = setup_background_logger() 
