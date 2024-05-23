@@ -818,7 +818,7 @@ async def newExpense(request: ASGIRequest):
                 )
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'NewExpense Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'NewExpense Function')
         return response
 
 @csrf_exempt
@@ -900,7 +900,7 @@ async def newEntry(request:ASGIRequest):
                     )
         else:
             response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-            taskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+            await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
             return response
     except Exception as e: 
         response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -958,7 +958,7 @@ async def deleteEntry(request:ASGIRequest):
                 return response
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
         return response
 
 
@@ -1002,5 +1002,5 @@ async def deleteExpense(request: ASGIRequest):
             return response
     else:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
         return response

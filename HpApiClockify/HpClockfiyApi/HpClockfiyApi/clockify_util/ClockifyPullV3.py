@@ -5,7 +5,6 @@ import asyncio
 import httpx
 import time
 from httpcore import ConnectTimeout
-from asgiref.sync import sync_to_async
 from .hpUtil import get_current_time , dumps, sqlConnect, cleanUp
 from .. Loggers import setup_background_logger
 
