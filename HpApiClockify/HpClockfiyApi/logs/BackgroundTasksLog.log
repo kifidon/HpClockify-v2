@@ -359,3 +359,12 @@
 2024-05-23 09:28:52,784 - background_tasks - INFO - Pulling Expense Category and trying again
 2024-05-23 13:43:23,361 - background_tasks - ERROR - Problem Updating User Data 121: (['“No Start Date Specified” value has an invalid date format. It must be in YYYY-MM-DD format.'])
 2024-05-23 13:43:23,372 - background_tasks - INFO - Saving task result
+2024-05-23 14:14:56,622 - background_tasks - ERROR - Problem inserting User Data 107: ('status')
+2024-05-23 14:14:56,634 - background_tasks - INFO - Saving task result
+2024-05-23 14:16:11,823 - background_tasks - INFO - Saving task result
+2024-05-23 14:16:34,625 - background_tasks - INFO - Saving task result
+2024-05-23 14:16:34,628 - background_tasks - INFO - Saving task result
+2024-05-23 14:16:43,783 - background_tasks - INFO - Saving task result
+2024-05-23 14:16:43,785 - background_tasks - INFO - Saving task result
+2024-05-23 14:18:30,929 - background_tasks - INFO - Update Entry Called
+2024-05-23 15:53:12,961 - background_tasks - INFO - Update Entry Called

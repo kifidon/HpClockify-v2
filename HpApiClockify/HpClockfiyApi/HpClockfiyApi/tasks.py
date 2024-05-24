@@ -303,7 +303,7 @@ async def approvedEntries(request: ASGIRequest):
                 if len(allEntries) != 0:
                     for i in range(0,len(allEntries)): # updates all entries async 
                         tasks.append(
-                            asyncio.create_task(updateAsync(allEntries[i]))
+                            updateAsync(allEntries[i])
                         )
                     await asyncio.gather(*tasks)
                     logger.info(f'Entries added for timesheet {timeId}') 

@@ -1169,8 +1169,8 @@ Input Is
     "id": "661429f481e45b6da33545e5",
 {
 2024-05-21 16:35:57,486 - server - DEBUG - Update Path taken for User 
-2024-05-21 16:35:57,650 - server - ERROR - Unknown Error (310) ['“04/02/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
-2024-05-21 16:35:57,651 - server - INFO - (324) - ['“04/02/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-21 16:35:57,650 - server - ERROR - Unknown Error (310) ['ï¿½04/02/2024ï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-21 16:35:57,651 - server - INFO - (324) - ['ï¿½04/02/2024ï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
 2024-05-21 16:36:33,806 - server - INFO - Validating Request...
 2024-05-21 16:36:33,807 - server - DEBUG - TSnab31ks1Ml1oXkZHMIzp7R33SRSedz
 2024-05-21 16:36:33,807 - server - WARNING - Invalid Request
@@ -1406,8 +1406,8 @@ Input Is
     "id": "65e63758b43c5f3b0dda2dbb",
 {
 2024-05-22 08:51:56,741 - server - DEBUG - Update Path taken for User 
-2024-05-22 08:51:56,909 - server - ERROR - Unknown Error (320) ['“01/29/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
-2024-05-22 08:51:56,911 - server - INFO - (334) - ['“01/29/2024” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-22 08:51:56,909 - server - ERROR - Unknown Error (320) ['ï¿½01/29/2024ï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-22 08:51:56,911 - server - INFO - (334) - ['ï¿½01/29/2024ï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
 2024-05-23 13:41:48,519 - server - INFO - Validating Request...
 2024-05-23 13:41:48,528 - server - WARNING - Invalid Request
 2024-05-23 13:41:48,528 - server - INFO - Validating Request...
@@ -1422,5 +1422,32 @@ Input Is
 2024-05-23 13:42:43,246 - server - WARNING - Invalid Request
 2024-05-23 13:43:20,934 - server - INFO - Validating Request...
 2024-05-23 13:43:20,934 - server - INFO - Request Validated!
-2024-05-23 13:43:23,363 - server - ERROR - Unknown Error (475) ['“No Start Date Specified” value has an invalid date format. It must be in YYYY-MM-DD format.']
-2024-05-23 13:43:23,370 - server - INFO - (489) - ['“No Start Date Specified” value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-23 13:43:23,363 - server - ERROR - Unknown Error (475) ['ï¿½No Start Date Specifiedï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-23 13:43:23,370 - server - INFO - (489) - ['ï¿½No Start Date Specifiedï¿½ value has an invalid date format. It must be in YYYY-MM-DD format.']
+2024-05-23 13:55:45,674 - server - INFO - Validating Request...
+2024-05-23 13:55:45,674 - server - INFO - Request Validated!
+2024-05-23 13:55:48,767 - server - INFO - Saved User: Jeremy Hoeksema 
+2024-05-23 14:14:54,023 - server - INFO - Validating Request...
+2024-05-23 14:14:54,024 - server - INFO - Request Validated!
+2024-05-23 14:14:56,630 - server - ERROR - Unknown Error (475) `create()` did not return an object instance.
+2024-05-23 14:14:56,632 - server - INFO - (489) - `create()` did not return an object instance.
+2024-05-23 14:16:11,821 - server - INFO - newExpense view called
+2024-05-23 14:16:11,822 - server - INFO - Validating Request...
+2024-05-23 14:16:11,822 - server - INFO - Validating Request...
+2024-05-23 14:16:34,622 - server - INFO - New Entry view called
+2024-05-23 14:16:34,623 - server - INFO - Validating Request...
+2024-05-23 14:16:34,624 - server - INFO - Validating Request...
+2024-05-23 14:16:34,626 - server - ERROR - {"Message": "(903): You cannot call this from an async context - use a thread or sync_to_async."}
+2024-05-23 14:16:43,780 - server - INFO - New Entry view called
+2024-05-23 14:16:43,781 - server - INFO - Validating Request...
+2024-05-23 14:16:43,782 - server - INFO - Validating Request...
+2024-05-23 14:16:43,784 - server - ERROR - {"Message": "(903): You cannot call this from an async context - use a thread or sync_to_async."}
+2024-05-23 14:18:28,653 - server - INFO - New Entry view called
+2024-05-23 14:18:28,653 - server - INFO - Validating Request...
+2024-05-23 14:18:28,653 - server - INFO - Request Validated!
+2024-05-23 14:18:30,926 - server - INFO - Update path taken for Entry
+2024-05-23 15:53:10,605 - server - INFO - {'X-Api-Key': ', 'Clockify-Signature': 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE', 'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.39.0', 'Accept': '*/*', 'Cache-Control': 'no-cache', 'Postman-Token': 'f6dbec1d-7493-43be-94be-f9d318a6f923', 'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive', 'Content-Length': '1604'}
+2024-05-23 15:53:10,609 - server - INFO - New Entry view called
+2024-05-23 15:53:10,609 - server - INFO - Validating Request...
+2024-05-23 15:53:10,609 - server - INFO - Request Validated!
+2024-05-23 15:53:12,959 - server - INFO - Update path taken for Entry
