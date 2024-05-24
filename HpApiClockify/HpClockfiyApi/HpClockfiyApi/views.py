@@ -841,6 +841,7 @@ async def newEntry(request:ASGIRequest):
     '''
     caller = 'New Entry view called'
     logger = setup_server_logger()
+    logger.info(request.headers)
     logger.info(caller)
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
