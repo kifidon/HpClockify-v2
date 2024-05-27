@@ -25,7 +25,7 @@ from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
 from .clockify_util.hpUtil import taskResult, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
-
+import time 
 import requests
 import asyncio
 
@@ -301,11 +301,16 @@ async def approvedEntries(request: ASGIRequest):
                 updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
                 tasks = []
                 if len(allEntries) != 0:
-                    for i in range(0,len(allEntries)): # updates all entries async 
-                        tasks.append(
-                            updateAsync(allEntries[i])
-                        )
-                    await asyncio.gather(*tasks)
+                    '''Causes SQL server deadlock on resources'''
+                    # for i in range(0,len(allEntries)): # updates all entries async 
+                    #     tasks.append(
+                    #         updateAsync(allEntries[i])
+                    #     )
+                    # await asyncio.gather(*tasks)
+                    for i in range(0,len(allEntries)): # updates all entries sync 
+                            time.sleep(1)
+                            asyncio.create_task(updateAsync(allEntries[i]))
+                        
                     logger.info(f'Entries added for timesheet {timeId}') 
                     response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
                     await saveTaskResult(response, inputData, caller)
