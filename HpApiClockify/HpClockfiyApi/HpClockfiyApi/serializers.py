@@ -269,7 +269,8 @@ class EntrySerializer(serializers.Serializer):
             return instance
         except Exception as e:
             logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
-            return instance
+            raise e
+
 
 class TagsForSerializer(serializers.Serializer):
     '''
@@ -321,7 +322,7 @@ class TagsForSerializer(serializers.Serializer):
             return instance
         except Exception as e: 
             logger.warning(f'UnknownError: {dumps(str(e), indent = 4)}')
-            return instance
+            raise e 
     
 class CategorySerializer(serializers.ModelSerializer): 
     '''
