@@ -387,7 +387,7 @@ async def approvedExpenses(request:ASGIRequest):
             tasks = []
             for expense in allExpenses:
                 tasks.append(
-                    asyncio.create_task(asyncUpdateExpense(expense))
+                    asyncUpdateExpense(expense)
                 )
             try:
                 await asyncio.gather(*tasks)
