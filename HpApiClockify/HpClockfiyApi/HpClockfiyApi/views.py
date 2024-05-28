@@ -143,7 +143,7 @@ async def updateTimesheets(request:ASGIRequest):
 
                 async def createTask(): # handles Entries and Expenses Once at a time
                     await callBackgroungEntry()
-                    await callBackgroungExpense()
+                    # await callBackgroungExpense()
                     
                 updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
                 result = await updateAsync()
