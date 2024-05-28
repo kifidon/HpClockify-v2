@@ -686,7 +686,7 @@ async def removeTimeOffRequests(request:ASGIRequest):
                 return JsonResponse(data= {'Message': f'Deleted Time off request {inputData['id']}'}, status = status.HTTP_200_OK)
             except Exception as e: 
                 response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'})
-                logger.error(response.data['Message'])
+                logger.error(response.content['Message'])
                 await saveTaskResult(response, dumps(loads(request.body)), 'TimeOff delete Function')
                 return response  
         else: 
