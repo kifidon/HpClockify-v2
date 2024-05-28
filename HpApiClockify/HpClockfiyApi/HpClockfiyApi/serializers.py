@@ -235,9 +235,9 @@ class EntrySerializer(serializers.Serializer):
         except Exception as e:
             timesheet = None 
         logger.debug(validated_data['billable'])
-        if validated_data['billable'] == False:
-            bill = False
-        else: bill= True
+        if validated_data['billable'] == False: #excplicit bit conversion 
+            bill = 0
+        else: bill= 1
         entry = Entry.objects.create(
             id= validated_data['id'],
             timesheetId = timesheet,
@@ -258,9 +258,9 @@ class EntrySerializer(serializers.Serializer):
         logger.debug(validated_data)
         try:
             logger.debug(validated_data['billable'])
-            if validated_data['billable'] == False:
-                bill = False
-            else: bill= True
+            if validated_data['billable'] == False: #excplicit bit conversion 
+                bill = 0
+            else: bill= 1
             # instance.id = instance.id
             try:
                 instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
