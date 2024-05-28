@@ -225,6 +225,8 @@ class EntrySerializer(serializers.Serializer):
         logger = setup_background_logger('DEBUG')
         logger.info('Create Entry Called')
         if validated_data.get('hourlyRate') is not None:
+            if validated_data['billable'] == True:
+                logger.warning('No Rate on billable Entry')
             Rate = validated_data.get('hourlyRate').get('amount')
         else: Rate = -1
         try: 
