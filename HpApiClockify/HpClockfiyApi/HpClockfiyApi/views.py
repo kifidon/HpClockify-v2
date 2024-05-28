@@ -497,7 +497,7 @@ async def getEmployeeUsers(request: ASGIRequest):
         except Exception as e: 
             logger.info(f'({e.__traceback__.tb_lineno}) - {str(e)}')    
             response = JsonResponse(data={'Message': str(e)}, status= status.HTTP_400_BAD_REQUEST)
-            await saveTaskResult(response, inputData, caller)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
             return response
     else: 
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
@@ -640,7 +640,7 @@ async def getTimeOffRequests(request: ASGIRequest):
                 logger.error(str(e))
                 response = JsonResponse(data= {'Message': f'Error of type {type(e)} at {e.__traceback__.tb_lineno}'},
                                         status=status.HTTP_503_SERVICE_UNAVAILABLE)
-                await saveTaskResult(response, inputData, caller)
+                asyncio.create_task(saveTaskResult(response, inputData, caller))
                 return response
         else:
             response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe=False)

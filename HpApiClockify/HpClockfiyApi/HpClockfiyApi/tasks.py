@@ -125,12 +125,12 @@ async def retryExpenses(request: ASGIRequest):
             url =  'http://localhost:8000/HpClockifyApi/newExpense' # host url of main server 
             requests.post(url=url, data=inputData, headers=headers)
             response = JsonResponse(data = 'Retry Expense Event Completed Succesfully', status=status.HTTP_201_CREATED, safe = False)
-            await saveTaskResult(response, inputData, caller)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
             return response
         except Exception as e:
             response = JsonResponse(data = {'Message': f'({e.__traceback__.tb_lineno}) - {str(e)}'}, status=status.HTTP_400_BAD_REQUEST, safe = False)
             logger.critical(response.content.decode('utf-8'))
-            await saveTaskResult(response, inputData, caller)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
             return response
     
     else:
@@ -139,7 +139,7 @@ async def retryExpenses(request: ASGIRequest):
                 'Message': 'Method Not Suported'
             }, status= status.HTTP_405_METHOD_NOT_ALLOWED
         )
-        await saveTaskResult(response, inputData, caller)
+        asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
 
 @csrf_exempt
@@ -264,7 +264,7 @@ async def approvedEntries(request: ASGIRequest):
                 if len(allEntries) == 0:
                     logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
                     response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-                    await saveTaskResult(response, inputData, caller)
+                    asyncio.create_task(saveTaskResult(response, inputData, caller))
                     return response
                 def syncUpdateEntries(entries): # create thread 
                     try: 
@@ -308,27 +308,27 @@ async def approvedEntries(request: ASGIRequest):
                     await asyncio.gather(*tasks)
                     logger.info(f'Entries added for timesheet {timeId}') 
                     response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                    await saveTaskResult(response, inputData, caller)
+                    asyncio.create_task(saveTaskResult(response, inputData, caller))
                     return response
                 else: 
                     logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
                     response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                    await saveTaskResult(response, inputData, caller)
+                    asyncio.create_task(saveTaskResult(response, inputData, caller))
                     return response
             else:
                     logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
                     response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                    await saveTaskResult(response, inputData, caller)
+                    asyncio.create_task(saveTaskResult(response, inputData, caller))
                     return response
     
         except Exception as e:
             logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
             response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
-            await saveTaskResult(response, inputData, caller)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
             return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
-        await saveTaskResult(response, inputData, caller)
+        asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
 
 @csrf_exempt
@@ -349,7 +349,7 @@ async def approvedExpenses(request:ASGIRequest):
             if len(allExpenses) == 0:
                 logger.warning('No Content. Is this expected?')
                 response =  JsonResponse(data = {f'Message': f'No Expenes for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-                await saveTaskResult(response, inputData, caller)
+                asyncio.create_task(saveTaskResult(response, inputData, caller))
                 return response
             def syncUpdateExpense(expense):
                 #refactoring 
@@ -388,21 +388,21 @@ async def approvedExpenses(request:ASGIRequest):
                 await asyncio.gather(*tasks)
                 logger.info(f'Expense added for timesheet {timeId}') 
                 response =  JsonResponse(data = 'Approved Expense Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                await saveTaskResult(response, inputData, caller)
+                asyncio.create_task(saveTaskResult(response, inputData, caller))
                 return response
             except Exception as e:
                 logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
                 response =  JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
-                await saveTaskResult(response, inputData, caller)
+                asyncio.create_task(saveTaskResult(response, inputData, caller))
                 return response
 
         else:
             logger.info(f'UpdateExpense on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
             response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-            await saveTaskResult(response, inputData, caller)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
             return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
-        await saveTaskResult(response, inputData, caller)
+        asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
         
