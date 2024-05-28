@@ -682,7 +682,7 @@ async def removeTimeOffRequests(request:ASGIRequest):
                         raise e 
                 
                 remove = sync_to_async(deleteTime)
-                await remove()
+                await remove(inputData)
                 return JsonResponse(data= {'Message': f'Deleted Time off request {inputData['id']}'}, status = status.HTTP_200_OK)
             except Exception as e: 
                 response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'})
