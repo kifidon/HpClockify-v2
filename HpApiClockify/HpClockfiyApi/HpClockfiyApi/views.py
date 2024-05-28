@@ -443,58 +443,62 @@ async def getEmployeeUsers(request: ASGIRequest):
         response (JSONResponse): Communicates back to the client the result of the request. Usually just a string or an echo of the request 
     '''
     caller = 'EmployeeUser Function '
-    secret  = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V'
-    secret2 = 'TSnab31ks1Ml1oXkZHMIzp7R33SRSedz'
-    secret3 = 'JtyuoJ1ds3tSeXB9vyPIHjRCmb0vmmDx'
-    Flag = False
-    if aunthenticateRequst(request, secret): 
-        stat = 'ACTIVE' 
-        Flag = True 
-    elif not Flag and aunthenticateRequst(request, secret2):
-        stat = 'ACTIVE'  
-        Flag = True 
-    elif not Flag and aunthenticateRequst(request, secret3): 
-        stat = 'INACTIVE'
-        Flag = True
-    if Flag: 
-        if request.method == 'POST': 
-            inputData = loads(request.body)
-            logger.debug(f'\nInput Is \n {reverseForOutput(inputData)}')
-# decode secret to find status 
-            def updateSync(inputData):
-                try: 
-                    try: 
-                        emp = Employeeuser.objects.get(id = inputData['id'])
-                        serializer = EmployeeUserSerializer(instance= emp, data = inputData, context = {'status': stat}) # change later 
-                        logger.debug('Update Path taken for User ')
-                    except Employeeuser.DoesNotExist: 
-                        serializer = EmployeeUserSerializer(data=inputData)
-                        logger.debug('Insert Path taken for user ')
+    logger.info(caller)
+    secret  = 'v9otRjmoOBTbwkf6IaBJ4VUgRGC8QU6V' # User Joined Workspace 
+    secret2 = 'TSnab31ks1Ml1oXkZHMIzp7R33SRSedz' #update User 
+    secret3 = 'Z9m05F1vt873wHG6hNAHok6l5YnJWmlM' # activate user 
+    secret4 = 'JtyuoJ1ds3tSeXB9vyPIHjRCmb0vmmDx' #deactivate User,
+    secrets = [secret, secret2, secret3, secret4]
+    try: #athenticate request 
+        index = secrets.index(request.headers['Clockify-Signature'])
+        # decode secret to find status 
+        if index <=2: 
+            stat = 'ACTIVE'
+        if index == 3: 
+            stat = 'INACTIVE'
+    except ValueError:
+        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+        logger.critical(response.content)
+        saveTaskResult(response, dumps(loads(request.body)), 'User  Function')
+        return response 
 
-                    if serializer.is_valid():
-                        serializer.save()
-                        logger.info(f'Saved User: {inputData['name']} ')
-                        return True 
-                    else: 
-                        logger.error(f'Invalid Data: {reverseForOutput(serializer.errors)}')
-                        raise ValidationError('Serializer could not be saved. Invalid data ')
-                except Exception as e: 
-                    if not isinstance(e, ValidationError): 
-                        logger.error(f'Unknown Error ({e.__traceback__.tb_lineno}) {str(e)}')
-                        raise e
-                    raise e
-
-            saveUser = sync_to_async(updateSync)
+    if request.method == 'POST': 
+        inputData = loads(request.body)
+        logger.debug(f'\nInput Is \n {reverseForOutput(inputData)}')
+        def updateSync(inputData):
             try: 
-                result = await saveUser(inputData)   
-                if result: 
-                    return JsonResponse(data={'User': inputData['name']}, status = status.HTTP_201_CREATED)  
-                else: raise Exception('Unknown Behavior ')   
+                try: 
+                    emp = Employeeuser.objects.get(id = inputData['id'])
+                    serializer = EmployeeUserSerializer(instance= emp, data = inputData, context = {'status': stat}) # change later 
+                    logger.debug('Update Path taken for User ')
+                except Employeeuser.DoesNotExist: 
+                    serializer = EmployeeUserSerializer(data=inputData)
+                    logger.debug('Insert Path taken for user ')
+
+                if serializer.is_valid():
+                    serializer.save()
+                    logger.info(f'Saved User: {inputData['name']} ')
+                    return True 
+                else: 
+                    logger.error(f'Invalid Data: {reverseForOutput(serializer.errors)}')
+                    raise ValidationError('Serializer could not be saved. Invalid data ')
             except Exception as e: 
-                logger.info(f'({e.__traceback__.tb_lineno}) - {str(e)}')    
-                response = JsonResponse(data={'Message': str(e)}, status= status.HTTP_400_BAD_REQUEST)
-                await saveTaskResult(response, inputData, caller)
-                return response
+                if not isinstance(e, ValidationError): 
+                    logger.error(f'Unknown Error ({e.__traceback__.tb_lineno}) {str(e)}')
+                    raise e
+                raise e
+
+        saveUser = sync_to_async(updateSync)
+        try: 
+            result = await saveUser(inputData)   
+            if result: 
+                return JsonResponse(data={'User': inputData['name']}, status = status.HTTP_201_CREATED)  
+            else: raise Exception('Unknown Behavior ')   
+        except Exception as e: 
+            logger.info(f'({e.__traceback__.tb_lineno}) - {str(e)}')    
+            response = JsonResponse(data={'Message': str(e)}, status= status.HTTP_400_BAD_REQUEST)
+            await saveTaskResult(response, inputData, caller)
+            return response
     else: 
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
         saveTaskResult(response, dumps(loads(request.body)), 'User  Function')
