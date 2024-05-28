@@ -224,6 +224,7 @@ class EntrySerializer(serializers.Serializer):
     def create(self, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Create Entry Called')
+        logger.debug(validated_data)
         if validated_data.get('hourlyRate') is not None:
             if validated_data['billable'] == True:
                 logger.warning('No Rate on billable Entry')
@@ -250,6 +251,7 @@ class EntrySerializer(serializers.Serializer):
     def update(self, instance: Entry, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Entry Called')
+        logger.debug(validated_data)
         try:
             # instance.id = instance.id
             try:
