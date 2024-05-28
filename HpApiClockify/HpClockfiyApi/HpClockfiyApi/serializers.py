@@ -234,12 +234,16 @@ class EntrySerializer(serializers.Serializer):
             timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
         except Exception as e:
             timesheet = None 
+        logger.debug(validated_data['billable'])
+        if validated_data['billable'] == False:
+            bill = False
+        else: bill= True
         entry = Entry.objects.create(
             id= validated_data['id'],
             timesheetId = timesheet,
             duration = timeDuration(validated_data.get('timeInterval').get('duration')),
             description = validated_data.get('description'),
-            billable = validated_data.get('billable') ,
+            billable = bill ,
             project = Project.objects.get(id=validated_data.get('project').get('id')),
             hourlyRate = Rate,
             start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
@@ -253,6 +257,10 @@ class EntrySerializer(serializers.Serializer):
         logger.info('Update Entry Called')
         logger.debug(validated_data)
         try:
+            logger.debug(validated_data['billable'])
+            if validated_data['billable'] == False:
+                bill = False
+            else: bill= True
             # instance.id = instance.id
             try:
                 instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
@@ -261,7 +269,7 @@ class EntrySerializer(serializers.Serializer):
                 logger.debug(type(e))
             instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
             instance.description = validated_data.get('description') or instance.description
-            instance.billable = validated_data.get('billable') or instance.billable
+            instance.billable = bill or instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
             if validated_data.get('hourlyRate') is not None:     
                 instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
