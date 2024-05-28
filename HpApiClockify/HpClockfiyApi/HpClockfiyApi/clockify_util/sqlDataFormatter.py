@@ -15,7 +15,7 @@ def MonthylyProjReport(startDate = None, endDate = None):
             year = str(int(year) - 1).rjust(2, '0')
         else: previousMonth = str(int(month) -1 ).rjust(2, '0')
         startDate = f"20{year}-{previousMonth}-25"
-        endDate = f"20{year}-{month}-24"
+        endDate = f"20{year}-{month}-25"
     else: 
         month = endDate[5:7]
         year = endDate[2:4]
