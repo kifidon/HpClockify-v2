@@ -264,7 +264,7 @@ class EntrySerializer(serializers.Serializer):
             instance.billable = validated_data.get('billable') or instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
             if validated_data.get('hourlyRate') is not None:     
-                instance.rate = validated_data.get('hourlyRate').get('amount') 
+                instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
             else: instance.hourlyRate =  -1
             instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
             instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
