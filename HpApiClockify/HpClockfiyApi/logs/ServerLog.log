@@ -1454,3 +1454,24 @@ Input Is
 2024-05-28 09:14:20,334 - server - INFO - BillableReport Called
 2024-05-28 09:16:31,193 - server - INFO - BillableReport Called
 2024-05-28 09:17:17,568 - server - INFO -  C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-24-5
+2024-05-28 11:08:16,211 - server - INFO - Validating Request...
+2024-05-28 11:08:16,212 - server - DEBUG - me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy
+2024-05-28 11:08:16,212 - server - INFO - Request Validated!
+2024-05-28 11:08:16,212 - server - INFO - POST: updateTimesheet
+2024-05-28 11:08:16,214 - server - ERROR - Unknown error (113): 'id'
+2024-05-28 11:08:23,078 - server - ERROR - Caught Exception (518): 'id'
+2024-05-28 11:08:32,501 - server - INFO - Validating Request...
+2024-05-28 11:08:32,502 - server - DEBUG - me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy
+2024-05-28 11:08:32,502 - server - INFO - Request Validated!
+2024-05-28 11:08:32,503 - server - INFO - POST: updateTimesheet
+2024-05-28 11:08:34,157 - server - INFO - UpdateTimesheet:"665609d23bee8e1f16204725"202
+2024-05-28 11:11:15,490 - server - INFO - Validating Request...
+2024-05-28 11:11:15,500 - server - DEBUG - me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy
+2024-05-28 11:11:15,500 - server - INFO - Request Validated!
+2024-05-28 11:11:15,500 - server - INFO - POST: updateTimesheet
+2024-05-28 11:11:18,149 - server - INFO - UpdateTimesheet:"665609d23bee8e1f16204725"202
+2024-05-28 11:13:27,230 - server - INFO - Validating Request...
+2024-05-28 11:13:27,230 - server - DEBUG - me1lD8vSd5jqmBeaO2DpZvtQ2Qbwzrmy
+2024-05-28 11:13:27,230 - server - INFO - Request Validated!
+2024-05-28 11:13:27,230 - server - INFO - POST: updateTimesheet
+2024-05-28 11:13:30,008 - server - INFO - UpdateTimesheet:"665609d23bee8e1f16204725"202
