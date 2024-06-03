@@ -1,9 +1,10 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
 from .sqlDataFormatter import MonthylyProjReport, WeeklyTimeSheet
-
+import asyncio
 import datetime
 import pytz
+from asgiref.sync import sync_to_async
 from .. Loggers import setup_server_logger
 logger = setup_server_logger('DEBUG')
 
@@ -23,7 +24,8 @@ def UserEvent(wkSpaceName = 'Hill Plain'):
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
-def ClientEvent(wkSpaceName = 'Hill Plain'):
+async def ClientEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -34,11 +36,13 @@ def ClientEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushClients(wid, conn, cursor))
+    clients = sync_to_async(ClockifyPushV3.pushClients, thread_sensitive=True)
+    logger.info( await clients(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
-def ProjectEvent(wkSpaceName = 'Hill Plain'):
+async def ProjectEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -49,11 +53,13 @@ def ProjectEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushProjects(wid, conn, cursor))
+    projects = sync_to_async(ClockifyPushV3.pushProjects, thread_sensitive=True)
+    logger.info(await projects(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
-def PolicyEvent(wkSpaceName = 'Hill Plain'):
+async def PolicyEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -64,7 +70,8 @@ def PolicyEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushPolicies(wid, conn, cursor))
+    policies = sync_to_async(ClockifyPushV3.pushPolicies, thread_sensitive= True)
+    logger.info(await policies(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
@@ -96,7 +103,9 @@ def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     logger.info(ClockifyPushV3.pushTimeOff(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
-def UserGroupEvent(wkSpaceName = 'Hill Plain'):
+
+async def HolidayEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -107,7 +116,25 @@ def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushUserGroups(wid, conn, cursor))
+    holidays = sync_to_async(ClockifyPushV3.pushHolidays, thread_sensitive=True)
+    logger.info(await holidays(wid, conn, cursor))
+    cleanUp(conn=conn, cursor=cursor)
+    return 1
+
+async def UserGroupEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Called')
+    wid = ClockifyPushV3.getWID(wkSpaceName)
+    cursor , conn = sqlConnect()
+    attempts = 0
+    while cursor is None and conn is None and attempts < 10:
+        attempts += 1
+        logger.info(f" Retrying.....Connecting to server")
+        cursor , conn = sqlConnect()
+    if cursor is None and conn is None:
+        logger.error('cannot connect to server')
+        return 0
+    usergroups = sync_to_async(ClockifyPushV3.pushUserGroups, thread_sensitive= True)
+    logger.info(await usergroups(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
 def CreateTextFile():
@@ -131,15 +158,16 @@ def weeklyPayroll(start_date = None, end_date = None):
     logger.info(f" {file_path}")
     return file_path
 
-def main():
-    UserEvent()
-    ClientEvent()
-    ProjectEvent()
-    PolicyEvent()
-    TimesheetEvent()
-    TimeOffEvent()
-    UserGroupEvent()
-    return 'Opperation Complete. View Logging For errors @: https://hpclockifyapi.azurewebsites.net/'
+async def main(): # Move the sql connection to the thread to increase performance by running async 
+    await asyncio.gather(
+        
+    (ClientEvent()),
+    (ProjectEvent()),
+    (PolicyEvent()),
+    (HolidayEvent()),
+    (UserGroupEvent())
+    )
+    return 'Opperation Complete. View Logging For errors'
 
 if __name__ == "__main__":
     main()
