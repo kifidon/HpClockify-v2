@@ -775,7 +775,7 @@ async def newExpense(request: ASGIRequest):
                     return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) 
                 except ValidationError as e:
                     return JsonResponse(data={'Message': 'Invalid Inlput data. Review selections and try again'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         else:
             response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
             await saveTaskResult(response, dumps(loads(request.body)), 'NewExpense Function')
@@ -804,7 +804,7 @@ async def newEntry(request:ASGIRequest):
     '''
     caller = 'New Entry view called'
     logger = setup_server_logger()
-    logger.info(request.headers)
+    logger.debug(request.headers)
     logger.info(caller)
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  

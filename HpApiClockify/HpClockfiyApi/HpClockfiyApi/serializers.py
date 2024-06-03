@@ -367,7 +367,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Expense
-        fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']
+        fields = "__all__"
         
 class TimeOffSerializer(serializers.ModelSerializer): 
     '''
