@@ -747,10 +747,10 @@ async def newExpense(request: ASGIRequest):
     secret2 = 'l7Zqmv1BMxNPsTKKtWYEsjsHNpSfnUrj' #UpdateExpene
     try: 
         if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+            inputData = loads(request.body)
+            logger.debug(dumps(inputData, indent=4))
+            
             if request.method == 'POST':
-                inputData = loads(request.body)
-                logger.debug(dumps(inputData, indent=4))
-                
                 def processExpense(inputData): # returns a flag for each possible FK or PK constraint raised. Only handles C flag as of May 22 2024
                     try: 
                         expenseId = create_hash(inputData['userId'], inputData['categoryId'], inputData['date'])
@@ -766,7 +766,7 @@ async def newExpense(request: ASGIRequest):
                                 logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
                             raise ValidationError(serializer.errors)
                     except Exception as e: 
-                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)}')
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
 
                 processExpenseAsync = sync_to_async(processExpense)
@@ -774,8 +774,37 @@ async def newExpense(request: ASGIRequest):
                     result = await processExpenseAsync(inputData)
                     return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) 
                 except ValidationError as e:
-                    return JsonResponse(data={'Message': 'Invalid Inlput data. Review selections and try again'}, status=status.HTTP_400_BAD_REQUEST)
+                    return JsonResponse(data={'Message': 'Invalid Input data. Review selections and try again. A simliar Expense may already exist'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            elif request.method == 'PUT':
+                def UpdateExpense(inputData): # returns a flag for each possible FK or PK constraint raised. Only handles C flag as of May 22 2024
+                    try: 
+                        expense = Expense.objects.get(id=inputData['id'])
+                        serializer = ExpenseSerializer(data=inputData, instance=expense)
+                        if serializer.is_valid():
+                            serializer.save()
+                            logger.info(reverseForOutput(inputData))
+                            logger.info(f'Updated Expense with Id - {inputData['id']}')
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except Expense.DoesNotExist as e:
+                        logger.critical(f'input id is {inputData['id']}')
+                        raise e
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
 
+                processExpenseAsync = sync_to_async(UpdateExpense)
+                try:
+                    result = await processExpenseAsync(inputData)
+                    return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED) 
+                except ValidationError as e:
+                    return JsonResponse(data={'Message': 'Invalid Input data. Review selections and try again. A simliar Expense may already exist'}, status=status.HTTP_400_BAD_REQUEST)
+            else: 
+                return JsonResponse(data = None, status=status.HTTP_510_NOT_EXTENDED, safe= False)
         else:
             response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
             await saveTaskResult(response, dumps(loads(request.body)), 'NewExpense Function')
