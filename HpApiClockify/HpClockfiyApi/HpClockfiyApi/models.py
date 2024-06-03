@@ -139,7 +139,7 @@ class Category(models.Model):
         return self.name or ""
     
 class Expense(models.Model):
-    id = models.CharField(primary_key=True,max_length = 50 )
+    id = models.CharField(primary_key=True,max_length = 64 )
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     userId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='userId')
     date = models.DateField(blank=False, null = False)
