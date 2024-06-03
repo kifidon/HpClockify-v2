@@ -76,8 +76,9 @@ def MonthylyProjReport(startDate = None, endDate = None):
             outputRows = cursor.fetchall()
             outputRows = [['' if val is None else val for val in row] for row in outputRows]
             df = pd.DataFrame(outputRows, columns = ['Number', 'Row', 'Name', 'Supplier', 'Qty', 'Unit', 'Unit Cost', 'Amount'] )
+            MonthFile = 0 + month
             if not (df.empty):
-                df.iloc[0,0] = f"HP-IND-{year}-{month}-{df.iloc[0,0]}" 
+                df.iloc[0,0] = f"HP-IND-{year}-{MonthFile[-2:]}-{df.iloc[0,0]}" 
                 df.iloc[0, 2] =f"{getAbbreviation(month, year)} Indirect: {df.iloc[0,2]}" 
 
                 df.to_excel(file_path, index = False)

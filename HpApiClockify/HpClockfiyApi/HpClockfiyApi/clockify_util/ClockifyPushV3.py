@@ -361,13 +361,14 @@ def pushClients(wkSpaceID, conn, cursor):
             cEmail = client['email']
             cAddress = client['address']
             cName = client ['name']
+            CNotes = client['note']
             try:
                 cursor.execute(
                     '''
-                    INSERT INTO Client ( id, email, address, name, workspace_id)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO Client ( id, email, address, name, workspace_id, longName)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     ''',
-                    (cID, cEmail, cAddress, cName, wkSpaceID)
+                    (cID, cEmail, cAddress, cName, wkSpaceID, CNotes)
                 )
                 logger.info(f"Adding Client information...({count})")
                 count += 1
@@ -375,7 +376,7 @@ def pushClients(wkSpaceID, conn, cursor):
                 if 'PRIMARY KEY constraint' in str(e) or 'PRIMARY KEY constraint' in str(e):
                     cursor.execute( 
                         '''
-                        SELECT email, address, name FROM Client
+                        SELECT email, address, name, longName FROM Client
                         Where id = ? and workspace_id = ?
                         ''', (cID, wkSpaceID)
                     )
@@ -384,6 +385,7 @@ def pushClients(wkSpaceID, conn, cursor):
                         ((cEmail is not None or oldClient[0] is not None) and cEmail != oldClient[0])
                         or ((cAddress is not None or oldClient[1] is not None) and cAddress != oldClient[1])
                         or ((cName is not None or oldClient[2] is not None) and cName != oldClient[2])
+                        or ((CNotes is not None or oldClient[3] is not None) and cName != oldClient[3])
                     ):
                         cursor.execute(
                             '''
@@ -391,11 +393,12 @@ def pushClients(wkSpaceID, conn, cursor):
                             set 
                                 email = ?,
                                 address = ?,
-                                name = ?
+                                name = ?,
+                                longName = ?
                             where 
                                 id = ? and workspace_id = ?
                             ''',
-                            (cEmail, cAddress, cName, cID, wkSpaceID)
+                            (cEmail, cAddress, cName, cID, wkSpaceID, CNotes)
                         )
                         logger.info(f"\tUpdating Client information...({update})")
                         update += 1
