@@ -10,7 +10,19 @@ from ..models import BackGroundTaskResult
 from django.http import JsonResponse, HttpResponse
 import os 
 import shutil
+import hashlib
 
+def create_hash(user_id, category_id, date_string):
+    # Concatenate the user ID, category ID, and date string
+    combined_string = user_id + category_id + date_string
+    
+    # Calculate the SHA-256 hash of the combined string
+    hash_object = hashlib.sha256(combined_string.encode())
+    
+    # Get the hexadecimal representation of the hash and truncate it to 64 characters
+    hash_id = hash_object.hexdigest()[:64]
+    
+    return hash_id
 
 def download_text_file(folder_path = None):
     

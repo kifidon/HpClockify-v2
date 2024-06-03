@@ -48,7 +48,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash
 from . import settings
 
 import httpx
@@ -748,82 +748,34 @@ async def newExpense(request: ASGIRequest):
     try: 
         if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
             if request.method == 'POST':
-                try:
-                    inputData = loads(request.body)
-                    RetryFlag = False
-                except JSONDecodeError: # if request comes from internal secondary server then the inputData must be accesed differently
-                    logger.info('Called Internally')
-                    inputData = request.POST  
-                    RetryFlag = True
-                except Exception:
-                    logger.warning('Unknown Exception, attempting to handle')
-                    inputData = request.POST
-                    RetryFlag = True
+                inputData = loads(request.body)
                 logger.debug(dumps(inputData, indent=4))
                 
                 def processExpense(inputData): # returns a flag for each possible FK or PK constraint raised. Only handles C flag as of May 22 2024
-                    try:
-                        expense = Expense.objects.get(id=inputData['id'])
-                        serializer = ExpenseSerializer(data= inputData, instance=expense)
-                        logger.info('Updating Expense')
-                    except Expense.DoesNotExist:
-                        logger.info('Inserting New Expense ')
-                        serializer = ExpenseSerializer(data = inputData)
-                    try:
+                    try: 
+                        expenseId = create_hash(inputData['userId'], inputData['categoryId'], inputData['date'])
+                        inputData['id'] = expenseId
+                        serializer = ExpenseSerializer(data=inputData)
                         if serializer.is_valid():
                             serializer.save()
                             logger.info(reverseForOutput(inputData))
                             logger.info(f'Saved Expense with Id - {inputData['id']}')
-                            return True, 'V' # V for valid 
+                            return True
                         else:
-            # Possibly turn this into another thread 
-                            #force backgroung task 
-                            logger.warning(f'Serializer could not be saved: {serializer.errors}')
                             for key, value in serializer.errors.items():
                                 logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                                # Check if the value is an instance of ErrorDetail
-                                if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                                    # Print the key and each error code and message
-                                    for error_detail in value:
-                                        code = error_detail.code
-                                        field = key
-                                        '''
-                                        include check for other foreign keys to know which foreign key 
-                                        constraint is violated and which function should handle it
-                                        '''
-                                        if code == 'does_not_exist': 
-                                            return False, 'C' # C for category P for Project, F for file in later updates 
-                            return False, 'X' # Unknown, Raise error (BAD Request)
-                    except Exception as e:
-                        logger.error(f'Unknown Error Caught -{e} at {e.__traceback__.tb_lineno}')
-                        return False, 'X'
+                            raise ValidationError(serializer.errors)
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)}')
+                        raise e
 
-                async def callBackgroungCategory():
-                    if not RetryFlag:
-                        url =  'http://localhost:5000/HpClockifyApi/task/retryExpense'
-                        async with httpx.AsyncClient(timeout=300) as client:
-                            await client.post(url=url, data=inputData)
-                    else: 
-                        logger.error('Max retries reached. Failing task')
-                            
                 processExpenseAsync = sync_to_async(processExpense)
-                result = await processExpenseAsync(inputData)
-                if result[0]:
-                    return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) # validated data later
-                elif result[1] == 'C':
-                    # Enqueue a background task to retry the operation
-                    asyncio.create_task(callBackgroungCategory()) 
-                    return JsonResponse(
-                        data={
-                            'Message': 'Foreign Key Constraint on Category. Calling background task and trying again. Review Logs for result '
-                            }, status=status.HTTP_307_TEMPORARY_REDIRECT)
-                elif result[1] == 'X':
-                    return JsonResponse(
-                        data= {
-                            'Message': 'Post Data could not be validated. Review Logs'
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                    )
+                try:
+                    result = await processExpenseAsync(inputData)
+                    return JsonResponse(data=inputData, status=status.HTTP_201_CREATED) 
+                except ValidationError as e:
+                    return JsonResponse(data={'Message': 'Invalid Inlput data. Review selections and try again'}, status=status.HTTP_400_BAD_REQUEST)
+        
         else:
             response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
             await saveTaskResult(response, dumps(loads(request.body)), 'NewExpense Function')

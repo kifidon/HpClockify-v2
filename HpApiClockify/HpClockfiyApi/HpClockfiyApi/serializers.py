@@ -363,14 +363,8 @@ class ExpenseSerializer(serializers.ModelSerializer):
             "total": 10000
         }
     '''
-    date = serializers.DateField(input_formats=['%Y-%m-%dT%H:%M:%SZ'])
+    date = serializers.DateField(input_formats=['%m/%d/%Y'])
     
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['workspaceId'] = str(instance['workspaceId'])
-        data['userId'] = str(instance['userId']) 
-        data['projectId'] = str(instance['projectId']) 
-        return data
     class Meta:
         model = Expense
         fields = ['id', 'workspaceId','userId', 'date', 'categoryId', 'projectId',  'notes', 'quantity', 'billable', 'fileId', 'timesheetId', 'total']

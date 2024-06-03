@@ -147,10 +147,9 @@ class Expense(models.Model):
     categoryId = models.ForeignKey(Category, models.DO_NOTHING, db_column='categoryId' )
     notes = models.TextField(blank=True, null=True)
     quantity = models.FloatField( blank=True, null=True)
-    billable = models.BooleanField(default=True, max_length=1)
-    fileId = models.CharField(max_length=50, blank=True, null=True)
-    total = models.IntegerField( blank=True, null=True)
-    timesheetId = models.ForeignKey(Timesheet, models.CASCADE, blank= True, null=True, db_column='timesheetId')
+    subTotal = models.FloatField( blank=True, null=True)
+    taxes = models.FloatField( blank=True, null=True)
+    
 
     class Meta:
         managed = False
