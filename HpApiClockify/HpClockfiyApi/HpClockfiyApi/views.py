@@ -810,7 +810,8 @@ async def newExpense(request: ASGIRequest):
             await saveTaskResult(response, dumps(loads(request.body)), 'NewExpense Function')
             return response
     except Exception as e: 
-        response = JsonResponse(data={'Invalid Request': f'Error Occured On server: {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        response = JsonResponse(data={'Invalid Request': f'Error Occured On server ({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        logger.error(response.content)
         return response
 
 @csrf_exempt
