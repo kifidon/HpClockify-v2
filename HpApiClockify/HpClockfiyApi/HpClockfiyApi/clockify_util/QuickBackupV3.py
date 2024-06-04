@@ -160,7 +160,6 @@ def weeklyPayroll(start_date = None, end_date = None):
 
 async def main(): # Move the sql connection to the thread to increase performance by running async 
     await asyncio.gather(
-        
     (ClientEvent()),
     (ProjectEvent()),
     (PolicyEvent()),
