@@ -179,7 +179,7 @@ class TimeOffRequests(models.Model):
 class FilesForExpense(models.Model):
     expenseId = models.CharField(max_length=64, primary_key=True, db_column= 'expenseId')
     workspaceId = models.CharField(max_length=50, db_column='workspaceId')
-    binaryData = models.BinaryField(db_column='binaryData')
+    binaryData = models.TextField(db_column='binaryData')
     class Meta: 
         managed = False 
         db_table = 'FilesForExpense'

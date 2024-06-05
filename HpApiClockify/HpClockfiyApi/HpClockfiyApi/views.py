@@ -1009,12 +1009,6 @@ def requestFilesForExpense(request:ASGIRequest):
     if request.method == 'PUT':
         try:
             inputData = loads(request.body)
-            imageData = inputData['binaryData'] 
-            # Extract the Base64 encoded image data (remove the data URL prefix)
-            base64_data = imageData.split(",")[1]
-            # Decode the Base64 string into binary data
-            binary_data = base64.b64decode(base64_data)
-            inputData['binaryData'] = binary_data
             try: 
                 file = FilesForExpense.objects.get(expenseId = inputData['expenseId'])
                 serializer = FileExpenseSerializer(instance= file, data = inputData)
@@ -1022,8 +1016,10 @@ def requestFilesForExpense(request:ASGIRequest):
                 logger.critical('Cannot find a corresponding record')
                 raise FilesForExpense.DoesNotExist('Cannot Find a Corresponding record')
             if serializer.is_valid():
+                logger.debug('Validated')
                 serializer.save()
                 logger.info(f'Opperation Complete for Expense {inputData['expenseId']}')
+                logger.debug(inputData['binaryData'])
                 return JsonResponse(data='SUCCSESFUL', status = status.HTTP_201_CREATED, safe= False)
             else: 
                 for key, value in serializer.errors.items():
