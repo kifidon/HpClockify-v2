@@ -1001,12 +1001,12 @@ async def deleteExpense(request: ASGIRequest):
         await saveTaskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
         return response
     
-@api_view(['POST', "PUT"])
+@api_view(["PUT"])
 @csrf_exempt
 def requestFilesForExpense(request:ASGIRequest): 
     logger = setup_server_logger()
     logger.info('Inserting Recipt into Database for an Expense...')
-    if request.method == 'POST':
+    if request.method == 'PUT':
         try:
             inputData = loads(request.body)
             imageData = inputData['binaryData'] 
@@ -1015,7 +1015,12 @@ def requestFilesForExpense(request:ASGIRequest):
             # Decode the Base64 string into binary data
             binary_data = base64.b64decode(base64_data)
             inputData['binaryData'] = binary_data
-            serializer = FileExpenseSerializer(data=inputData)
+            try: 
+                file = FilesForExpense.objects.get(expenseId = inputData['expenseId'])
+                serializer = FileExpenseSerializer(instance= file, data = inputData)
+            except FilesForExpense.DoesNotExist as e: 
+                logger.critical('Cannot find a corresponding record')
+                raise FilesForExpense.DoesNotExist('Cannot Find a Corresponding record')
             if serializer.is_valid():
                 serializer.save()
                 logger.info(f'Opperation Complete for Expense {inputData['expenseId']}')
