@@ -27,6 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils  #, transaction
 from .serializers import (
     EmployeeUserSerializer,
+    FileExpenseSerializer,
     TimesheetSerializer,
     TimeOffSerializer,
     ExpenseSerializer,
@@ -35,6 +36,7 @@ from .serializers import (
 )
 from .models import(
     TimeOffRequests,
+    FilesForExpense,
     Employeeuser,
     Timesheet,
     Expense,
@@ -49,11 +51,12 @@ import os
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash
+from . Loggers import setup_server_logger
 from . import settings
 
-import httpx
-from . Loggers import setup_server_logger
 from json.decoder import JSONDecodeError
+import httpx
+import base64
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
@@ -955,7 +958,6 @@ async def deleteEntry(request:ASGIRequest):
         await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
         return response
 
-
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
     '''
@@ -998,3 +1000,35 @@ async def deleteExpense(request: ASGIRequest):
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
         await saveTaskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
         return response
+    
+@csrf_exempt
+async def requestFilesForExpense(request:ASGIRequest): 
+    logger = setup_server_logger()
+    logger.info('Inserting Recipt into Database for an Expense...')
+    if request.method == 'POST':
+        try:
+            inputData = loads(request.body)
+            imageData = inputData['binaryData'] 
+            # Extract the Base64 encoded image data (remove the data URL prefix)
+            base64_data = imageData.split(",")[1]
+            # Decode the Base64 string into binary data
+            binary_data = base64.b64decode(base64_data)
+            inputData['binaryData'] = binary_data
+            serializer = FileExpenseSerializer(data=inputData)
+            if serializer.is_valid():
+                serializer.save()
+                logger.info(f'Opperation Complete for Expense {inputData['expenseId']}')
+                return JsonResponse(data='SUCCSESFUL', status = status.HTTP_201_CREATED, safe= False)
+            else: 
+                for key, value in serializer.errors.items():
+                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                raise ValidationError(serializer.errors)
+        except ValidationError as e:
+            return JsonResponse(data={'Message': 'Invalid Input data. Could not serialize image'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f'Caught Exception ({e.__traceback__.tb_lineno}) - {str(e)}')
+            response = JsonResponse(data={'Invalid Request': f'Error Occured On server'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            taskResult(response=response, inputData=inputData, caller='requestFilesForExpense')
+            return response
+
+            
