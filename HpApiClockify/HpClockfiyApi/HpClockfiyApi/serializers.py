@@ -116,8 +116,9 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         logger = setup_background_logger() 
+        logger.debug(self.initial_data)
         try:
-            validated_data['status'] = self.get_status(self.context)
+            validated_data['status'] = self.get_status(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data)
             logger.debug(dumps(validated_data, indent = 4))
