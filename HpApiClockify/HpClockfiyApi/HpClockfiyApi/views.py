@@ -458,11 +458,13 @@ async def getEmployeeUsers(request: ASGIRequest):
     try: #athenticate request 
         index = secrets.index(request.headers['Clockify-Signature'])
         # decode secret to find status 
+        logger.debug(index)
         if index <=2: 
             stat = 'ACTIVE'
-        if index == 3: 
+        elif index == 3: 
             stat = 'INACTIVE'
-        else: stat = 'UNKNOWN'
+        else: 
+            raise ValueError
     except ValueError:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
         logger.critical(response.content)
@@ -471,15 +473,16 @@ async def getEmployeeUsers(request: ASGIRequest):
 
     if request.method == 'POST': 
         inputData = loads(request.body)
+        inputData['status'] = stat
         logger.debug(f'\nInput Is \n {reverseForOutput(inputData)}')
         def updateSync(inputData):
             try: 
                 try: 
                     emp = Employeeuser.objects.get(id = inputData['id'])
-                    serializer = EmployeeUserSerializer(instance= emp, data = inputData, context = {'status': stat}) # change later 
+                    serializer = EmployeeUserSerializer(instance= emp, data = inputData) 
                     logger.debug('Update Path taken for User ')
                 except Employeeuser.DoesNotExist: 
-                    serializer = EmployeeUserSerializer(data=inputData, context = {'status': stat})
+                    serializer = EmployeeUserSerializer(data=inputData)
                     logger.debug('Insert Path taken for user')
                 if serializer.is_valid():
                     serializer.save()
