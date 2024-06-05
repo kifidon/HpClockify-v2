@@ -149,7 +149,7 @@ class Expense(models.Model):
     quantity = models.FloatField( blank=True, null=True)
     subTotal = models.FloatField( blank=True, null=True)
     taxes = models.FloatField( blank=True, null=True)
-    status = models.CharField( default = 'PENDING')
+    status = models.CharField( default = 'PENDING', blank= True, null=True)
     
 
     class Meta:
@@ -175,6 +175,16 @@ class TimeOffRequests(models.Model):
         managed = False
         db_table = 'TimeOffRequests'
         unique_together = (('id', 'workspaceId'))
+
+class FilesForExpense(models.Model):
+    expenseId = models.ForeignKey(Expense, on_delete= models.CASCADE, primary_key=True)
+    workspaceId = models.ForeignKey(Workspace, on_delete=models.DO_NOTHING)
+    binaryData = models.BinaryField()
+    class Meta: 
+        managed = False 
+        db_table = 'FilesForExpense'
+        unique_together= (('expenseId', 'workspaceId'))
+
 
 class BackGroundTaskResult(models.Model):
     status_code = models.IntegerField(default=404)

@@ -9,7 +9,8 @@ from .models import(
     Tagsfor,
     Expense, 
     Category,
-    TimeOffRequests
+    TimeOffRequests,
+    FilesForExpense
 )
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
@@ -465,3 +466,8 @@ class TimeOffSerializer(serializers.ModelSerializer):
         model = TimeOffRequests
         fields = '__all__'
 
+class FileExpenseSerializer(serializers.ModelSerializer):
+
+    class Meta: 
+        model = FilesForExpense
+        fields = "__all__"
