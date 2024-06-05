@@ -462,6 +462,7 @@ async def getEmployeeUsers(request: ASGIRequest):
             stat = 'ACTIVE'
         if index == 3: 
             stat = 'INACTIVE'
+        else: stat = 'UNKNOWN'
     except ValueError:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
         logger.critical(response.content)
@@ -478,9 +479,8 @@ async def getEmployeeUsers(request: ASGIRequest):
                     serializer = EmployeeUserSerializer(instance= emp, data = inputData, context = {'status': stat}) # change later 
                     logger.debug('Update Path taken for User ')
                 except Employeeuser.DoesNotExist: 
-                    serializer = EmployeeUserSerializer(data=inputData)
-                    logger.debug('Insert Path taken for user ')
-
+                    serializer = EmployeeUserSerializer(data=inputData, context = {'status': stat})
+                    logger.debug('Insert Path taken for user')
                 if serializer.is_valid():
                     serializer.save()
                     logger.info(f'Saved User: {inputData['name']} ')
