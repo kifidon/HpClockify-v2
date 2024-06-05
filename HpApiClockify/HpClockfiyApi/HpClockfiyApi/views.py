@@ -1001,7 +1001,8 @@ async def deleteExpense(request: ASGIRequest):
         await saveTaskResult(response, dumps(loads(request.body)), 'DeleteExpense Function')
         return response
     
-api_view(['POST', "PUT"])
+@api_view(['POST', "PUT"])
+@csrf_exempt
 def requestFilesForExpense(request:ASGIRequest): 
     logger = setup_server_logger()
     logger.info('Inserting Recipt into Database for an Expense...')

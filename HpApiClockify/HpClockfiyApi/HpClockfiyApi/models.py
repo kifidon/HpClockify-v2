@@ -177,9 +177,9 @@ class TimeOffRequests(models.Model):
         unique_together = (('id', 'workspaceId'))
 
 class FilesForExpense(models.Model):
-    expenseId = models.ForeignKey(Expense, on_delete= models.CASCADE, primary_key=True)
-    workspaceId = models.ForeignKey(Workspace, on_delete=models.DO_NOTHING)
-    binaryData = models.BinaryField()
+    expenseId = models.ForeignKey(Expense, on_delete= models.CASCADE, primary_key=True, db_column= 'expenseId')
+    workspaceId = models.ForeignKey(Workspace, on_delete=models.DO_NOTHING, db_column='workspaceId')
+    binaryData = models.BinaryField(db_column='binaryData')
     class Meta: 
         managed = False 
         db_table = 'FilesForExpense'
