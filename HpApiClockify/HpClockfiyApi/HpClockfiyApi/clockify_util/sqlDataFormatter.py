@@ -119,7 +119,8 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
             where exists (
                 select 1 From Entry en 
                 inner join TimeSheet ts on ts.id = en.time_sheet_id
-                where ts.status = 'APPROVED'
+                inner join EmployeeUser eu on eu.id = ts.emp_id
+                where ts.status = 'APPROVED' and eu.hasTruck = 1
             )
             '''
         )
