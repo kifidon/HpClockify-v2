@@ -219,7 +219,7 @@ def getAbbreviation(month = None, year = None ):
         '12': 'Dec'
     }
     if month is None:
-        month, year = getMonthYear()
+        month, year = getMonthYear() # current month 
     return f"{ months.get(month, f'Invalid Month: {month}')} 20{year}"
 
 
