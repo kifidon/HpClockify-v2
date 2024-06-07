@@ -1,0 +1,499 @@
+2024-06-07 14:34:46,130 - server - INFO - EmployeeUser Function 
+2024-06-07 14:35:14,293 - server - INFO - EmployeeUser Function 
+2024-06-07 14:35:22,621 - server - INFO - EmployeeUser Function 
+2024-06-07 14:35:22,621 - server - CRITICAL - b'{"Invalid Request": "SECURITY ALERT"}'
+2024-06-07 14:36:42,071 - server - INFO - EmployeeUser Function 
+2024-06-07 14:36:42,073 - server - CRITICAL - b'{"Invalid Request": "SECURITY ALERT"}'
+2024-06-07 14:36:57,408 - server - INFO - EmployeeUser Function 
+2024-06-07 14:36:57,409 - server - DEBUG - 1
+2024-06-07 14:36:57,410 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:37:00,425 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:37:00,636 - server - ERROR - Unknown Error (488) 'hasTruck'
+2024-06-07 14:37:00,642 - server - INFO - (502) - 'hasTruck'
+2024-06-07 14:39:06,188 - server - INFO - EmployeeUser Function 
+2024-06-07 14:39:06,188 - server - DEBUG - 1
+2024-06-07 14:39:06,188 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:39:08,278 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:39:08,436 - server - ERROR - Unknown Error (488) 'hasTruck'
+2024-06-07 14:39:08,438 - server - INFO - (502) - 'hasTruck'
+2024-06-07 14:40:58,793 - server - INFO - EmployeeUser Function 
+2024-06-07 14:40:58,794 - server - DEBUG - 1
+2024-06-07 14:40:58,795 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:41:00,949 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:41:01,108 - server - ERROR - Unknown Error (488) 'hasTruck'
+2024-06-07 14:41:01,108 - server - INFO - (502) - 'hasTruck'
+2024-06-07 14:41:56,219 - server - INFO - EmployeeUser Function 
+2024-06-07 14:41:56,220 - server - DEBUG - 1
+2024-06-07 14:41:56,220 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:41:58,512 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:41:58,701 - server - ERROR - Unknown Error (488) cannot access local variable 'e' where it is not associated with a value
+2024-06-07 14:41:58,703 - server - INFO - (502) - cannot access local variable 'e' where it is not associated with a value
+2024-06-07 14:42:50,832 - server - INFO - EmployeeUser Function 
+2024-06-07 14:42:50,833 - server - DEBUG - 1
+2024-06-07 14:42:50,833 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:42:53,106 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:42:53,635 - server - INFO - Saved User: Jeff McLeod 
+2024-06-07 14:44:31,535 - server - INFO - EmployeeUser Function 
+2024-06-07 14:44:31,535 - server - DEBUG - 1
+2024-06-07 14:44:31,535 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:44:33,772 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:44:34,251 - server - INFO - Saved User: Jeff McLeod 
+2024-06-07 14:46:23,840 - server - INFO - EmployeeUser Function 
+2024-06-07 14:46:23,840 - server - DEBUG - 1
+2024-06-07 14:46:23,840 - server - DEBUG - 
+Input Is 
+ }
+    "status": "ACTIVE"
+    ],
+        }
+            "type": "CHECKBOX"
+            "name": "hasTruck",
+            "value": true,
+            "customFieldId": "66636c8285def31fcde9e5c3",
+        {
+        },
+            "type": "TXT"
+            "name": "Start Date",
+            "value": "2023-08-23",
+            "customFieldId": "664d0d56a17be2283ae908ec",
+        {
+        },
+            "type": "DROPDOWN_SINGLE"
+            "name": "Role",
+            "value": "OM",
+            "customFieldId": "664d0d0a6a8fa06c786a886e",
+        {
+    "userCustomFields": [
+    },
+        "theme": "DEFAULT"
+        "showOnlyWorkingDays": false,
+        "scheduling": false,
+        "multiFactorEnabled": false,
+        "lang": "EN",
+        "projectPickerSpecialFilter": false,
+        "darkTheme": false,
+        "myStartOfDay": "09:00",
+        "groupSimilarEntriesDisabled": false,
+        "collapseAllProjectLists": false,
+        "projectListCollapse": 50,
+        "dashboardPinToTop": false,
+        "dashboardViewType": "PROJECT",
+        "dashboardSelection": "ME",
+        "isCompactViewOn": false,
+        },
+            "subgroup": "Time Entry"
+            "group": "Project",
+        "summaryReportSettings": {
+        "timeTrackingManual": false,
+        "onboarding": false,
+        "reminders": false,
+        "alerts": false,
+        "pto": false,
+        "approval": false,
+        "scheduledReports": false,
+        "longRunning": false,
+        "weeklyUpdates": false,
+        "sendNewsletter": false,
+        "dateFormat": "MM/DD/YYYY",
+        "timeFormat": "HOUR12",
+        "timeZone": "America/Denver",
+        "weekStart": "SUNDAY",
+    "settings": {
+    "profilePicture": "https://img.clockify.me/no-user-image.png",
+    "name": "Jeff McLeod",
+    "email": "jeff.mcleod@hillplain.com",
+    "id": "65c25e2977682a2076da0aca",
+{
+2024-06-07 14:46:25,975 - server - DEBUG - Update Path taken for User 
+2024-06-07 14:46:26,471 - server - INFO - Saved User: Jeff McLeod 
+2024-06-07 14:59:53,182 - server - INFO - BillableReport Called
+2024-06-07 15:00:11,119 - server - INFO - BillableReport Called
+2024-06-07 15:01:42,837 - server - INFO - BillableReport Called
+2024-06-07 15:04:59,189 - server - INFO - BillableReport Called
+2024-06-07 15:07:07,615 - server - INFO - BillableReport Called
+2024-06-07 15:07:57,712 - server - INFO -  C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-24-6
+2024-06-07 15:08:10,948 - server - INFO - BillableReport Called
+2024-06-07 15:08:57,589 - server - INFO -  C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-24-6
+2024-06-07 15:09:09,349 - server - INFO - BillableReport Called for Equipment
+2024-06-07 15:09:31,267 - server - INFO - BillableReport Called for Equipment
+2024-06-07 15:10:21,175 - server - INFO -  C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-EQP-24-6
+2024-06-07 15:16:09,338 - server - INFO - BillableReport Called for Equipment
+2024-06-07 15:17:01,957 - server - INFO -  C:\Users\TimmyIfidon\Desktop\Docs and Projects\HPDB Stuff\HpClockify-v2\HpApiClockify\HpClockfiyApi\HP-IND-EQP-24-06

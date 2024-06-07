@@ -199,6 +199,7 @@ def getMonthYear():
 
     # Extract the month and year
     month = str(current_date.month)
+    month = (str(0) + month)[-2:] # ensures 2 digit
     year = str(current_date.year)[2:]
     return month, year
 
@@ -219,7 +220,7 @@ def getAbbreviation(month = None, year = None ):
     }
     if month is None:
         month, year = getMonthYear()
-    return f"{ months.get(month, 'Invalid Month')} 20{year}"
+    return f"{ months.get(month, f'Invalid Month: {month}')} 20{year}"
 
 
 def get_current_time():
