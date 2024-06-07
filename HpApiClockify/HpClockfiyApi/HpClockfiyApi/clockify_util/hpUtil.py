@@ -199,6 +199,7 @@ def getMonthYear():
 
     # Extract the month and year
     month = str(current_date.month)
+    month = str(0 + int(month))[-2:] # ensures 2 digit
     year = str(current_date.year)[2:]
     return month, year
 

@@ -79,11 +79,27 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()  # validate this later 
-    
+    hasTruck = serializers.SerializerMethodField() 
+
     def get_status(self, obj):
         status = obj['status']
         return status 
-
+    
+    def get_hasTruck(self, obj):
+        logger = setup_background_logger() 
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+        try:
+            if field['hasTruck']:
+                return 1
+            else:
+                return 0
+        except Exception as e: 
+            logger.debug(type(e))
+            
+            return 0
+    
     def get_role(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
@@ -107,6 +123,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         try:
             logger.debug(self.initial_data)
             validated_data['status'] = self.get_status(self.initial_data)
+            validated_data['hasTruck'] = self.get_hasTruck(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data) 
             logger.info(dumps(validated_data, indent = 4))
@@ -121,6 +138,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['status'] = self.get_status(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data)
+            validated_data['hasTruck'] = self.get_hasTruck(self.initial_data)
             logger.debug(dumps(validated_data, indent = 4))
             updated = super().update(instance= instance, validated_data=validated_data)
             updated.save(force_update= True )

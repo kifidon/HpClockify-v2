@@ -35,7 +35,6 @@ logger = setup_background_logger(loggerLevel) #pass level argument
 
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
-
 def deleteCategory(newCategories):
     '''
     Function Description: 
@@ -57,8 +56,6 @@ def deleteCategory(newCategories):
             category.delete
             deleted += 1
     return deleted 
-
-    
 
 @csrf_exempt
 async def retryExpenses(request: ASGIRequest):   

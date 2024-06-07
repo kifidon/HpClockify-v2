@@ -48,7 +48,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash
 from . Loggers import setup_server_logger
@@ -300,6 +300,25 @@ def monthlyBillableReport(request, start_date = None, end_date= None):
     return download_text_file(folder_path)
 
 @api_view(['GET'])
+def monthlyBillableReportEquipment(request, start_date = None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('BillableReport Called for Equipment')
+    folder_path = monthlyBillableEqp(start_date, end_date )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
 def weeklyPayrollReport(request, start_date=None, end_date= None):
     '''
     Function Description: 
@@ -465,7 +484,7 @@ async def getEmployeeUsers(request: ASGIRequest):
             stat = 'INACTIVE'
         else: 
             raise ValueError
-    except ValueError:
+    except Exception:
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
         logger.critical(response.content)
         saveTaskResult(response, dumps(loads(request.body)), 'User  Function')
