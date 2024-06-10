@@ -15,7 +15,7 @@ def MonthylyProjReport(startDate = None, endDate = None):
             year = str(int(year) - 1).rjust(2, '0')
         else: previousMonth = str(int(month) -1 ).rjust(2, '0')
         startDate = f"20{year}-{previousMonth}-25"
-        endDate = f"20{year}-{month}-25"
+        endDate = f"20{year}-{month}-25" #non inclusive 
     else: 
         month = endDate[5:7]
         year = endDate[2:4]
@@ -23,14 +23,11 @@ def MonthylyProjReport(startDate = None, endDate = None):
     try:
         cursor.execute(
             f'''
-            Select 
-                 p.id, p.code
-            from Project p
-            where exists (
-                select 1 From Entry en 
-                inner join TimeSheet ts on ts.id = en.time_sheet_id
-                where ts.status = 'APPROVED'
-            )
+            select Distinct p.id,  p.code  from Project p 
+            inner join Entry en on en.project_id = p.id
+            inner join TimeSheet ts on ts.id = en.time_sheet_id
+            where ts.status = 'APPROVED' 
+            and en.start_time between '{startDate}' and '{endDate}'
             '''
         )
         pIds = cursor.fetchall()
@@ -113,18 +110,16 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
     try:
         cursor.execute(
             f'''
-            Select 
-                 p.id, p.code
-            from Project p
-            where exists (
-                select 1 From Entry en 
-                inner join TimeSheet ts on ts.id = en.time_sheet_id
-                inner join EmployeeUser eu on eu.id = ts.emp_id
-                where ts.status = 'APPROVED' and eu.hasTruck = 1
-            )
+            select Distinct p.id, p.code  from Project p 
+            inner join Entry en on en.project_id = p.id
+            inner join TimeSheet ts on ts.id = en.time_sheet_id
+            inner join EmployeeUser eu on eu.id = ts.emp_id
+            where eu.hasTruck = 1 and ts.status = 'APPROVED' and en.start_time between '{startDate}' and '{endDate}'
             '''
         )
         pIds = cursor.fetchall()
+        if pIds is None:
+            return None
         for pId in pIds:
             current_dir = settings.BASE_DIR
            # current_dir = r"C:\Users\TimmyIfidon\Desktop"
