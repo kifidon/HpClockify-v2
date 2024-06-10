@@ -123,7 +123,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         try:
             logger.debug(self.initial_data)
             validated_data['status'] = self.get_status(self.initial_data)
-            validated_data['hasTruck'] = self.get_hasTruck(self.initial_data)
+            validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data) 
             logger.info(dumps(validated_data, indent = 4))
