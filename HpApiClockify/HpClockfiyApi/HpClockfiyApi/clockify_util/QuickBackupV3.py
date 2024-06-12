@@ -148,8 +148,8 @@ def CreateTextFile():
     file.close()
     logger.info(filePath, end="")
          
-def monthlyBillable(start_date = None, end_date = None):
-    file_path = (MonthylyProjReport(start_date, end_date ))
+def monthlyBillable(month = None, year = None):
+    file_path = (MonthylyProjReport(month, year ))
     logger.info(f" {file_path}")
     return file_path
     

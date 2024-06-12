@@ -7,18 +7,21 @@ from .. import settings
 import logging
 
 
-def MonthylyProjReport(startDate = None, endDate = None):
-    if startDate is None or endDate is None:
+def MonthylyProjReport(month = None, year = None):
+    if month is None or year is None:
         month, year = getMonthYear()
-        if int(month) -1 == 0: 
-            previousMonth = '12'
-            year = str(int(year) - 1).rjust(2, '0')
-        else: previousMonth = str(int(month) -1 ).rjust(2, '0')
-        startDate = f"20{year}-{previousMonth}-25"
-        endDate = f"20{year}-{month}-25" #non inclusive 
+    else:
+        month = getAbbreviation(month, reverse=True)
+
+    if int(month) -1 == 0: 
+        previousMonth = '12'
+        previousYear = str(int(year) - 1).rjust(2, '0')
     else: 
-        month = endDate[5:7]
-        year = endDate[2:4]
+        previousMonth = str(int(month) -1 ).rjust(2, '0')
+        previousYear = year
+    startDate = f"20{previousYear}-{previousMonth}-25"
+    endDate = f"20{year}-{month}-25" # non inclusive 
+    
     cursor, conn = sqlConnect()
     try:
         cursor.execute(

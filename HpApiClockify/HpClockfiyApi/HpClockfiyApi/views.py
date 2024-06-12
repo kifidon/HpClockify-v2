@@ -281,7 +281,7 @@ def timesheets(request: ASGIRequest):
 
 
 @api_view(['GET'])
-def monthlyBillableReport(request, start_date = None, end_date= None):
+def monthlyBillableReport(request, month = None, year= None):
     '''
     Function Description: 
        Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
@@ -296,7 +296,7 @@ def monthlyBillableReport(request, start_date = None, end_date= None):
     '''
     logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called')
-    folder_path = monthlyBillable(start_date, end_date )
+    folder_path = monthlyBillable(month, year )
     return download_text_file(folder_path)
 
 @api_view(['GET'])
