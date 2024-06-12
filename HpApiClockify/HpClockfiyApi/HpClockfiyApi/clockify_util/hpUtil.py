@@ -40,7 +40,7 @@ def download_text_file(folder_path = None):
         shutil.rmtree(temp_dir)
         os.remove(zip_file_path)
         return response
-    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (YYYY-MM-DD)\nReview Logs for more detail @ https://hpclockifyapi.azurewebsites.net/')
+    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (ex. /Feb/24/)\nReview Logs for more detail')
 
 
 def count_working_daysV2(start_date:datetime, end_date: datetime, excludeDays=[] ):
@@ -203,8 +203,8 @@ def getMonthYear():
     year = str(current_date.year)[2:]
     return month, year
 
-def getAbbreviation(month = None, year = None ):
-    months = {
+def getAbbreviation(month = None, year = None, reverse = False ):
+    Abbreviation = {
         '01': 'Jan',
         '02': 'Feb',
         '03': 'Mar',
@@ -218,9 +218,28 @@ def getAbbreviation(month = None, year = None ):
         '11': 'Nov',
         '12': 'Dec'
     }
+
+    monthNum = {
+        'Jan': '01',
+        'Feb': '02',
+        'Mar': '03',
+        'Apr': '04',
+        'May': '05',
+        'Jun': '06',
+        'Jul': '07',
+        'Aug': '08',
+        'Sep': '09',
+        'Oct': '10',
+        'Nov': '11',
+        'Dec': '12'
+    }
+
     if month is None:
         month, year = getMonthYear() # current month 
-    return f"{ months.get(month, f'Invalid Month: {month}')} 20{year}"
+    if not reverse: 
+        return f"{ Abbreviation.get(month, f'Invalid Month: {month}')}"
+    else:
+        return f"{ monthNum.get(month, f'Invalid Month: {month}')}"
 
 
 def get_current_time():
