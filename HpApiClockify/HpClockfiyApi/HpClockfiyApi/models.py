@@ -47,7 +47,7 @@ class Employeeuser(models.Model):
     status = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
-    Truck = models.IntegerField(max_length=1, blank= False, null = False, default=0, db_column='hasTruck')
+    Truck = models.IntegerField(blank= False, null = False, default=0, db_column='hasTruck')
     class Meta:
         managed = False
         db_table = 'EmployeeUser'
@@ -149,7 +149,7 @@ class Expense(models.Model):
     quantity = models.FloatField( blank=True, null=True)
     subTotal = models.FloatField( blank=True, null=True)
     taxes = models.FloatField( blank=True, null=True)
-    status = models.CharField( default = 'PENDING', blank= True, null=True)
+    status = models.CharField( max_length = 50, default = 'PENDING', blank= True, null=True)
     
 
     class Meta:

@@ -1,5 +1,6 @@
 import pyodbc
 import copy
+import json
 # import logging
 from .. Loggers import setup_background_logger, setup_server_logger
 from .ClockifyPullV3 import getApiKey, getWorkspaces,getWorkspaceUsers, getProjects, getApprovedRequests, getHolidays, getClients, getPolocies, getTimeOff, getUserGroups
@@ -189,17 +190,21 @@ def deleteProjects(conn, cursor, wkSpaceID):
         )
         oldProjects = cursor.fetchall()
         for delete in oldProjects:
-            if delete[0] not in newProj:
-                cursor.execute(
-                    '''
-                    DELETE FROM Project
-                    WHERE 
-                        id = ? and
-                        workspace_id = ?
-                    ''', (delete[0], wkSpaceID)
-                )
-                logger.info(f"\t\t\tDeleted...{deleted}")
-                deleted += 1
+            try:
+                if delete[0] not in newProj:
+                    cursor.execute(
+                        '''
+                        DELETE FROM Project
+                        WHERE 
+                            id = ? and
+                            workspace_id = ?
+                        ''', (delete[0], wkSpaceID)
+                    )
+                    logger.info(f"\t\t\tDeleted...{deleted}")
+                    deleted += 1
+            except pyodbc.IntegrityError as e:
+                logger.warning(f"Can't delete project: {e}") 
+                continue
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
@@ -357,18 +362,19 @@ def pushClients(wkSpaceID, conn, cursor):
     clients = getClients(wkSpaceID, key)
     try:
         for client in clients:
+            logger.debug(json.dumps(client))
             cID = client['id']
             cEmail = client['email']
             cAddress = client['address']
             cName = client ['name']
-            CNotes = client['note']
+            cLongName = client['note']
             try:
                 cursor.execute(
                     '''
                     INSERT INTO Client ( id, email, address, name, workspace_id, longName)
                     VALUES (?, ?, ?, ?, ?, ?)
                     ''',
-                    (cID, cEmail, cAddress, cName, wkSpaceID, CNotes)
+                    (cID, cEmail, cAddress, cName, wkSpaceID, cLongName)
                 )
                 logger.info(f"Adding Client information...({count})")
                 count += 1
@@ -385,8 +391,11 @@ def pushClients(wkSpaceID, conn, cursor):
                         ((cEmail is not None or oldClient[0] is not None) and cEmail != oldClient[0])
                         or ((cAddress is not None or oldClient[1] is not None) and cAddress != oldClient[1])
                         or ((cName is not None or oldClient[2] is not None) and cName != oldClient[2])
-                        or ((CNotes is not None or oldClient[3] is not None) and cName != oldClient[3])
+                        or ((cLongName is not None or oldClient[3] is not None) and cLongName != oldClient[3])
                     ):
+                        
+                        logger.debug(cLongName)
+                        logger.debug(oldClient)
                         cursor.execute(
                             '''
                             Update Client
@@ -398,9 +407,9 @@ def pushClients(wkSpaceID, conn, cursor):
                             where 
                                 id = ? and workspace_id = ?
                             ''',
-                            (cEmail, cAddress, cName, cID, wkSpaceID, CNotes)
+                            (cEmail, cAddress, cName, cLongName, cID, wkSpaceID )
                         )
-                        logger.info(f"\tUpdating Client information...({update})")
+                        logger.info(f"\tUpdating Client information...({cName})")
                         update += 1
                     else:
                         exists += 1
@@ -413,11 +422,11 @@ def pushClients(wkSpaceID, conn, cursor):
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logger.error("Committing changes...")  # Commit changes if no exceptions occurred                    
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                    
         return(f"Client: {count} new records. {exists} unchanged. {update} updated.\n")
 
 def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
-    update = 0 ; exists = 0; count = 0
+    update = 0; exists = 0; count = 0
     try:
         for tag in tags: 
             cursor.execute(
