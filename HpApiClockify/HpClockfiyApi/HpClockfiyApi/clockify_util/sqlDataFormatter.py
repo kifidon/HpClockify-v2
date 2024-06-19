@@ -193,7 +193,6 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
         start, end = getCurrentPaycycle()
         startDate = start
         endDate = end
-    print (endDate)
     current_dir = settings.BASE_DIR
     folder_name = f"PayrollLog-{startDate}-{endDate}"
     folder_path = os.path.join(current_dir, folder_name)
@@ -206,10 +205,17 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     try:
         cursor.execute(
             '''
-            SELECT name, date, RegularHrs, Overtime, TotalHours , TimeOff, policy_name, Holiday  FROM AttendanceApproved
+            SELECT att.name, att.Date, att.RegularHrs, att.Overtime, att.TotalHours , att.TimeOff, att.policy_name, att.Holiday  FROM AttendanceApproved att
+            WHERE att.Date BETWEEN ? AND ?
+
+            Union ALL
+
+            Select tt.name,Null, Sum(tt.RegularHrs), Sum(tt.Overtime), Sum(tt.TotalHours), Sum(tt.TimeOff), 'Policy_name', 'Holiday' From AttendanceApproved tt
             WHERE [Date] BETWEEN ? AND ?
-            ORDER BY [date] , [name]
-            ''', ( startDate, endDate)
+            Group By tt.name
+
+            ORDER BY [name], Date DESC
+            ''', ( startDate, endDate, startDate, endDate)
         )
         rows = cursor.fetchall()
 

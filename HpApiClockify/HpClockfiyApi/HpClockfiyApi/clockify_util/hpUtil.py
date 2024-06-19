@@ -176,7 +176,7 @@ def getCurrentPaycycle():
 
     # Calculate the most recent Sunday (start of this week)
     start_of_this_week = current_date - timedelta(days=current_date.weekday() + 1)
-    # Adjust if the start of the week falls on a Sunday
+    
     if start_of_this_week.weekday() != 6:
         start_of_this_week += timedelta(days=-7)
 
