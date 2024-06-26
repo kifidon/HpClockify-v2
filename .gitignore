@@ -3,4 +3,7 @@ __pycache__/
 *.xlsx
 *.pyc
 *.pyo
-.venv/
+.venv/Lib
+.venv/Scripts
+.venv/pyenv.cfg
+.vscode/
