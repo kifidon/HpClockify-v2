@@ -1,6 +1,6 @@
-__pycache__
+__pycache__/
 *.log
 *.xlsx
 *.pyc
 *.pyo
-.venv
+.venv/
