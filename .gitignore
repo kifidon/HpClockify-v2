@@ -1,3 +1,6 @@
 __pycache__
 *.log
 *.xlsx
+*.pyc
+*.pyo
+.venv
