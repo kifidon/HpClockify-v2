@@ -153,8 +153,8 @@ def monthlyBillable(month = None, year = None):
     logger.info(f" {file_path}")
     return file_path
     
-def monthlyBillableEqp(start_date = None, end_date = None):
-    file_path = (MonthylyProjReportEqp(start_date, end_date ))
+def monthlyBillableEqp(month = None, year = None):
+    file_path = (MonthylyProjReportEqp(month, year))
     logger.info(f" {file_path}")
     return file_path
     
