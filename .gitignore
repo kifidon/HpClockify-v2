@@ -11,3 +11,4 @@ __pycache__/
 .idea/
 .vscode/
 node_modules/
+HpApiClockify/HpClockfiyApi/*.xlsx
