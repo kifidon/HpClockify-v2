@@ -24,6 +24,19 @@ def create_hash(user_id, category_id, date_string):
     
     return hash_id
 
+
+def hash50(vall1, vall2 = None, vall3 = None):
+    # Concatenate the user ID, category ID, and date string
+    combined_string = vall1 + (vall2 or '') + (vall3 or '')
+    
+    # Calculate the SHA-256 hash of the combined string
+    hash_object = hashlib.sha256(combined_string.encode())
+    
+    # Get the hexadecimal representation of the hash and truncate it to 64 characters
+    hash_id = hash_object.hexdigest()[:50]
+    
+    return hash_id
+
 def download_text_file(folder_path = None):
     
     if folder_path:

@@ -25,23 +25,8 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils  #, transaction
-from .serializers import (
-    EmployeeUserSerializer,
-    FileExpenseSerializer,
-    TimesheetSerializer,
-    TimeOffSerializer,
-    ExpenseSerializer,
-    EntrySerializer,
-
-)
-from .models import(
-    TimeOffRequests,
-    FilesForExpense,
-    Employeeuser,
-    Timesheet,
-    Expense,
-    Entry,
-)
+from .serializers import *
+from .models import*
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response 
@@ -50,7 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50
 from . Loggers import setup_server_logger
 from . import settings
 
@@ -1055,4 +1040,389 @@ def requestFilesForExpense(request:ASGIRequest):
             taskResult(response=response, inputData=inputData, caller='requestFilesForExpense')
             return response
 
-            
+#########################################################################################################################################################################################################
+
+@api_view(['PUT', 'POST', 'GET'])
+@csrf_exempt
+async def lemSheet(request:ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        logger.info(request.method)
+        if request.method == 'POST':
+            def postThread(inputData):
+                try:
+                    inputData['id'] = hash50(inputData['clientId'], inputData['lem_sheet_date'])
+                    #gen LemNumber
+                    lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
+                    inputData['lemNumber'] = 'LEM-' + str(len(lems) + 1).zfill(4)
+                    serializer = LemSheetSerializer(data=inputData)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return True
+                    else:
+                        for key, value in serializer.errors.items():
+                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        raise ValidationError(serializer.errors)
+                except ValidationError as v:
+                    return False
+                except Exception as e: 
+                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                    raise e
+            post = sync_to_async(postThread, thread_sensitive= True)
+
+            result = await post(inputData)
+            if result:
+                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+        else: #do this later if needed
+            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except Exception as e:
+        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        logger.error(response.content)
+        return response
+
+@api_view(['PUT', 'POST', 'GET'])
+@csrf_exempt
+async def roles(request:ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        logger.info(request.method)
+        if request.method == 'POST':
+            def postThread(inputData):
+                try:
+                    inputData['id'] = hash50(inputData['name'])
+                    serializer = RoleSerializer(data=inputData)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return True
+                    else:
+                        for key, value in serializer.errors.items():
+                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        raise ValidationError(serializer.errors)
+                except ValidationError as v:
+                    return False
+                except Exception as e: 
+                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                    raise e
+            post = sync_to_async(postThread, thread_sensitive= True)
+
+            result = await post(inputData)
+            if result:
+                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+        else: #do this later if needed
+            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except Exception as e:
+        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        logger.error(response.content)
+        return response
+
+@api_view(['PUT', 'POST', 'GET'])
+@csrf_exempt
+async def equipment(request:ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        logger.info(request.method)
+        if request.method == 'POST':
+            def postThread(inputData):
+                try:
+                    inputData['id'] = hash50(inputData['name'])
+                    serializer = EquipmentSerializer(data=inputData)
+                    if serializer.is_valid():
+                        serializer.save()
+                        return True
+                    else:
+                        for key, value in serializer.errors.items():
+                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        raise ValidationError(serializer.errors)
+                except ValidationError as v:
+                    return False
+                except Exception as e: 
+                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                    raise e
+            post = sync_to_async(postThread, thread_sensitive= True)
+
+            result = await post(inputData)
+            if result:
+                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+        else: #do this later if needed
+            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except Exception as e:
+        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        logger.error(response.content)
+        return response
+
+
+
+'''Future Proof   
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def lemWorker(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def lemEntry(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+        
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def equipEntry(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def eqpRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def workerRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def eqpRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def clientRep(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+'''
+

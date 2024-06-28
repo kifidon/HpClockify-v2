@@ -1,17 +1,7 @@
 from rest_framework import serializers
 from . Loggers import setup_background_logger
-from .models import(
-    Employeeuser,
-    Workspace,
-    Timesheet,
-    Entry,
-    Project,
-    Tagsfor,
-    Expense, 
-    Category,
-    TimeOffRequests,
-    FilesForExpense
-)
+from .models import *
+
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
 from datetime import date
@@ -296,7 +286,11 @@ class EntrySerializer(serializers.Serializer):
             return instance
         except Exception as e:
             logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
+<<<<<<< Updated upstream
             return instance
+=======
+            raise e
+>>>>>>> Stashed changes
 
 class TagsForSerializer(serializers.Serializer):
     '''
@@ -490,3 +484,49 @@ class FileExpenseSerializer(serializers.ModelSerializer):
     class Meta: 
         model = FilesForExpense
         fields = "__all__"
+
+#########################################################################################################################################################################################################
+class LemSheetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LemSheet
+        fields = '__all__'
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Equipment
+        fields = '__all__'
+
+class LemWorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LemWorker
+        fields = '__all__'
+
+class LemEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LemEntry
+        fields = '__all__'
+
+class EquipEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EquipEntry
+        fields = '__all__'
+
+class WorkerRateSheetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkerRateSheet
+        fields = '__all__'
+
+class EqpRateSheetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EqpRateSheet
+        fields = '__all__'
+
+class ClientRepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientRep
+        fields = '__all__'
