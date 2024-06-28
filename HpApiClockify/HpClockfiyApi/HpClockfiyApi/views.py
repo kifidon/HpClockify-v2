@@ -1070,6 +1070,7 @@ async def lemSheet(request:ASGIRequest):
                     return False
                 except utils.IntegrityError as c:
                     if "PRIMARY KEY constraint" in str(c):
+                        logger.error(reverseForOutput(inputData))
                         raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
                 except Exception as e: 
                     logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
