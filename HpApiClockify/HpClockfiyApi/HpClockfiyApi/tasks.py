@@ -25,7 +25,7 @@ from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
 from .clockify_util.hpUtil import taskResult, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
-
+import time 
 import requests
 import asyncio
 
@@ -90,7 +90,7 @@ async def retryExpenses(request: ASGIRequest):
             def pushCategories(category:dict):
                 try: 
                     try: #try update otherwise insert for Categories 
-                        categoryInstanece = Category.objects.get(pk=category['id'])
+                        categoryInstanece = Category.objects.get(pk=category["id"])
                         serializer = CategorySerializer(data= category, instance=categoryInstanece)
                         logger.info(f'Existing Category... Updatiing')
                     except Category.DoesNotExist:
@@ -162,9 +162,9 @@ def updateTags(inputdata: dict):
         logger.info(f'updateTags Function called')
 
         workspaceId = inputdata.get('timesheet').get('workspaceId')
-        timeId = inputdata.get('timesheet').get('id')
+        timeId = inputdata.get('timesheet').get("id")
         tags_data = inputdata.get('entry').get('tags')
-        entry_id = inputdata.get('entry').get('id')
+        entry_id = inputdata.get('entry').get("id")
         # Get existing tags associated with the entry
         def deleteOldTags():
             try: 
@@ -175,7 +175,7 @@ def updateTags(inputdata: dict):
                     existing_tag_ids.append(tag.id) 
                 existing_tag_ids = set(existing_tag_ids)
                     # Extract tag ids from the request payload
-                request_tag_ids = set(tag['id'] for tag in tags_data)
+                request_tag_ids = set(tag["id"] for tag in tags_data)
                     # Find tags to delete
                 tags_to_delete = existing_tag_ids - request_tag_ids
                 Tagsfor.objects.filter(id__in=tags_to_delete).delete()
@@ -189,7 +189,7 @@ def updateTags(inputdata: dict):
             # Create new tags
             logger.debug(dumps(tags_data, indent= 4))
             try: 
-                tagObj = Tagsfor.objects.get(id=tag['id'], entryid = entry_id, workspace = workspaceId)
+                tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspace = workspaceId)
                 serializer = TagsForSerializer(data=tag, instance=tagObj, context={
                     'workspaceId': workspaceId,
                     'timeid': timeId,
@@ -205,7 +205,7 @@ def updateTags(inputdata: dict):
                 logger.info(f'Creating new tag')
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag['id']} 202 ACCEPTED') 
+                logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag["id"]} 202 ACCEPTED') 
                 data_lines = dumps(serializer.validated_data, indent=4).split('\n')
                 reversed_data = '\n'.join(data_lines[::-1])
                 logger.info(f'{reversed_data}')
@@ -252,7 +252,7 @@ async def approvedEntries(request: ASGIRequest):
             logger.debug(dumps(inputData,indent=4))
             key = ClockifyPullV3.getApiKey()
             
-            timeId = inputData.get('id')
+            timeId = inputData.get("id")
             workspaceId = inputData.get('workspaceId')
             stat = inputData.get('status').get('state') or None
         
@@ -269,16 +269,16 @@ async def approvedEntries(request: ASGIRequest):
                         entries['workspaceId']= workspaceId
                         entries['timesheetId'] = entries['approvalRequestId']
                         try: # try and update if exists, otherwise create
-                            entry = Entry.objects.get(id = entries['id'], workspaceId = workspaceId )
+                            entry = Entry.objects.get(id = entries["id"], workspaceId = workspaceId )
                             serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
-                            logger.info(f'Updating Entry {entries['id']}')
+                            logger.info(f'Updating Entry {entries["id"]}')
                         except Entry.DoesNotExist:
                             serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
                             logger.warning(f'Creating new Entry on timesheet {timeId}')
 
                         if serializer.is_valid():
                             serializer.save()
-                            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
+                            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries["id"]} 202 ACCEPTED') 
                             reversed_data = reverseForOutput(entries)
                             logger.info(f'{reversed_data}') 
                             if (len(entries['tags']) != 0):
@@ -298,11 +298,16 @@ async def approvedEntries(request: ASGIRequest):
                 updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
                 tasks = []
                 if len(allEntries) != 0:
-                    for i in range(0,len(allEntries)): # updates all entries async 
-                        tasks.append(
-                            updateAsync(allEntries[i])
-                        )
-                    await asyncio.gather(*tasks)
+                    '''Causes SQL server deadlock on resources'''
+                    # for i in range(0,len(allEntries)): # updates all entries async 
+                    #     tasks.append(
+                    #         updateAsync(allEntries[i])
+                    #     )
+                    # await asyncio.gather(*tasks)
+                    for i in range(0,len(allEntries)): # updates all entries sync 
+                            time.sleep(1)
+                            asyncio.create_task(updateAsync(allEntries[i]))
+                        
                     logger.info(f'Entries added for timesheet {timeId}') 
                     response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
                     asyncio.create_task(saveTaskResult(response, inputData, caller))
@@ -337,7 +342,7 @@ async def approvedExpenses(request:ASGIRequest):
         inputData = bytes_to_dict(request.body)
         logger.debug(f'InputData\n{reverseForOutput(inputData)}')
         key = ClockifyPullV3.getApiKey()
-        timeId = inputData.get('id')
+        timeId = inputData.get("id")
         workspaceId = inputData.get('workspaceId')
         stat = inputData.get('status').get('state') or None
 
@@ -350,13 +355,13 @@ async def approvedExpenses(request:ASGIRequest):
                 return response
             def syncUpdateExpense(expense):
                 #refactoring 
-                expense['categoryId'] = expense['category']['id']
-                expense[ 'projectId'] = expense['project']['id']
+                expense['categoryId'] = expense['category']["id"]
+                expense[ 'projectId'] = expense['project']["id"]
                 expense['timesheetId'] = expense['approvalRequestId']
                 try:
                     try:
                         approvalID = expense['approvalRequestId'] if expense['approvalRequestId'] is not None else timeId
-                        expenseObj = Expense.objects.get(id=expense['id'], workspaceId = workspaceId)
+                        expenseObj = Expense.objects.get(id=expense["id"], workspaceId = workspaceId)
 
                         serializer = ExpenseSerializer(instance=expenseObj, data=expense)
                         logger.info('Updating Expense...')
@@ -365,7 +370,7 @@ async def approvedExpenses(request:ASGIRequest):
                         logger.warning(f'Creating new Expense on timesheet {timeId}')
                     if serializer.is_valid():
                         serializer.save()
-                        logger.info(f'UpdateExpense on timesheet({timeId}): EX-{expense['id']} 202 ACCEPTED')
+                        logger.info(f'UpdateExpense on timesheet({timeId}): EX-{expense["id"]} 202 ACCEPTED')
                         logger.info(reverseForOutput(expense))
                         return serializer.validated_data
                     else:

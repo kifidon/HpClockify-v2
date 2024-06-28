@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from .. import settings 
 import logging
-
+from ..Loggers import setup_background_logger
 
 def MonthylyProjReport(month = None, year = None):
     if month is None or year is None:
@@ -61,7 +61,8 @@ def MonthylyProjReport(month = None, year = None):
                     Sum(Amount) as Amount
                 FROM MonthlyBillable mb
                 WHERE 
-                    mb.start_time BETWEEN ? AND ? AND
+                    Cast(mb.start_time as Date ) >= ? AND
+                    Cast(mb.start_time as Date ) < ? AND
                     mb.project_id = @ProjID 
                 GROUP BY 
                     [Number],
@@ -97,20 +98,25 @@ def MonthylyProjReport(month = None, year = None):
         logging.error(f"Error: {str(e)}")
         return None
 
-def MonthylyProjReportEqp(startDate = None, endDate = None):
-    if startDate is None or endDate is None:
-        month, year = getMonthYear()
+def MonthylyProjReportEqp(month = None, year = None):
+    logger = setup_background_logger()
+    try:
+        if month is None or year is None:
+            month, year = getMonthYear()
+        else:
+            month = getAbbreviation(month, reverse=True)
+
         if int(month) -1 == 0: 
             previousMonth = '12'
-            year = str(int(year) - 1).rjust(2, '0')
-        else: previousMonth = str(int(month) -1 ).rjust(2, '0')
-        startDate = f"20{year}-{previousMonth}-25"
-        endDate = f"20{year}-{month}-25"
-    else: 
-        month = endDate[5:7]
-        year = endDate[2:4]
-    cursor, conn = sqlConnect()
-    try:
+            previousYear = str(int(year) - 1).rjust(2, '0')
+        else: 
+            previousMonth = str(int(month) -1 ).rjust(2, '0')
+            previousYear = year
+        startDate = f"20{previousYear}-{previousMonth}-25"
+        endDate = f"20{year}-{month}-25" # non inclusive 
+        
+        cursor, conn = sqlConnect()
+    
         cursor.execute(
             f'''
             select Distinct p.id, p.code  from Project p 
@@ -132,6 +138,7 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
                 os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
             df = []
+            logger.info(f"{startDate}  {endDate}")
             cursor.execute(
                 '''
                 DECLARE @ProjID VARCHAR(100)= ?;
@@ -150,7 +157,8 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
                     Sum(Amount) as Amount
                 FROM MonthlyBillableEqp mb
                 WHERE 
-                    mb.start_time BETWEEN ? AND ? AND
+                    Cast(mb.start_time as Date ) >= ? AND
+                    Cast(mb.start_time as Date ) < ? AND
                     mb.project_id = @ProjID 
                 GROUP BY 
                     [Number],
@@ -163,6 +171,7 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
                 ''', (pId[0], startDate, endDate)
             )
             outputRows = cursor.fetchall()
+            logger.info(outputRows)
             outputRows = [['' if val is None else val for val in row] for row in outputRows]
             df = pd.DataFrame(outputRows, columns = ['Number', 'Row', 'Name', 'Supplier', 'Qty', 'Unit', 'Unit Cost', 'Amount'] )
             
@@ -186,14 +195,15 @@ def MonthylyProjReportEqp(startDate = None, endDate = None):
     except PermissionError as e:
         logging.error(f"Error: {str(e)}")
         return None
-
+    except Exception as e:
+        logging.error(f"Error: {str(e)}")
+        return None
 
 def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     if startDate is None or endDate is None:
         start, end = getCurrentPaycycle()
         startDate = start
         endDate = end
-    print (endDate)
     current_dir = settings.BASE_DIR
     folder_name = f"PayrollLog-{startDate}-{endDate}"
     folder_path = os.path.join(current_dir, folder_name)
@@ -206,10 +216,17 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     try:
         cursor.execute(
             '''
-            SELECT name, date, RegularHrs, Overtime, TotalHours , TimeOff, policy_name, Holiday  FROM AttendanceApproved
+            SELECT att.name, att.Date, att.RegularHrs, att.Overtime, att.TotalHours , att.TimeOff, att.policy_name, att.Holiday  FROM AttendanceApproved att
+            WHERE att.Date BETWEEN ? AND ?
+
+            Union ALL
+
+            Select tt.name,Null, Sum(tt.RegularHrs), Sum(tt.Overtime), Sum(tt.TotalHours), Sum(tt.TimeOff), 'Policy_name', 'Holiday' From AttendanceApproved tt
             WHERE [Date] BETWEEN ? AND ?
-            ORDER BY [date] , [name]
-            ''', ( startDate, endDate)
+            Group By tt.name
+
+            ORDER BY [name], Date DESC
+            ''', ( startDate, endDate, startDate, endDate)
         )
         rows = cursor.fetchall()
 

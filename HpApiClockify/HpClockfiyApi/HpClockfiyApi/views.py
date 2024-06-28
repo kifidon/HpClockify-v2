@@ -285,7 +285,7 @@ def monthlyBillableReport(request, month = None, year= None):
     return download_text_file(folder_path)
 
 @api_view(['GET'])
-def monthlyBillableReportEquipment(request, start_date = None, end_date= None):
+def monthlyBillableReportEquipment(request, month = None, year= None):
     '''
     Function Description: 
        Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
@@ -300,7 +300,7 @@ def monthlyBillableReportEquipment(request, start_date = None, end_date= None):
     '''
     logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called for Equipment')
-    folder_path = monthlyBillableEqp(start_date, end_date )
+    folder_path = monthlyBillableEqp(month, year )
     return download_text_file(folder_path)
 
 @api_view(['GET'])

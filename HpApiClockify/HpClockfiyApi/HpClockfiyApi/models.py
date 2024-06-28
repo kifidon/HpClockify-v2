@@ -149,7 +149,7 @@ class Expense(models.Model):
     quantity = models.FloatField( blank=True, null=True)
     subTotal = models.FloatField( blank=True, null=True)
     taxes = models.FloatField( blank=True, null=True)
-    status = models.CharField( default = 'PENDING', blank= True, null=True)
+    status = models.CharField( max_length = 50, default = 'PENDING', blank= True, null=True)
     
 
     class Meta:

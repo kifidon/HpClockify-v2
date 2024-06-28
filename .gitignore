@@ -12,3 +12,12 @@ __pycache__/
 .vscode/
 node_modules/
 HpApiClockify/HpClockfiyApi/*.xlsx
+__pycache__/
+*.log
+*.xlsx
+*.pyc
+*.pyo
+.vscode/
+.venv/
+.github/
+.gitattributes

@@ -338,7 +338,7 @@ class TagsForSerializer(serializers.Serializer):
             return instance
         except Exception as e: 
             logger.warning(f'UnknownError: {dumps(str(e), indent = 4)}')
-            return instance
+            raise e 
     
 class CategorySerializer(serializers.ModelSerializer): 
     '''
