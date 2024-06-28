@@ -33,7 +33,7 @@ def hash50(vall1, vall2 = None, vall3 = None):
     hash_object = hashlib.sha256(combined_string.encode())
     
     # Get the hexadecimal representation of the hash and truncate it to 64 characters
-    hash_id = hash_object.hexdigest()[-32:]
+    hash_id = hash_object.hexdigest()[:-45]
     
     return hash_id
 
