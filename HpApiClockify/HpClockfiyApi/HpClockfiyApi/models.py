@@ -47,11 +47,7 @@ class Employeeuser(models.Model):
     status = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
-<<<<<<< Updated upstream
-    Truck = models.IntegerField(max_length=1, blank= False, null = False, default=0, db_column='hasTruck')
-=======
     Truck = models.IntegerField(blank= False, null = True, default=0, db_column='hasTruck')
->>>>>>> Stashed changes
     class Meta:
         managed = False
         db_table = 'EmployeeUser'

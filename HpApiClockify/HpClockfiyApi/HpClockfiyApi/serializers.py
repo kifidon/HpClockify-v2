@@ -286,11 +286,7 @@ class EntrySerializer(serializers.Serializer):
             return instance
         except Exception as e:
             logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
-<<<<<<< Updated upstream
-            return instance
-=======
             raise e
->>>>>>> Stashed changes
 
 class TagsForSerializer(serializers.Serializer):
     '''
