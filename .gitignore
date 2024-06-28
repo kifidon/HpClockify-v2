@@ -1,0 +1,12 @@
+# Ignore the virtual environment directory
+.venv/
+
+# Other common items to ignore
+*.pyc
+__pycache__/
+.DS_Store
+.env
+*.log
+.idea/
+.vscode/
+node_modules/
