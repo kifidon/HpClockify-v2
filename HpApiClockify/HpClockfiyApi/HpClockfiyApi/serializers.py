@@ -483,6 +483,7 @@ class FileExpenseSerializer(serializers.ModelSerializer):
 
 #########################################################################################################################################################################################################
 class LemSheetSerializer(serializers.ModelSerializer):
+    lem_sheet_date = serializers.DateField(input_formats=['%m/%d/%Y', '%Y-%m-%d'])
     class Meta:
         model = LemSheet
         fields = '__all__'

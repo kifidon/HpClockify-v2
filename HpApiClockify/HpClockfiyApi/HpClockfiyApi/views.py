@@ -1042,21 +1042,22 @@ def requestFilesForExpense(request:ASGIRequest):
 
 #########################################################################################################################################################################################################
 
-@api_view(['PUT', 'POST', 'GET'])
+# @api_view(["PUT", "POST", "GET"])
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
     logger = setup_server_logger()
     try: 
         inputData = loads(request.body)
-        logger.debug(reverseForOutput(inputData))
         logger.info(request.method)
+        logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
             def postThread(inputData):
                 try:
-                    inputData['id'] = hash50(inputData['clientId'], inputData['lem_sheet_date'])
+                    inputData["Lid"] = hash50(inputData['clientId'], inputData['lem_sheet_date'], inputData['lem_sheet_date'])
                     #gen LemNumber
                     lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
-                    inputData['lemNumber'] = 'LEM-' + str(len(lems) + 1).zfill(4)
+                    # logger.debug(type(lems))
+                    inputData['lemNumber'] = 'LEM-' + str(lems.count() + 1).zfill(4)
                     serializer = LemSheetSerializer(data=inputData)
                     if serializer.is_valid():
                         serializer.save()
@@ -1067,19 +1068,24 @@ async def lemSheet(request:ASGIRequest):
                         raise ValidationError(serializer.errors)
                 except ValidationError as v:
                     return False
+                except utils.IntegrityError as c:
+                    if "PRIMARY KEY constraint" in str(c):
+                        raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
                 except Exception as e: 
                     logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                     raise e
             post = sync_to_async(postThread, thread_sensitive= True)
-
-            result = await post(inputData)
-            if result:
-                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
-            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            try:
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            except utils.IntegrityError as c:
+                return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
     except Exception as e:
-        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \\n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
         logger.error(response.content)
         return response
 
