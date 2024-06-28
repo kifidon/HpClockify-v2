@@ -1,5 +1,6 @@
 # Ignore the virtual environment directory
 .venv/
+*.xlsx
 
 # Other common items to ignore
 *.pyc
@@ -10,4 +11,3 @@ __pycache__/
 .idea/
 .vscode/
 node_modules/
-*.xlsx
