@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/18dc4cd3-f7d7-43c2-a624-d6547e05d58a/resourceGroups/SQL/providers/Microsoft.Web/sites/HpClockifyAPI",
-    "appService.deploySubpath": "HpClockfiyApi"
-}
