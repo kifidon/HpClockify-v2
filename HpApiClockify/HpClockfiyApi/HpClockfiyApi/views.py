@@ -1079,7 +1079,7 @@ async def lemSheet(request:ASGIRequest):
             try:
                 result = await post(inputData)
                 if result:
-                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                    return JsonResponse(data=inputData['Lid'], status= status.HTTP_201_CREATED)
                 else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
