@@ -1053,7 +1053,7 @@ async def lemSheet(request:ASGIRequest):
         if request.method == 'POST':
             def postThread(inputData):
                 try:
-                    inputData["Lid"] = hash50(inputData['clientId'], inputData['lem_sheet_date'], inputData['lem_sheet_date'])
+                    inputData["Lid"] = hash50( inputData['lem_sheet_date'], inputData['lem_sheet_date'])
                     #gen LemNumber
                     lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
                     # logger.debug(type(lems))

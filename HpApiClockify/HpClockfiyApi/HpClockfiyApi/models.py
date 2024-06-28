@@ -199,7 +199,7 @@ class BackGroundTaskResult(models.Model):
 ##################################################################################################################################################################################################
 
 class LemSheet(models.Model):
-    Lid = models.CharField(max_length = 50, db_column='Lid') # hasehd by client, date, and project
+    Lid = models.CharField(max_length = 50, db_column='Lid') #  date, and project
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     lem_sheet_date = models.DateField(blank=False, null=False)
     lemNumber = models.CharField(max_length = 10, blank = False, null = False)
