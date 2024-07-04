@@ -49,7 +49,7 @@ urlpatterns = [
     path('HpClockifyApi/requestFiles', views.requestFilesForExpense),
     
     path('HpClockifyApi/lemSheet', views.lemSheet),
-    path('HpClockifyApi/roles', views.roles),
+    path('HpClockifyApi/lemEntry', views.LemWorkerEntry),
     path('HpClockifyApi/equipment', views.equipment),
     
     path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
