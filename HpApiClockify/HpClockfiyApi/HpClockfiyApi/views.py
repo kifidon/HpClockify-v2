@@ -1079,7 +1079,7 @@ async def lemSheet(request:ASGIRequest):
             try:
                 result = await post(inputData)
                 if result:
-                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                    return JsonResponse(data=inputData['Lid'], status= status.HTTP_201_CREATED, safe=False)
                 else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
@@ -1090,9 +1090,9 @@ async def lemSheet(request:ASGIRequest):
         logger.error(response.content)
         return response
 
-@api_view(['PUT', 'POST', 'GET'])
+# @api_view(['PUT', 'POST', 'GET'])
 @csrf_exempt
-async def roles(request:ASGIRequest):
+async def LemWorkerEntry(request:ASGIRequest):
     logger = setup_server_logger()
     try: 
         inputData = loads(request.body)
@@ -1101,8 +1101,30 @@ async def roles(request:ASGIRequest):
         if request.method == 'POST':
             def postThread(inputData):
                 try:
-                    inputData['id'] = hash50(inputData['name'])
-                    serializer = RoleSerializer(data=inputData)
+                    try:
+                        lemworker = LemWorker.objects.get(empId = inputData['empId'], roleId=inputData['roleId'], workspaceId=inputData['workspaceId'])
+                        # do not need to insert a new one
+                    except LemWorker.DoesNotExist:
+                        try:
+                            workerSerializer = LemWorkerSerializer(data=inputData)
+                            if workerSerializer.is_valid():
+                                # save new worker role 
+                                workerSerializer.save()
+                            else:
+                                for key, value in workerSerializer.errors.items():
+                                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                                raise ValidationError(workerSerializer.errors)
+                        except ValidationError as v:
+                            return False
+                        except utils.IntegrityError as c:
+                            if "PRIMARY KEY constraint" in str(c):
+                                logger.error(reverseForOutput(inputData))
+                                raise(utils.IntegrityError("Server is trying to insert a duplicate Request. Contact Admin"))
+                            
+
+                    #add lem entry 
+                    inputData['workerId'] = inputData['empId'] #refactoring
+                    serializer = LemEntrySerializer(data=inputData)
                     if serializer.is_valid():
                         serializer.save()
                         return True
@@ -1111,10 +1133,16 @@ async def roles(request:ASGIRequest):
                             logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
                         raise ValidationError(serializer.errors)
                 except ValidationError as v:
+                    logger.debug('Invalid lem entry')
                     return False
+                except utils.IntegrityError as c:
+                    if "PRIMARY KEY constraint" in str(c):
+                        logger.error(reverseForOutput(inputData))
+                        raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
                 except Exception as e: 
                     logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                     raise e
+                
             post = sync_to_async(postThread, thread_sensitive= True)
 
             result = await post(inputData)

@@ -223,7 +223,7 @@ class Role(models.Model):
         db_table = 'Role'
 
 class Equipment(models.Model):
-    id = models.CharField(max_length=50)
+    equipId = models.CharField(max_length=50, db_column='id')
     name = models.CharField(max_length=50, null=False, blank= False)
     workspaceId = models.ForeignKey(Workspace, on_delete=models.DO_NOTHING, db_column='workspaceId')
     class Meta: 
