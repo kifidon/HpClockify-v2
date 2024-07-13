@@ -31,6 +31,8 @@ urlpatterns = [
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
     path('payroll', views.weeklyPayrollReport),
     path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
+    path('getTime', views.dailyTimeEntry),
+    
     path('timeSheets', views.timesheets),
     
     path('HpClockifyApi/bankedHours', views.bankedHrs),

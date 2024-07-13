@@ -33,7 +33,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import main, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50
 from . Loggers import setup_server_logger
@@ -301,6 +301,25 @@ def monthlyBillableReportEquipment(request, month = None, year= None):
     logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called for Equipment')
     folder_path = monthlyBillableEqp(month, year )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def dailyTimeEntry(request):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('Daily Entry Report Called')
+    folder_path = dailyEntries( )
     return download_text_file(folder_path)
 
 @api_view(['GET'])
@@ -1043,6 +1062,31 @@ def requestFilesForExpense(request:ASGIRequest):
 #########################################################################################################################################################################################################
 
 # @api_view(["PUT", "POST", "GET"])
+def postThreadLemSheet(inputData):
+    try:
+        inputData["id"] = hash50(inputData['clientId'], inputData['lem_sheet_date'], inputData['projectId'])
+        #gen LemNumber
+        lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
+        # logger.debug(type(lems))
+        inputData['lemNumber'] = 'LEM-' + str(lems.count() + 1).zfill(4)
+        serializer = LemSheetSerializer(data=inputData)
+        if serializer.is_valid():
+            serializer.save()
+            return True
+        else:
+            for key, value in serializer.errors.items():
+                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(serializer.errors)
+    except ValidationError as v:
+        return False
+    except utils.IntegrityError as c:
+        if "PRIMARY KEY constraint" in str(c):
+            logger.error(reverseForOutput(inputData))
+            raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
+    except Exception as e: 
+        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+        raise e
+
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
     logger = setup_server_logger()
@@ -1051,31 +1095,9 @@ async def lemSheet(request:ASGIRequest):
         logger.info(request.method)
         logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
-            def postThread(inputData):
-                try:
-                    inputData["Lid"] = hash50(inputData['clientId'], inputData['lem_sheet_date'], inputData['projectId'])
-                    #gen LemNumber
-                    lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
-                    # logger.debug(type(lems))
-                    inputData['lemNumber'] = 'LEM-' + str(lems.count() + 1).zfill(4)
-                    serializer = LemSheetSerializer(data=inputData)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return True
-                    else:
-                        for key, value in serializer.errors.items():
-                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                        raise ValidationError(serializer.errors)
-                except ValidationError as v:
-                    return False
-                except utils.IntegrityError as c:
-                    if "PRIMARY KEY constraint" in str(c):
-                        logger.error(reverseForOutput(inputData))
-                        raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
-                except Exception as e: 
-                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
-                    raise e
-            post = sync_to_async(postThread, thread_sensitive= True)
+            
+
+            post = sync_to_async(postThreadLemSheet, thread_sensitive= True)
             try:
                 result = await post(inputData)
                 if result:
@@ -1091,6 +1113,38 @@ async def lemSheet(request:ASGIRequest):
         return response
 
 # @api_view(['PUT', 'POST', 'GET'])
+
+def postThreadLemWorker(inputData: dict):
+    logger = setup_server_logger()
+    try:
+        logger.info("Looking for LemWorker...")
+        lemworker = LemWorker.objects.get(
+            empId = inputData['empId'],
+            roleId= inputData['roleId'],
+        )
+        logger.info("Found!")
+        return True
+        # do not need to insert a new one
+    except LemWorker.DoesNotExist:
+        logger.info("Not Found!")
+        logger.info("Creating a new LemWorker Record")
+        try:
+            inputData["_id"] = hash50(inputData['empId'], inputData["roleId"])
+            workerSerializer = LemWorkerSerializer(data=inputData)
+            if workerSerializer.is_valid():
+                # save new worker role 
+                workerSerializer.save()
+                logger.info('New Lem Worker Added Successfully')
+                return True
+            else:
+                for key, value in workerSerializer.errors.items():
+                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                raise ValidationError(workerSerializer.errors)
+        except Exception as e: 
+            logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+            raise e
+        
+
 @csrf_exempt
 async def LemWorkerEntry(request:ASGIRequest):
     logger = setup_server_logger()
@@ -1099,60 +1153,28 @@ async def LemWorkerEntry(request:ASGIRequest):
         logger.debug(reverseForOutput(inputData))
         logger.info(request.method)
         if request.method == 'POST':
-            def postThread(inputData):
-                try:
-                    try:
-                        lemworker = LemWorker.objects.get(empId = inputData['empId'], roleId=inputData['roleId'], workspaceId=inputData['workspaceId'])
-                        # do not need to insert a new one
-                    except LemWorker.DoesNotExist:
-                        try:
-                            workerSerializer = LemWorkerSerializer(data=inputData)
-                            if workerSerializer.is_valid():
-                                # save new worker role 
-                                workerSerializer.save()
-                            else:
-                                for key, value in workerSerializer.errors.items():
-                                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                                raise ValidationError(workerSerializer.errors)
-                        except ValidationError as v:
-                            return False
-                        except utils.IntegrityError as c:
-                            if "PRIMARY KEY constraint" in str(c):
-                                logger.error(reverseForOutput(inputData))
-                                raise(utils.IntegrityError("Server is trying to insert a duplicate Request. Contact Admin"))
-                            
+            
+            post = sync_to_async(postThreadLemWorker, thread_sensitive= True)
 
-                    #add lem entry 
-                    inputData['workerId'] = inputData['empId'] #refactoring
-                    serializer = LemEntrySerializer(data=inputData)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return True
-                    else:
-                        for key, value in serializer.errors.items():
-                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                        raise ValidationError(serializer.errors)
-                except ValidationError as v:
-                    logger.debug('Invalid lem entry')
-                    return False
-                except utils.IntegrityError as c:
-                    if "PRIMARY KEY constraint" in str(c):
-                        logger.error(reverseForOutput(inputData))
-                        raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
-                except Exception as e: 
-                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
-                    raise e
-                
-            post = sync_to_async(postThread, thread_sensitive= True)
+            await post(inputData)
 
-            result = await post(inputData)
-            if result:
-                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
-            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            url =  'http://localhost:5000/HpClockifyApi/task/Entry'
+            async with httpx.AsyncClient(timeout=300) as client:
+                await client.post(url=url, data=inputData)
+
+            return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            
         else: #do this later if needed
-            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+            return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Revew Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.error(reverseForOutput(inputData))
+                raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
     except Exception as e:
-        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        response = JsonResponse(data={f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
 

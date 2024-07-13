@@ -1,8 +1,11 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle
-from .ClockifyPushV3 import getWID, pushApprovedTime, pushTimeOff 
+from .ClockifyPushV3 import getWID, pushApprovedTime, pushTimeOff
+from .ClockifyPullV3 import getDetailedEntryReport
 import pyodbc
 import os
 import pandas as pd
+from json import loads, dumps
+from datetime import datetime, timedelta
 from .. import settings 
 import logging
 from ..Loggers import setup_background_logger
@@ -210,7 +213,7 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path )
     file_path = os.path.join(folder_path, f"{folder_name}-Data.xlsx")
-    df = []
+    
     cursor, conn = sqlConnect()
     
     try:
@@ -245,6 +248,51 @@ def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
     except PermissionError as e:
         logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
 
+def DailyTimeEntryReport():
+    try:
+        logger = setup_background_logger()
+        logger.info("Generating daily time entry report...")
+        today = datetime.now().strftime("%Y-%m-%d")
+        current_dir = settings.BASE_DIR
+        folder_name = f"TimeEntryReport-{today}"
+        folder_path = os.path.join(current_dir, folder_name)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+        file_path = os.path.join(folder_path, f"HillPlainClockifyTime.xlsx")
+        data=  getDetailedEntryReport("65c249bfedeea53ae19d7dad") #HP clockify workspace id
+        logger.debug(dumps(data, indent=4))
+        df = pd.DataFrame(columns=["Employee", "Start", "End","Duration", "Rate", "Amount", "Project", "Client", "Description"])
+        for entry in data['timeentries']:
+            summary = {
+                "Employee": entry['userName'],
+                "Start": 
+                    datetime.strftime( #format date time 
+                        datetime.strptime(entry['timeInterval']['start'], "%Y-%m-%dT%H:%M:%S-06:00"),
+                        "%H:%M:%S - %Y/%m/%d"    
+                    ),
+                "End":
+                    datetime.strftime( #format date time 
+                        datetime.strptime(entry['timeInterval']['end'],"%Y-%m-%dT%H:%M:%S-06:00"),
+                        "%H:%M:%S - %Y/%m/%d"    
+                    ),
+                "Duration": round(float(entry['timeInterval']['duration'])/3600, 2),
+                "Rate": round(float(entry["rate"])/100, 2),
+                "Amount": round(float(entry["amount"])/100, 2),
+                "Project": entry["projectName"],
+                "Client": entry["clientName"],
+                "Description": entry["description"]
+            }
+            df.loc[len(df)] = summary
+        
+        logger.debug(df)
+        if not (df.empty):
+            df.to_excel(file_path, index = False)
+
+        return folder_path
+    except Exception as e:
+        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
+        pass
+        
 
 def main():
     

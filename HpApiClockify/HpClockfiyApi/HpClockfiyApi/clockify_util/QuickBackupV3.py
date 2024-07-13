@@ -1,6 +1,6 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from .sqlDataFormatter import MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet
+from .sqlDataFormatter import MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
 import asyncio
 import datetime
 import pytz
@@ -155,6 +155,11 @@ def monthlyBillable(month = None, year = None):
     
 def monthlyBillableEqp(month = None, year = None):
     file_path = (MonthylyProjReportEqp(month, year))
+    logger.info(f" {file_path}")
+    return file_path
+
+def dailyEntries():
+    file_path = DailyTimeEntryReport()
     logger.info(f" {file_path}")
     return file_path
     

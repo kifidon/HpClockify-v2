@@ -4,11 +4,13 @@ import pyodbc
 import asyncio 
 import httpx
 import time
+from json import loads
+from datetime import datetime, timedelta
 from httpcore import ConnectTimeout
+
 from .hpUtil import get_current_time , dumps, sqlConnect, cleanUp
 from .. Loggers import setup_background_logger
-
-logger = setup_background_logger('DEBUG')
+logger = setup_background_logger()
 
 MAX_RETRIES = 3
 DELAY = 2 #seconds 
@@ -393,8 +395,52 @@ def getCategories(workspaceId, page):
         return response.json()
     else:
         raise(Exception('Failed to pull from Clockify'))
+    
 
+def getDetailedEntryReport(workspaceId):
+    logger.info('Pulling Detailed Expense Report')
+    try:
+        print('Pulling Detailed Expense Report')
+        key = getApiKey()
+        headers = {
+            "X-Api-Key": key
+        }
+        url = f'https://reports.api.clockify.me/v1/workspaces/{workspaceId}/reports/detailed'
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        #convert to strings
+        today = today.strftime('%Y-%m-%dT00:00:00.000Z')
+        yesterday = yesterday.strftime('%Y-%m-%dT00:00:00.000Z') 
+        requestBody = {
+            "approvalState":  "ALL",
+            "dateRangeEnd": today,
+            "dateRangeStart": yesterday,
+            "dateRangeType": "YESTERDAY",
+            "exportType": "JSON",
+            "sortOrder": "ASCENDING",
+            "detailedFilter": {
+                "options": {
+                    "totals": "CALCULATE"
+                },
+                "page": 1,
+                "pageSize": 200,
+                "sortColumn": "USER"
+            }
+        }
+        response = requests.post(url=url, headers=headers, json=requestBody)
+        if response.status_code== 200: 
+            output = loads(response.content)
+            return output 
+        else: 
+            logger.critical(response.text)
+            print(response.text)
+    except Exception as e :
+        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+        raise e
+    
 def main():
+
+    # detailedEntryReport('65c249bfedeea53ae19d7dad')
     pass
 if __name__ == "__main__":
     main()

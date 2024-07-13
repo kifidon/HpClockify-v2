@@ -1,21 +1,12 @@
 
-from .serializers import (
-    ExpenseSerializer, 
-    CategorySerializer,
-    EntrySerializer,
-    TagsForSerializer
-)
-from .models import (
-    Category,
-    Entry,
-    Tagsfor, 
-    Expense,
-    BackGroundTaskResult
-)
+from .serializers import *
+from .models import *
 from django.utils import timezone
 from django.core.handlers.asgi import ASGIRequest
 from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db import  utils 
+
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from asgiref.sync import sync_to_async
@@ -24,7 +15,7 @@ from json import loads, dumps
 from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
-from .clockify_util.hpUtil import taskResult, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
+from .clockify_util.hpUtil import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
 import time 
 import requests
 import asyncio
@@ -407,4 +398,48 @@ async def approvedExpenses(request:ASGIRequest):
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
-        
+
+
+def postThreadLemEntryTask(inputData: dict):
+    logger = setup_background_logger()
+    try:
+        inputData["workerId"] = LemWorker.objects.get(empId = inputData['empId'], roleId= inputData['roleId']).pk  #refactoring
+        inputData["_id"] = hash50(inputData['lemId'], inputData['workerId'], inputData['workspaceId'])
+        logger.debug(reverseForOutput(inputData))
+        serializer = LemEntrySerializer(data=inputData)
+        if serializer.is_valid():
+            serializer.save() 
+            logger.info("Succsesfully saved Lem Entry")
+            return True
+        else:
+            for key, value in serializer.errors.items():
+                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(serializer.error_messages)
+    except Exception as e: 
+            logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+            raise e
+
+@csrf_exempt
+async def lemEntrytTask(request: ASGIRequest): 
+    logger = setup_background_logger()
+    try:
+        logger.info('Inserting Lem Entry Information')
+        inputData = loads(request.body)
+        if request.method == 'POST':
+            post = sync_to_async(postThreadLemEntryTask, thread_sensitive=True)
+            await post(inputData)
+            return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+        else: #do this later if needed
+            return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Revew Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.error(reverseForOutput(inputData))
+                raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
+    except Exception as e:
+        response = JsonResponse(data={f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(response.content)
+        return response
+    

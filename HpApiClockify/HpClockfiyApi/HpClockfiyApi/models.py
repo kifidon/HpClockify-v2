@@ -199,7 +199,7 @@ class BackGroundTaskResult(models.Model):
 ##################################################################################################################################################################################################
 
 class LemSheet(models.Model):
-    Lid = models.CharField(max_length = 50, db_column='Lid') #  date, and project
+    id = models.CharField(max_length = 50, primary_key=True) #  date, and project
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     lem_sheet_date = models.DateField(blank=False, null=False)
     lemNumber = models.CharField(max_length = 10, blank = False, null = False)
@@ -223,29 +223,26 @@ class Role(models.Model):
         db_table = 'Role'
 
 class Equipment(models.Model):
-    equipId = models.CharField(max_length=50, db_column='id')
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    equipId = models.CharField(max_length=50, null= False, blank=False)
     name = models.CharField(max_length=50, null=False, blank= False)
-    workspaceId = models.ForeignKey(Workspace, on_delete=models.DO_NOTHING, db_column='workspaceId')
     class Meta: 
         managed = False
         db_table = 'Equipment'
-        constraints = [
-            models.UniqueConstraint(fields=['id', 'workspaceId'], name='unique_equipment')
-        ]
-
+        
 class LemWorker(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     empId = models.ForeignKey(Employeeuser, on_delete= models.CASCADE, db_column='empId') # 
     roleId = models.ForeignKey(Role, on_delete=models.DO_NOTHING, db_column='roleId')
-    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId') #
     class Meta: 
         managed = False
         db_table = 'LemWorker'
         constraints = [
-            models.UniqueConstraint(fields=['empId', 'roleId', 'workspaceId'], name='unique_emp_role')
+            models.UniqueConstraint(fields=['empId', 'roleId'], name='unique_emp_role')
         ]
 
 class LemEntry(models.Model):
-    # id = models.CharField(max_length = 50, primary_key =True) # hashed by lemId and workerId
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)# hashed by lemId and workerId
     lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId') 
     workerId = models.ForeignKey(LemWorker, on_delete=models.DO_NOTHING, db_column='workerId')
     work = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
@@ -262,6 +259,7 @@ class LemEntry(models.Model):
         ]
 
 class EquipEntry(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId')
     equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId')
     isUnitRate = models.BooleanField()
@@ -275,6 +273,7 @@ class EquipEntry(models.Model):
         ]
 
 class WorkerRateSheet(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     clientId = models.ForeignKey(Client, on_delete= models.CASCADE, db_column='clientId', blank=False, null=False)
     roleId = models.ForeignKey(Role, on_delete=models.DO_NOTHING, db_column='roleId', blank=False, null= False)
     workRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
@@ -289,6 +288,7 @@ class WorkerRateSheet(models.Model):
         ]
 
 class EqpRateSheet(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='clientId', blank=False, null=False)
     equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId', blank=False, null=False)
     unitRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
@@ -302,6 +302,7 @@ class EqpRateSheet(models.Model):
         ]
 
 class ClientRep(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     empId = models.ForeignKey(Employeeuser, on_delete=models.DO_NOTHING, db_column='empId', blank=False, null=False)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='clientId', blank= False, null=False)
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
