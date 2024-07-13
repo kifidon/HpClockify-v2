@@ -125,9 +125,9 @@ def check_category_for_deletion(category_id, categories):
     return True
 
 def bytes_to_dict(byte_string):
-    logger = setup_background_logger('DEBUG')
+    logger = setup_background_logger()
     try:
-
+        logger.debug(f"byte to string - {byte_string}")
         # Decode the byte string into a regular string
         json_string = byte_string.decode('utf-8')
 
@@ -137,16 +137,21 @@ def bytes_to_dict(byte_string):
             for key, value in data.items():
                 try:
                     data[key] = ast.literal_eval(value[0])
-                except SyntaxError:
+                except Exception:
                     data[key] = value[0]
-            print(data)
+            logger.debug(f"Output dict - {data}")
             return data
         else:
-            return loads(json_string)
+            output = loads(json_string)
+            logger.debug(dumps(output, indent=4))
+            return output
     except JSONDecodeError as e:
         # Handle JSON decoding errors
         logger.error(f"Error decoding JSON: {e} at {e.__traceback__.tb_lineno}")
         return None
+    except Exception as e:
+        logger.error(f"({e.__traceback__.tb_lineno} - {str(e)}")
+        raise e
 
 def count_working_days(start_date, end_date, conn, cursor ):
     """

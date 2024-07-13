@@ -54,6 +54,8 @@ urlpatterns = [
     path('HpClockifyApi/lemEntry', views.LemWorkerEntry),
     path('HpClockifyApi/equipment', views.equipment),
     
+    path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
+    
     path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
     path('HpClockifyApi/task/Entry', tasks.approvedEntries),
     path('HpClockifyApi/task/Expense', tasks.approvedExpenses),

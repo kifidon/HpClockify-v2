@@ -1101,7 +1101,7 @@ async def lemSheet(request:ASGIRequest):
             try:
                 result = await post(inputData)
                 if result:
-                    return JsonResponse(data=inputData['Lid'], status= status.HTTP_201_CREATED, safe=False)
+                    return JsonResponse(data=inputData['id'], status= status.HTTP_201_CREATED, safe=False)
                 else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
@@ -1158,7 +1158,7 @@ async def LemWorkerEntry(request:ASGIRequest):
 
             await post(inputData)
 
-            url =  'http://localhost:5000/HpClockifyApi/task/Entry'
+            url =  'http://localhost:5000/HpClockifyApi/task/lemEntry'
             async with httpx.AsyncClient(timeout=300) as client:
                 await client.post(url=url, data=inputData)
 
@@ -1174,7 +1174,7 @@ async def LemWorkerEntry(request:ASGIRequest):
                 raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
             return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
     except Exception as e:
-        response = JsonResponse(data={f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
 

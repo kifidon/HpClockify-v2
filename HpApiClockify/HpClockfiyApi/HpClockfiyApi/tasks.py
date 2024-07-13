@@ -424,7 +424,10 @@ async def lemEntrytTask(request: ASGIRequest):
     logger = setup_background_logger()
     try:
         logger.info('Inserting Lem Entry Information')
-        inputData = loads(request.body)
+
+        inputData = bytes_to_dict(request.body)
+        logger.debug(inputData)
+        logger.debug(type(inputData) )
         if request.method == 'POST':
             post = sync_to_async(postThreadLemEntryTask, thread_sensitive=True)
             await post(inputData)
@@ -439,7 +442,7 @@ async def lemEntrytTask(request: ASGIRequest):
                 raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
             return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
     except Exception as e:
-        response = JsonResponse(data={f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
     
