@@ -40,6 +40,7 @@ from . Loggers import setup_server_logger
 from . import settings
 
 from json.decoder import JSONDecodeError
+from datetime import datetime
 import httpx
 import base64
 
@@ -1167,7 +1168,7 @@ async def LemWorkerEntry(request:ASGIRequest):
         else: #do this later if needed
             return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
     except ValidationError as v:
-            return JsonResponse(data="Invalid Request. Revew Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+            return JsonResponse(data="Invalid Request. Review Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
     except utils.IntegrityError as c:
             if "PRIMARY KEY constraint" in str(c):
                 logger.error(reverseForOutput(inputData))
@@ -1178,43 +1179,58 @@ async def LemWorkerEntry(request:ASGIRequest):
         logger.error(response.content)
         return response
 
-@api_view(['PUT', 'POST', 'GET'])
+
+def postThreadEquipEntry(inputData: dict):
+    logger = setup_server_logger()
+    try:
+        inputData['id'] = hash50(inputData["lemId"], inputData["equipId"], str(datetime.now())) 
+        logger.debug(dumps(inputData, indent=4))
+        serializer = EquipEntrySerializer(data=inputData)
+        
+        if serializer.is_valid():
+            serializer.save()
+            logger.info("Equip Entry saved succsesfully")
+            return True
+        else:
+            for key, value in serializer.errors.items():
+                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(serializer.errors)
+    except Exception as e: 
+        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+        raise e
+        
+
 @csrf_exempt
-async def equipment(request:ASGIRequest):
+async def equipmentEntries(request: ASGIRequest):
     logger = setup_server_logger()
     try: 
         inputData = loads(request.body)
         logger.debug(reverseForOutput(inputData))
         logger.info(request.method)
         if request.method == 'POST':
-            def postThread(inputData):
-                try:
-                    inputData['id'] = hash50(inputData['name'])
-                    serializer = EquipmentSerializer(data=inputData)
-                    if serializer.is_valid():
-                        serializer.save()
-                        return True
-                    else:
-                        for key, value in serializer.errors.items():
-                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-                        raise ValidationError(serializer.errors)
-                except ValidationError as v:
-                    return False
-                except Exception as e: 
-                    logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
-                    raise e
-            post = sync_to_async(postThread, thread_sensitive= True)
-
+            post = sync_to_async(postThreadEquipEntry, thread_sensitive= True)
             result = await post(inputData)
             if result:
                 return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
             else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Review Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.error(reverseForOutput(inputData))
+                raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
     except Exception as e:
-        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
+    
+
+
+
 
 
 

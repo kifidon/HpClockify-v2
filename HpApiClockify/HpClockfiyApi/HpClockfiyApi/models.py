@@ -259,7 +259,7 @@ class LemEntry(models.Model):
         ]
 
 class EquipEntry(models.Model):
-    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId')
     equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId')
     isUnitRate = models.BooleanField()
