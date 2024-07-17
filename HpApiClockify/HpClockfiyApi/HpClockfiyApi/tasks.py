@@ -405,6 +405,7 @@ def postThreadLemEntryTask(inputData: dict):
     try:
         inputData["workerId"] = LemWorker.objects.get(empId = inputData['empId'], roleId= inputData['roleId']).pk  #refactoring
         inputData["_id"] = hash50(inputData['lemId'], inputData['workerId'], inputData['workspaceId'])
+        logger.debug(inputData["_id"])
         logger.debug(reverseForOutput(inputData))
         serializer = LemEntrySerializer(data=inputData)
         if serializer.is_valid():

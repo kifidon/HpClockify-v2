@@ -41,6 +41,7 @@ from . import settings
 
 from json.decoder import JSONDecodeError
 from datetime import datetime
+import time 
 import httpx
 import base64
 
@@ -1183,20 +1184,21 @@ async def LemWorkerEntry(request:ASGIRequest):
 def postThreadEquipEntry(inputData: dict):
     logger = setup_server_logger()
     try:
-        inputData['id'] = hash50(inputData["lemId"], inputData["equipId"], str(datetime.now())) 
+        inputData["_id"] = hash50(inputData["lemId"], inputData["equipId"], str(time.time())) 
         logger.debug(dumps(inputData, indent=4))
-        serializer = EquipEntrySerializer(data=inputData)
-        
-        if serializer.is_valid():
-            serializer.save()
+        threadSerializer = EquipEntrySerializer(data=inputData)
+        if threadSerializer.is_valid():
+            logger.info("Saving Expense Entry")
+            threadSerializer.save()
             logger.info("Equip Entry saved succsesfully")
             return True
         else:
-            for key, value in serializer.errors.items():
+            for key, value in threadSerializer.errors.items():
                 logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
-            raise ValidationError(serializer.errors)
+            raise ValidationError(threadSerializer.initial_data)
     except Exception as e: 
-        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+        logger.debug(f"Initial Data: {dumps(threadSerializer.initial_data, indent = 4)}")
+        logger.error(f"{type(e)} ({e.__traceback__.tb_lineno}) - {str(e)} ")
         raise e
         
 
@@ -1207,6 +1209,7 @@ async def equipmentEntries(request: ASGIRequest):
         inputData = loads(request.body)
         logger.debug(reverseForOutput(inputData))
         logger.info(request.method)
+
         if request.method == 'POST':
             post = sync_to_async(postThreadEquipEntry, thread_sensitive= True)
             result = await post(inputData)
@@ -1224,17 +1227,14 @@ async def equipmentEntries(request: ASGIRequest):
                 raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
             return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
     except Exception as e:
-        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
     
 
 
-
-
-
-
-'''Future Proof   
+'''
+Future Proof   
     @api_view(['PUT', 'POST', 'GET'])
     @csrf_exempt
     async def lemWorker(request:ASGIRequest):

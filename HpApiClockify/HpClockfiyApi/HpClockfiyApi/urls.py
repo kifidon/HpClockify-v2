@@ -52,7 +52,7 @@ urlpatterns = [
     
     path('HpClockifyApi/lemSheet', views.lemSheet),
     path('HpClockifyApi/lemEntry', views.LemWorkerEntry),
-    path('HpClockifyApi/equipment', views.equipment),
+    path('HpClockifyApi/equipmentEntry', views.equipmentEntries),
     
     path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
     

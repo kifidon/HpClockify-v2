@@ -26,15 +26,16 @@ def create_hash(user_id, category_id, date_string):
 
 
 def hash50(vall1, vall2 = None, vall3 = None):
+    logger = setup_background_logger()
     # Concatenate the user ID, category ID, and date string
     combined_string = vall1 + (vall2 or '') + (vall3 or '')
-    
+    logger.debug(f"Hash String: {combined_string}")
     # Calculate the SHA-256 hash of the combined string
     hash_object = hashlib.sha256(combined_string.encode())
     
     # Get the hexadecimal representation of the hash and truncate it to 64 characters
     hash_id = hash_object.hexdigest()[:45]
-    
+    logger.debug(f"ID: {hash_id}")
     return hash_id
 
 def download_text_file(folder_path = None):

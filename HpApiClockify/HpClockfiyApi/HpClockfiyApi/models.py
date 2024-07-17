@@ -223,8 +223,7 @@ class Role(models.Model):
         db_table = 'Role'
 
 class Equipment(models.Model):
-    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
-    equipId = models.CharField(max_length=50, null= False, blank=False)
+    id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     name = models.CharField(max_length=50, null=False, blank= False)
     class Meta: 
         managed = False
@@ -259,18 +258,15 @@ class LemEntry(models.Model):
         ]
 
 class EquipEntry(models.Model):
-    id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    _id = models.CharField(primary_key=True, max_length=50)
     lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId')
     equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId')
     isUnitRate = models.BooleanField()
-    qty = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.00)
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     class Meta:
         managed = False
-        db_table = 'EquipEntry'
-        constraints = [
-            models.UniqueConstraint(fields=['lemId', 'workspaceId', ], name='unique_lem_entry')
-        ]
+        db_table = "EquipEntry"
 
 class WorkerRateSheet(models.Model):
     _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
