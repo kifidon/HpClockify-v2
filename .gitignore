@@ -21,4 +21,4 @@ __pycache__/
 .venv/
 .github/
 .gitattributes
-.HpApiClockify/HpClockfiyApi/HpClockfiyApi/migrations/
+HpApiClockify/HpClockfiyApi/HpClockfiyApi/migrations/
