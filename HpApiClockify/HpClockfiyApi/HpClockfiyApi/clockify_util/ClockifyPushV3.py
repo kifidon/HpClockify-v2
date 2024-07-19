@@ -541,7 +541,7 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
     deleteEntries(conn, cursor, entries, aID) # delete stale entries before inserting, as to minimize transactions
     try:
         for entry in entries:
-            approval = entry['approvalRequestId']
+            approval = entry['approvalRequestId'] or aID
             eID = entry['id']
             duration = timeDuration(entry['timeInterval']['duration'])
             description = entry['description']
