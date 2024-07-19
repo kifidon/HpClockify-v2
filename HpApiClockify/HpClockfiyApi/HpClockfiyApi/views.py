@@ -847,38 +847,38 @@ async def newExpense(request: ASGIRequest):
 
 
 
-entrySemaphore = asyncio.Semaphore(3)
+entrySemaphore = asyncio.Semaphore(1)
 
 def processEntry(inputData):
-                            try:
-                                entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                                serializer = EntrySerializer(instance=entry, data= inputData )
-                                logger.info(f'Update path taken for Entry')
-                            except Entry.DoesNotExist:
-                                serializer = EntrySerializer(data = inputData )
-                                logger.info(f'Insert path taken for Entry')
-                            if serializer.is_valid():
-                                serializer.save()
-                                logger.info('\tOperation Complete')
-                                # do the rest 
-                                return True, 'V'
-                            else:
-                                logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                                for key, value in serializer.errors.items():
-                                    logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-                                    # Check if the value is an instance of ErrorDetail
-                                    if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                                        # Print the key and each error code and message
-                                        for error_detail in value:
-                                            code = error_detail.code
-                                            field = key
-                                            '''
-                                            include check for other foreign keys to know which foreign key 
-                                            constraint is violated and which function should handle it
-                                            '''
-                                            if code == 'does_not_exist': 
-                                                return False, 'C' # C for category P for Project, F for file in later updates 
-                                return False, 'X' # Unknown, Raise error (BAD Request)
+    try:
+        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+        serializer = EntrySerializer(instance=entry, data= inputData )
+        logger.info(f'Update path taken for Entry')
+    except Entry.DoesNotExist:
+        serializer = EntrySerializer(data = inputData )
+        logger.info(f'Insert path taken for Entry')
+    if serializer.is_valid():
+        serializer.save()
+        logger.info('\tOperation Complete')
+        # do the rest 
+        return True, 'V'
+    else:
+        logger.warning(f'Serializer could not be saved: {serializer.errors}')
+        for key, value in serializer.errors.items():
+            logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+            # Check if the value is an instance of ErrorDetail
+            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                # Print the key and each error code and message
+                for error_detail in value:
+                    code = error_detail.code
+                    field = key
+                    '''
+                    include check for other foreign keys to know which foreign key 
+                    constraint is violated and which function should handle it
+                    '''
+                    if code == 'does_not_exist': 
+                        return False, 'C' # C for category P for Project, F for file in later updates 
+        return False, 'X' # Unknown, Raise error (BAD Request)
 
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
@@ -907,55 +907,65 @@ async def newEntry(request:ASGIRequest):
     retryFlag = True
     maxRetries = 3
     retryCount = 0
-    while retryFlag and maxRetries >= retryCount:
-        if retryCount > 0: 
-            logger.info('\tRetrying....')
-        retryCount += 1
-        retryFlag = False
-        try:
-            if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
-                if request.method == 'POST':
+    logger.info('\tWaiting for Semaphore')
+    async with entrySemaphore: # only 3 concurent tasks
+        logger.info('\tSemaphore Aquired')
+        while retryFlag and maxRetries > retryCount:
+            if retryCount > 0: 
+                logger.info('\tRetrying....')
+            retryCount += 1
+            retryFlag = False
+            try:
+                if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+                    #Get input Data 
                     try:
                         inputData = loads(request.body)
                     except Exception:
                         logger.warning('Unknown Exception, attempting to handle')
                         inputData = request.POST
-                    logger.debug(reverseForOutput(inputData))
-                    
-                    logger.info('\tWaiting for Semaphore')
-                    async with entrySemaphore: # only 3 concurent tasks
-                        logger.info('\tSemaphore Aquired')
-                        processEntryAsync = sync_to_async(processEntry)
-                        result = await processEntryAsync(inputData)
-                        
 
-            else:
-                response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-                await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
-                return response
-        except Exception as e: 
-            response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
-            logger.error(response.content.decode('utf-8'))
-            await saveTaskResult(response, loads(request.body), caller )
-            if 'deadlocked' in str(e):
-                retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
-            else:
-                # logger.debug('Not Deadlock?')
-                logger.error('Not Deadlock Error. Failed operation exiting')
-                return response
-        finally: 
-            logger.info('\tSemaphore Released')   
-            logger.info('') # for readability
-            if result[0]:
-                return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
-            else:
-                return JsonResponse(
-                    data= {
-                        'Message': 'Post Data could not be validated. Review Logs'
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                )
-    return JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    #assert POST
+                    if request.method != 'POST':
+                        response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
+                        asyncio.create_task(saveTaskResult(response, inputData, caller))
+                        break
+
+                    # store data
+                    logger.debug(reverseForOutput(inputData))
+                    processEntryAsync = sync_to_async(processEntry)
+                    result = await processEntryAsync(inputData)
+                    
+                    # generate response
+                    if result[0]:
+                        response = JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                        break
+                    else:
+                        response =  JsonResponse(
+                            data= {
+                                'Message': 'Post Data could not be validated. Review Logs'
+                                },
+                                status=status.HTTP_400_BAD_REQUEST
+                        )    
+                        break
+
+                else: #invalid security key
+                    response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+                    await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+                    break
+
+            except Exception as e: 
+                response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+                logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+                if 'deadlocked' in str(e):
+                    retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
+                else:
+                    break
+        if maxRetries <= retryCount:
+            response = JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    logger.info('Entry Semaphore Released')
+    await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+    return response
+            
         
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):

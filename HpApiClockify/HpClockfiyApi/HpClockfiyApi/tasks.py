@@ -314,7 +314,7 @@ async def approvedEntries(request: ASGIRequest):
                     await updateAsync(allEntries[i], workspaceId, timeId, inputData)
                     logger.info('\tTask Complete')
                 response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                logger.info(f'Entries added for timesheet {timeId}') 
+                logger.info(f'All Entries added for timesheet {timeId}') 
                 break
     
             except Exception as e:
