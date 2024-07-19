@@ -219,7 +219,8 @@ def updateTags(inputdata: dict):
 
 approvedEntrySemaphore = asyncio.Semaphore(2)
 
-def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread 
+def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread
+    logger.info('\t\tExecuting Task') 
     try: 
         #refactoring 
         entries['workspaceId']= workspaceId
@@ -306,9 +307,9 @@ async def approvedEntries(request: ASGIRequest):
                         #     )
                         # await asyncio.gather(*tasks)
                             for i in range(0,len(allEntries)): # updates all entries sync 
-                                time.sleep(randint(0,5))
-                                logger.info('Task Starting')
+                                time.sleep(randint(1,6))
                                 asyncio.create_task(updateAsync(allEntries[i], workspaceId, timeId, inputData))
+                                logger.info('\tTask has been created')
                         else: 
                             logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
                             response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
