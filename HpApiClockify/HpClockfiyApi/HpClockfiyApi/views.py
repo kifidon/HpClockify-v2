@@ -922,7 +922,7 @@ async def newEntry(request:ASGIRequest):
                     processEntryAsync = sync_to_async(processEntry)
                     result = await processEntryAsync(inputData)
                     if result[0]:
-                        return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                        retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
                     else:
                         return JsonResponse(
                             data= {
