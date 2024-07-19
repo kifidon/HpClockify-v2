@@ -151,6 +151,7 @@ async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryF
             if dataAll != 0:
                 output = []
                 for data in dataAll:
+                    logger.info('Temp store Entry data in dict() object')
                     if data is not None:
                         output.extend(data)           
                 return output 
