@@ -38,7 +38,7 @@ from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
 from . import settings
-
+from rest_framework.exceptions import ErrorDetail
 from json.decoder import JSONDecodeError
 from datetime import datetime
 import time 
@@ -845,6 +845,9 @@ async def newExpense(request: ASGIRequest):
         logger.error(response.content)
         return response
 
+entrySemaphore = asyncio.Semaphore(3)
+
+
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
     '''
@@ -887,41 +890,43 @@ async def newEntry(request:ASGIRequest):
                         logger.warning('Unknown Exception, attempting to handle')
                         inputData = request.POST
                     logger.debug(reverseForOutput(inputData))
-
-                    def processEntry(inputData):
-                        try:
-                            entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                            serializer = EntrySerializer(instance=entry, data= inputData )
-                            logger.info(f'Update path taken for Entry')
-                        except Entry.DoesNotExist:
-                            serializer = EntrySerializer(data = inputData )
-                            logger.info(f'Insert path taken for Entry')
-                        if serializer.is_valid():
-                            serializer.save()
-                            # do the rest 
-                            return True, 'V'
-                        else:
-                            logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                            for key, value in serializer.errors.items():
-                                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-                                # Check if the value is an instance of ErrorDetail
-                                if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                                    # Print the key and each error code and message
-                                    for error_detail in value:
-                                        code = error_detail.code
-                                        field = key
-                                        '''
-                                        include check for other foreign keys to know which foreign key 
-                                        constraint is violated and which function should handle it
-                                        '''
-                                        if code == 'does_not_exist': 
-                                            return False, 'C' # C for category P for Project, F for file in later updates 
-                            return False, 'X' # Unknown, Raise error (BAD Request)
-                    
+                    logger.info('Waiting for Semaphore')
+                    async with entrySemaphore: # only 3 concurent tasks
+                        logger.info('Semaphore Aquired')
+                        def processEntry(inputData):
+                            try:
+                                entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+                                serializer = EntrySerializer(instance=entry, data= inputData )
+                                logger.info(f'Update path taken for Entry')
+                            except Entry.DoesNotExist:
+                                serializer = EntrySerializer(data = inputData )
+                                logger.info(f'Insert path taken for Entry')
+                            if serializer.is_valid():
+                                serializer.save()
+                                # do the rest 
+                                return True, 'V'
+                            else:
+                                logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                                for key, value in serializer.errors.items():
+                                    logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                                    # Check if the value is an instance of ErrorDetail
+                                    if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                                        # Print the key and each error code and message
+                                        for error_detail in value:
+                                            code = error_detail.code
+                                            field = key
+                                            '''
+                                            include check for other foreign keys to know which foreign key 
+                                            constraint is violated and which function should handle it
+                                            '''
+                                            if code == 'does_not_exist': 
+                                                return False, 'C' # C for category P for Project, F for file in later updates 
+                                return False, 'X' # Unknown, Raise error (BAD Request)
+                        
                     processEntryAsync = sync_to_async(processEntry)
                     result = await processEntryAsync(inputData)
                     if result[0]:
-                        retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
+                        return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
                     else:
                         return JsonResponse(
                             data= {

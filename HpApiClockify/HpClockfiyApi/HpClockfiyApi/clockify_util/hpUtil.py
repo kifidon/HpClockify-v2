@@ -21,7 +21,7 @@ async def pauseOnDeadlock(caller, recordID):
     for i in range(pauseFor):
         logger.info('\t\tWaiting..........')
         await asyncio.sleep(1)
-    logger.info('Resuming after pause')
+    logger.info('\tResuming after pause')
     return True
 
 def create_hash(user_id, category_id, date_string):
