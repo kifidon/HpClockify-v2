@@ -11,6 +11,16 @@ from django.http import JsonResponse, HttpResponse
 import os 
 import shutil
 import hashlib
+import random
+
+async def pauseOnDeadlock(caller, recordID):
+    logger = setup_background_logger()
+    logger.warning(f'DEADLOCK OCCURED WHILE EXECUTING {caller} - Record ID is {recordID}')
+    pauseFor = random.randint(10, 120)
+    logger.info(f'Pausing for {pauseFor}')
+    await asyncio.sleep(pauseFor)
+    logger.info('Resuming after pause')
+    return True
 
 def create_hash(user_id, category_id, date_string):
     # Concatenate the user ID, category ID, and date string
@@ -333,6 +343,7 @@ def sqlConnect():
         tuple: A tuple containing a cursor object and a connection object if the connection is successful, otherwise dict().
     """
     try:
+        logger = setup_background_logger()
         #server info 
         server = 'hpcs.database.windows.net'
         database = 'hpdb'
@@ -346,8 +357,8 @@ def sqlConnect():
         cursor = conn.cursor()
         return cursor, conn
     except pyodbc.Error as e:
-        print(f"Error: {e}")
-        return None ,None
+        logger.critical(f"Error: {e}")
+        raise e
 
 def cleanUp(conn, cursor):
     """

@@ -35,7 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from .clockify_util.QuickBackupV3 import main, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
 from . import settings
 
@@ -869,70 +869,76 @@ async def newEntry(request:ASGIRequest):
     logger.info(caller)
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
-    try:
-        if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
-            if request.method == 'POST':
-                try:
-                    inputData = loads(request.body)
-                    RetryFlag = False 
-                except Exception:
-                    logger.warning('Unknown Exception, attempting to handle')
-                    inputData = request.POST
-                    RetryFlag = True
-                logger.debug(reverseForOutput(inputData))
-
-                def processEntry(inputData):
+    retryFlag = True
+    while retryFlag:
+        retryFlag = False
+        try:
+            if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+                if request.method == 'POST':
                     try:
-                        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                        serializer = EntrySerializer(instance=entry, data= inputData )
-                        logger.info(f'Update path taken for Entry')
-                    except Entry.DoesNotExist:
-                        serializer = EntrySerializer(data = inputData )
-                        logger.info(f'Insert path taken for Entry')
-                    if serializer.is_valid():
-                        serializer.save()
-                        # do the rest 
-                        return True, 'V'
+                        inputData = loads(request.body)
+                        RetryFlag = False 
+                    except Exception:
+                        logger.warning('Unknown Exception, attempting to handle')
+                        inputData = request.POST
+                        RetryFlag = True
+                    logger.debug(reverseForOutput(inputData))
+
+                    def processEntry(inputData):
+                        try:
+                            entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+                            serializer = EntrySerializer(instance=entry, data= inputData )
+                            logger.info(f'Update path taken for Entry')
+                        except Entry.DoesNotExist:
+                            serializer = EntrySerializer(data = inputData )
+                            logger.info(f'Insert path taken for Entry')
+                        if serializer.is_valid():
+                            serializer.save()
+                            # do the rest 
+                            return True, 'V'
+                        else:
+                            #force backgroung task 
+                            logger.warning(f'Serializer could not be saved: {serializer.errors}')
+                            for key, value in serializer.errors.items():
+                                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                                # Check if the value is an instance of ErrorDetail
+                                if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                                    # Print the key and each error code and message
+                                    for error_detail in value:
+                                        code = error_detail.code
+                                        field = key
+                                        '''
+                                        include check for other foreign keys to know which foreign key 
+                                        constraint is violated and which function should handle it
+                                        '''
+                                        if code == 'does_not_exist': 
+                                            return False, 'C' # C for category P for Project, F for file in later updates 
+                            return False, 'X' # Unknown, Raise error (BAD Request)
+                    
+                    processEntryAsync = sync_to_async(processEntry)
+                    result = await processEntryAsync(inputData)
+                    if result[0]:
+                        return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
                     else:
-                        #force backgroung task 
-                        logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                        for key, value in serializer.errors.items():
-                            logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-                            # Check if the value is an instance of ErrorDetail
-                            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                                # Print the key and each error code and message
-                                for error_detail in value:
-                                    code = error_detail.code
-                                    field = key
-                                    '''
-                                    include check for other foreign keys to know which foreign key 
-                                    constraint is violated and which function should handle it
-                                    '''
-                                    if code == 'does_not_exist': 
-                                        return False, 'C' # C for category P for Project, F for file in later updates 
-                        return False, 'X' # Unknown, Raise error (BAD Request)
-                
-                processEntryAsync = sync_to_async(processEntry)
-                result = await processEntryAsync(inputData)
-                if result[0]:
-                    return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
-                else:
-                    return JsonResponse(
-                        data= {
-                            'Message': 'Post Data could not be validated. Review Logs'
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                    )
-        else:
-            response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-            await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
-            return response
-    except Exception as e: 
-        response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
-        logger.error(response.content.decode('utf-8'))
-        await saveTaskResult(response, loads(request.body), caller )
-        return response
-    
+                        return JsonResponse(
+                            data= {
+                                'Message': 'Post Data could not be validated. Review Logs'
+                                },
+                                status=status.HTTP_400_BAD_REQUEST
+                        )
+            else:
+                response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+                await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+                return response
+        except Exception as e: 
+            response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+            logger.error(response.content.decode('utf-8'))
+            await saveTaskResult(response, loads(request.body), caller )
+            if 'deadlocked' in str(e):
+                retryFlag = pauseOnDeadlock('newEntry', inputData['id'] or '')
+            else:
+                return response
+        
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
     '''
@@ -951,40 +957,53 @@ async def deleteEntry(request:ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Entry Function called')
     secret = '0IQNBiGEAejNMlFmdQc8NWEiMe1Uzg01'
-    if aunthenticateRequst(request, secret):
-        inputData = loads(request.body)
-        logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
-        
-        if request.method == 'POST':
-            
-            def deleteEntry():
-                try:
-                    expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
-                    expense.delete()
-                    logger.info('Entry Deleted...')
-                    return True
-                except Entry.DoesNotExist:
-                    logger.warning('Entry was not deleted successfully')
-                    return False
-            
-            deleteAsync =  sync_to_async(deleteEntry)
-            result = await deleteAsync()
-            
-            if result:
-                response = JsonResponse(data = {
-                        'Message': 'Expense Deleted',
-                        'data': inputData
-                    }, status=status.HTTP_200_OK)
-                logger.debug(response)
+    retryFlag = True
+    caller = 'deleteEntry'
+    while retryFlag:
+        retryFlag = False
+        try:
+            if aunthenticateRequst(request, secret):
+                inputData = loads(request.body)
+                logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+                
+                if request.method == 'POST':
+                    
+                    def deleteEntry():
+                        try:
+                            expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
+                            expense.delete()
+                            logger.info('Entry Deleted...')
+                            return True
+                        except Entry.DoesNotExist:
+                            logger.warning('Entry was not deleted successfully')
+                            return False
+                    
+                    deleteAsync =  sync_to_async(deleteEntry)
+                    result = await deleteAsync()
+                    
+                    if result:
+                        response = JsonResponse(data = {
+                                'Message': 'Expense Deleted',
+                                'data': inputData
+                            }, status=status.HTTP_200_OK)
+                        logger.debug(response)
+                        return response
+                    else: 
+                        response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+                        logger.debug(response)
+                        return response
+            else:
+                response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+                await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
                 return response
-            else: 
-                response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
-                logger.debug(response)
+        except Exception as e: 
+            response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+            logger.error(response.content.decode('utf-8'))
+            await saveTaskResult(response, loads(request.body), caller )
+            if 'deadlocked' in str(e):
+                retryFlag = pauseOnDeadlock(caller, inputData['id']  or '')
+            else:
                 return response
-    else:
-        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
-        return response
 
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):

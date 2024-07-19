@@ -372,7 +372,7 @@ def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
     headers = {
         'X-Api-Key': key
     }
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=5"    
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=100&sort-column=UPDATED_AT"    
     response = requests.get(url, headers=headers)
     # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
     #     pass
