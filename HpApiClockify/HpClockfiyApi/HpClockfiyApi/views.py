@@ -870,18 +870,20 @@ async def newEntry(request:ASGIRequest):
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
     retryFlag = True
-    while retryFlag:
+    maxRetries = 3
+    retryCount = 0
+    while retryFlag and maxRetries < retryCount:
+        retryCount += 1
         retryFlag = False
         try:
             if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
                 if request.method == 'POST':
                     try:
                         inputData = loads(request.body)
-                        RetryFlag = False 
+
                     except Exception:
                         logger.warning('Unknown Exception, attempting to handle')
                         inputData = request.POST
-                        RetryFlag = True
                     logger.debug(reverseForOutput(inputData))
 
                     def processEntry(inputData):
@@ -935,9 +937,10 @@ async def newEntry(request:ASGIRequest):
             logger.error(response.content.decode('utf-8'))
             await saveTaskResult(response, loads(request.body), caller )
             if 'deadlocked' in str(e):
-                retryFlag = await pauseOnDeadlock('newEntry', inputData['id'] or '')
+                retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
             else:
                 return response
+    return JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
