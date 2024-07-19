@@ -16,10 +16,10 @@ from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
 from .clockify_util.hpUtil import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, pauseOnDeadlock
+from random import randint
 import time 
 import requests
 import asyncio
-
 
 loggerLevel = 'WARNING'
 logger = setup_background_logger(loggerLevel) #pass level argument 
@@ -287,7 +287,7 @@ async def approvedEntries(request: ASGIRequest):
                                 raise ValidationError(serializer.errors)
                         except Exception as e:
                             logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
-                            raise  e
+                            raise e
                         
                     updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
                     tasks = []
@@ -299,8 +299,8 @@ async def approvedEntries(request: ASGIRequest):
                         #     )
                         # await asyncio.gather(*tasks)
                         for i in range(0,len(allEntries)): # updates all entries sync 
-                                time.sleep(1)
-                                asyncio.create_task(updateAsync(allEntries[i]))
+                            time.sleep(randint(0,5))
+                            asyncio.create_task(updateAsync(allEntries[i]))
                             
                         logger.info(f'Entries added for timesheet {timeId}') 
                         response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
@@ -322,7 +322,8 @@ async def approvedEntries(request: ASGIRequest):
                 response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
                 asyncio.create_task(saveTaskResult(response, inputData, caller))
                 if 'deadlocked' in str(e):
-                    retryFlag = pauseOnDeadlock('approvedEntries', inputData['id'])
+                    logger.debug(f'Caught Deadlock error: {str(e)}')
+                    retryFlag = await pauseOnDeadlock('approvedEntries', inputData['id'])
                 else:
                     return response
     else:

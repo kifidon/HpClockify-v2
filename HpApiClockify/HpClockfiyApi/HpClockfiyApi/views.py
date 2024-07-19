@@ -935,7 +935,7 @@ async def newEntry(request:ASGIRequest):
             logger.error(response.content.decode('utf-8'))
             await saveTaskResult(response, loads(request.body), caller )
             if 'deadlocked' in str(e):
-                retryFlag = pauseOnDeadlock('newEntry', inputData['id'] or '')
+                retryFlag = await pauseOnDeadlock('newEntry', inputData['id'] or '')
             else:
                 return response
         
@@ -1001,7 +1001,7 @@ async def deleteEntry(request:ASGIRequest):
             logger.error(response.content.decode('utf-8'))
             await saveTaskResult(response, loads(request.body), caller )
             if 'deadlocked' in str(e):
-                retryFlag = pauseOnDeadlock(caller, inputData['id']  or '')
+                retryFlag = await pauseOnDeadlock(caller, inputData['id']  or '')
             else:
                 return response
 
