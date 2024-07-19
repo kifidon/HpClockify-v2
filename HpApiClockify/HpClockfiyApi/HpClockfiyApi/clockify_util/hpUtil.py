@@ -16,7 +16,7 @@ import random
 async def pauseOnDeadlock(caller, recordID):
     logger = setup_background_logger()
     logger.warning(f'DEADLOCK OCCURED WHILE EXECUTING {caller} - Record ID is {recordID}')
-    pauseFor = random.randint(0, 20 )
+    pauseFor = random.randint(0, 5 )
     logger.info(f'Pausing for {pauseFor}s')
     for i in range(pauseFor):
         await asyncio.sleep(1)
