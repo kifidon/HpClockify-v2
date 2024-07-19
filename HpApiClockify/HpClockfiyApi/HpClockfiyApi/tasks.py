@@ -217,6 +217,41 @@ def updateTags(inputdata: dict):
             logger.info(f'Unhandled Exception ({e.__traceback__.tb_lineno}): {str(e)} ')
             raise e
 
+approvedEntrySemaphore = asyncio.Semaphore(2)
+
+def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread 
+    try: 
+        #refactoring 
+        entries['workspaceId']= workspaceId
+        entries['timesheetId'] = entries['approvalRequestId']
+        try: # try and update if exists, otherwise create
+            entry = Entry.objects.get(id = entries["id"], workspaceId = workspaceId )
+            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
+            logger.info(f'Updating Entry {entries["id"]}')
+        except Entry.DoesNotExist:
+            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+            logger.warning(f'Creating new Entry on timesheet {timeId}')
+
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries["id"]} 202 ACCEPTED') 
+            reversed_data = reverseForOutput(entries)
+            logger.info(f'{reversed_data}') 
+            if (len(entries['tags']) != 0):
+                data = {
+                    'timesheet': inputData,
+                    'entry': entries
+                }
+                updateTags(data)
+            return serializer.validated_data
+        else: 
+            logger.error(f'{serializer.errors}')
+            raise ValidationError(serializer.errors)
+    except Exception as e:
+        logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
+        raise e
+                    
+
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest): 
     '''
@@ -257,60 +292,27 @@ async def approvedEntries(request: ASGIRequest):
                         response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
                         asyncio.create_task(saveTaskResult(response, inputData, caller))
                         return response
-                    def syncUpdateEntries(entries): # create thread 
-                        try: 
-                            #refactoring 
-                            entries['workspaceId']= workspaceId
-                            entries['timesheetId'] = entries['approvalRequestId']
-                            try: # try and update if exists, otherwise create
-                                entry = Entry.objects.get(id = entries["id"], workspaceId = workspaceId )
-                                serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
-                                logger.info(f'Updating Entry {entries["id"]}')
-                            except Entry.DoesNotExist:
-                                serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                                logger.warning(f'Creating new Entry on timesheet {timeId}')
-
-                            if serializer.is_valid():
-                                serializer.save()
-                                logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries["id"]} 202 ACCEPTED') 
-                                reversed_data = reverseForOutput(entries)
-                                logger.info(f'{reversed_data}') 
-                                if (len(entries['tags']) != 0):
-                                    data = {
-                                        'timesheet': inputData,
-                                        'entry': entries
-                                    }
-                                    updateTags(data)
-                                return serializer.validated_data
-                            else: 
-                                logger.error(f'{serializer.errors}')
-                                raise ValidationError(serializer.errors)
-                        except Exception as e:
-                            logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
-                            raise e
-                        
-                    updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-                    tasks = []
-                    if len(allEntries) != 0:
-                        '''Causes SQL server deadlock on resources'''
+                    logger.info('\tWaiting for Approved Entry Semaphore')
+                    async with approvedEntrySemaphore:
+                        logger.info('\tAquired Approved Entry Semaphore')
+                    
+                        updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                        tasks = []
+                        if len(allEntries) != 0:
+                            '''May cause SQL server deadlock on resources'''
                         # for i in range(0,len(allEntries)): # updates all entries async 
                         #     tasks.append(
                         #         updateAsync(allEntries[i])
                         #     )
                         # await asyncio.gather(*tasks)
-                        for i in range(0,len(allEntries)): # updates all entries sync 
-                            time.sleep(randint(0,5))
-                            asyncio.create_task(updateAsync(allEntries[i]))
-                            
-                        logger.info(f'Entries added for timesheet {timeId}') 
-                        response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                        asyncio.create_task(saveTaskResult(response, inputData, caller))
-                        return response
-                    else: 
-                        logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                        response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                        asyncio.create_task(saveTaskResult(response, inputData, caller))
-                        return response
+                            for i in range(0,len(allEntries)): # updates all entries sync 
+                                time.sleep(randint(0,5))
+                                asyncio.create_task(updateAsync(allEntries[i]))
+                        else: 
+                            logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
+                            response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                            asyncio.create_task(saveTaskResult(response, inputData, caller))
+                            return response
                 else:
                         logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
                         response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
@@ -326,6 +328,12 @@ async def approvedEntries(request: ASGIRequest):
                     retryFlag = await pauseOnDeadlock('approvedEntries', inputData['id'])
                 else:
                     return response
+            finally:
+                logger.info(f'Entries added for timesheet {timeId}') 
+                logger.info('\tSemaphore Released')
+                response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
+                asyncio.create_task(saveTaskResult(response, inputData, caller))
+                return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
