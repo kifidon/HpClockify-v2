@@ -308,7 +308,7 @@ async def approvedEntries(request: ASGIRequest):
                         # await asyncio.gather(*tasks)
                             for i in range(0,len(allEntries)): # updates all entries sync 
                                 time.sleep(randint(1,6))
-                                asyncio.create_task(updateAsync(allEntries[i], workspaceId, timeId, inputData))
+                                await updateAsync(allEntries[i], workspaceId, timeId, inputData)
                                 logger.info('\tTask has been created')
                         else: 
                             logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
