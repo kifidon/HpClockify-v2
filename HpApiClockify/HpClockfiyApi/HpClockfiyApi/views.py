@@ -873,6 +873,8 @@ async def newEntry(request:ASGIRequest):
     maxRetries = 3
     retryCount = 0
     while retryFlag and maxRetries >= retryCount:
+        if retryCount > 0: 
+            logger.info('/tRetrying....')
         retryCount += 1
         retryFlag = False
         try:
