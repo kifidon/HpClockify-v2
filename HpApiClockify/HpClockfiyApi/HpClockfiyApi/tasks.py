@@ -274,62 +274,63 @@ async def approvedEntries(request: ASGIRequest):
     logger.debug(type(request))
     if request.method == 'POST':
         retryFlag = True
-        while retryFlag:
-            retryFlag = False            
-            try:
-                logger.debug(type(request.body))
-                inputData = bytes_to_dict(request.body)
-                logger.debug(dumps(inputData,indent=4))
-                key = ClockifyPullV3.getApiKey()
-                
-                timeId = inputData.get("id")
-                workspaceId = inputData.get('workspaceId')
-                stat = inputData.get('status').get('state') or None
-            
-                if stat == 'APPROVED':
-                    allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
-                    if len(allEntries) == 0:
-                        logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
-                        response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-                        asyncio.create_task(saveTaskResult(response, inputData, caller))
-                        return response
-                    logger.info('\tWaiting for Approved Entry Semaphore')
-                    async with approvedEntrySemaphore:
-                        logger.info('\tAquired Approved Entry Semaphore')
+        retryFlag = False            
+        try:
+            async with approvedEntrySemaphore:
+                while retryFlag:
+                    try:
+                        logger.debug(type(request.body))
+                        inputData = bytes_to_dict(request.body)
+                        logger.debug(dumps(inputData,indent=4))
+                        key = ClockifyPullV3.getApiKey()
+                        
+                        timeId = inputData.get("id")
+                        workspaceId = inputData.get('workspaceId')
+                        stat = inputData.get('status').get('state') or None
                     
-                        updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-                        tasks = []
-                        if len(allEntries) != 0:
-                            '''May cause SQL server deadlock on resources'''
-                            for i in range(0,len(allEntries)): # updates all entries sync 
-                                await updateAsync(allEntries[i], workspaceId, timeId, inputData)
-                                logger.info('\tTask Complete')
-                        else: 
-                            logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                            response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                            asyncio.create_task(saveTaskResult(response, inputData, caller))
-                            return response
-                else:
-                        logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-                        response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                        if stat == 'APPROVED':
+                            allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+                            if len(allEntries) == 0:
+                                logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
+                                response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+                                asyncio.create_task(saveTaskResult(response, inputData, caller))
+                                return response
+                            logger.info('\tWaiting for Approved Entry Semaphore')
+                            logger.info('\tAquired Approved Entry Semaphore')
+                        
+                            updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                            tasks = []
+                            if len(allEntries) != 0:
+                                '''May cause SQL server deadlock on resources'''
+                                for i in range(0,len(allEntries)): # updates all entries sync 
+                                    await updateAsync(allEntries[i], workspaceId, timeId, inputData)
+                                    logger.info('\tTask Complete')
+                            else: 
+                                logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
+                                response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                                asyncio.create_task(saveTaskResult(response, inputData, caller))
+                                return response
+                        else:
+                                logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
+                                response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                                asyncio.create_task(saveTaskResult(response, inputData, caller))
+                                return response
+                
+                    except Exception as e:
+                        logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+                        response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
                         asyncio.create_task(saveTaskResult(response, inputData, caller))
-                        return response
-        
-            except Exception as e:
-                logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
-                asyncio.create_task(saveTaskResult(response, inputData, caller))
-                if 'deadlocked' in str(e):
-                    logger.debug(f'Caught Deadlock error: {str(e)}')
-                    retryFlag = await pauseOnDeadlock('approvedEntries', inputData['id'])
-                else:
-                    return response
-            finally:
-                logger.info(f'Entries added for timesheet {timeId}') 
-                logger.info('\tSemaphore Released')
-                response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                asyncio.create_task(saveTaskResult(response, inputData, caller))
-                return response
+                        if 'deadlocked' in str(e):
+                            logger.debug(f'Caught Deadlock error: {str(e)}')
+                            retryFlag = await pauseOnDeadlock('approvedEntries', inputData['id'])
+                        else:
+                            return response
+        finally:
+            logger.info(f'Entries added for timesheet {timeId}') 
+            logger.info('\tSemaphore Released')
+            response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
+            asyncio.create_task(saveTaskResult(response, inputData, caller))
+            return response
     else:
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
