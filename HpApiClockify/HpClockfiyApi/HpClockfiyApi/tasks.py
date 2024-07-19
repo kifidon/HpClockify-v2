@@ -307,7 +307,8 @@ async def approvedEntries(request: ASGIRequest):
                         # await asyncio.gather(*tasks)
                             for i in range(0,len(allEntries)): # updates all entries sync 
                                 time.sleep(randint(0,5))
-                                asyncio.create_task(updateAsync(allEntries[i]))
+                                logger.info('Task Starting')
+                                asyncio.create_task(updateAsync(allEntries[i], workspaceId, timeId, inputData))
                         else: 
                             logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
                             response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
