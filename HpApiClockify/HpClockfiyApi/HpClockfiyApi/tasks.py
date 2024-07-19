@@ -301,15 +301,9 @@ async def approvedEntries(request: ASGIRequest):
                         tasks = []
                         if len(allEntries) != 0:
                             '''May cause SQL server deadlock on resources'''
-                        # for i in range(0,len(allEntries)): # updates all entries async 
-                        #     tasks.append(
-                        #         updateAsync(allEntries[i])
-                        #     )
-                        # await asyncio.gather(*tasks)
                             for i in range(0,len(allEntries)): # updates all entries sync 
-                                time.sleep(randint(1,6))
                                 await updateAsync(allEntries[i], workspaceId, timeId, inputData)
-                                logger.info('\tTask has been created')
+                                logger.info('\tTask Complete')
                         else: 
                             logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
                             response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
