@@ -885,11 +885,11 @@ async def newEntry(request:ASGIRequest):
                 if request.method == 'POST':
                     try:
                         inputData = loads(request.body)
-
                     except Exception:
                         logger.warning('Unknown Exception, attempting to handle')
                         inputData = request.POST
                     logger.debug(reverseForOutput(inputData))
+                    
                     logger.info('\tWaiting for Semaphore')
                     async with entrySemaphore: # only 3 concurent tasks
                         logger.info('\tSemaphore Aquired')
@@ -903,6 +903,7 @@ async def newEntry(request:ASGIRequest):
                                 logger.info(f'Insert path taken for Entry')
                             if serializer.is_valid():
                                 serializer.save()
+                                logger.info('\tOperation Complete')
                                 # do the rest 
                                 return True, 'V'
                             else:
