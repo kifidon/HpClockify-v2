@@ -950,6 +950,8 @@ async def newEntry(request:ASGIRequest):
             if 'deadlocked' in str(e):
                 retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
             else:
+                # logger.debug('Not Deadlock?')
+                logger.error('Not Deadlock Error. Failed operation exiting')
                 return response
     return JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
