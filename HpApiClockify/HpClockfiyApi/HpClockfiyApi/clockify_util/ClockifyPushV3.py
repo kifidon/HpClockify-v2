@@ -542,6 +542,8 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
     try:
         for entry in entries:
             approval = entry['approvalRequestId'] or aID
+            if entry['approvalRequestId'] is not None and entry['approvalRequestId'] != '' and entry['approvalRequestId'] != aID:
+                logger.critical("Critical logic error - Timesheet ID and 'approvalRequestId' do not match")
             eID = entry['id']
             duration = timeDuration(entry['timeInterval']['duration'])
             description = entry['description']
