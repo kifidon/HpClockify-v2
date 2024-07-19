@@ -874,7 +874,7 @@ async def newEntry(request:ASGIRequest):
     retryCount = 0
     while retryFlag and maxRetries >= retryCount:
         if retryCount > 0: 
-            logger.info('/tRetrying....')
+            logger.info('\tRetrying....')
         retryCount += 1
         retryFlag = False
         try:
@@ -901,7 +901,6 @@ async def newEntry(request:ASGIRequest):
                             # do the rest 
                             return True, 'V'
                         else:
-                            #force backgroung task 
                             logger.warning(f'Serializer could not be saved: {serializer.errors}')
                             for key, value in serializer.errors.items():
                                 logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
