@@ -890,9 +890,9 @@ async def newEntry(request:ASGIRequest):
                         logger.warning('Unknown Exception, attempting to handle')
                         inputData = request.POST
                     logger.debug(reverseForOutput(inputData))
-                    logger.info('Waiting for Semaphore')
+                    logger.info('\tWaiting for Semaphore')
                     async with entrySemaphore: # only 3 concurent tasks
-                        logger.info('Semaphore Aquired')
+                        logger.info('\tSemaphore Aquired')
                         def processEntry(inputData):
                             try:
                                 entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
@@ -922,7 +922,8 @@ async def newEntry(request:ASGIRequest):
                                             if code == 'does_not_exist': 
                                                 return False, 'C' # C for category P for Project, F for file in later updates 
                                 return False, 'X' # Unknown, Raise error (BAD Request)
-                        
+                    logger.info('\tSemaphore Released')   
+                    logger.info('') # for readability
                     processEntryAsync = sync_to_async(processEntry)
                     result = await processEntryAsync(inputData)
                     if result[0]:

@@ -16,8 +16,10 @@ import random
 async def pauseOnDeadlock(caller, recordID):
     
     retrySem = asyncio.Semaphore(1)
+    logger = setup_background_logger()
+    logger.info('\t\tWaiting for Deadlock Semaphore')
     async with retrySem:
-        logger = setup_background_logger()
+        logger.info('\t\tAquired Deadlock Semaphore')
         logger.warning(f'DEADLOCK OCCURED WHILE EXECUTING {caller} - Record ID is {recordID}')
         pauseFor = random.randint(1, 5 )
         logger.info(f'Pausing for {pauseFor}s')
@@ -25,7 +27,8 @@ async def pauseOnDeadlock(caller, recordID):
             logger.info('\t\tWaiting..........')
             await asyncio.sleep(1)
         logger.info('\tResuming after pause')
-        return True
+    logger.info(f'\t\tDeadlock Semaphore released')
+    return True
 
 def create_hash(user_id, category_id, date_string):
     # Concatenate the user ID, category ID, and date string
