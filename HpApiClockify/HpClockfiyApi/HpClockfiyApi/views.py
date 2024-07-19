@@ -928,17 +928,7 @@ async def newEntry(request:ASGIRequest):
                         processEntryAsync = sync_to_async(processEntry)
                         result = await processEntryAsync(inputData)
                         
-                    logger.info('\tSemaphore Released')   
-                    logger.info('') # for readability
-                    if result[0]:
-                        return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
-                    else:
-                        return JsonResponse(
-                            data= {
-                                'Message': 'Post Data could not be validated. Review Logs'
-                                },
-                                status=status.HTTP_400_BAD_REQUEST
-                        )
+
             else:
                 response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
                 await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
@@ -953,6 +943,18 @@ async def newEntry(request:ASGIRequest):
                 # logger.debug('Not Deadlock?')
                 logger.error('Not Deadlock Error. Failed operation exiting')
                 return response
+        finally: 
+            logger.info('\tSemaphore Released')   
+            logger.info('') # for readability
+            if result[0]:
+                return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+            else:
+                return JsonResponse(
+                    data= {
+                        'Message': 'Post Data could not be validated. Review Logs'
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                )
     return JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 @csrf_exempt
