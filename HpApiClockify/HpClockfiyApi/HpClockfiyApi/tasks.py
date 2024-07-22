@@ -158,7 +158,7 @@ def updateTags(inputdata: dict):
         # Get existing tags associated with the entry
         def deleteOldTags():
             try: 
-                existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspace=workspaceId))
+                existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspaceId=workspaceId))
                     # Extract tag ids from the existing tags
                 existing_tag_ids = []
                 for tag in existing_tags: 
@@ -177,26 +177,20 @@ def updateTags(inputdata: dict):
 
         def updateTagSync(tag): # as thread 
             # Create new tags
-            logger.debug(dumps(tags_data, indent= 4))
+            logger.debug(f"Tags Data - {dumps(tags_data, indent= 4)}")
             try: 
-                tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspace = workspaceId)
-                serializer = TagsForSerializer(data=tag, instance=tagObj, context={
-                    'workspaceId': workspaceId,
-                    'entryid': entry_id
-                })
+                tag['entryid'] = entry_id
+                tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspaceId = workspaceId)
+                serializer = TagsForSerializer(data=tag, instance=tagObj, partial=True)
                 logger.warning('Updating Tag')
             except Tagsfor.DoesNotExist:
-                serializer = TagsForSerializer(data=tag, context={
-                    'workspaceId': workspaceId,
-                    'entryid': entry_id
-                })
+                serializer = TagsForSerializer(data=tag )
                 logger.info(f'Creating new tag')
             if serializer.is_valid():
+                logger.info("Saving Tag Data for entry")
                 serializer.save()
+                logger.info("Opperation Succsesful")
                 logger.info(f'UpdateTags on Entry: E-{entry_id}-T-{tag["id"]} 202 ACCEPTED') 
-                data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-                reversed_data = '\n'.join(data_lines[::-1])
-                logger.info(f'{reversed_data}')
                 return tags_data
             else: 
                 #  (serializer.validated_data)

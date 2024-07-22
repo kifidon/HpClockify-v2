@@ -99,7 +99,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         except Exception: 
             return 'No Role Specified'
     
-    def get_start_date(sekf, obj): 
+    def get_start_date(self, obj): 
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
@@ -265,7 +265,7 @@ class EntrySerializer(serializers.Serializer):
         logger.info('Update Entry Called')
         logger.debug(validated_data)
         try:
-            logger.debug(validated_data['billable'])
+            logger.debug(f"Billlable -({validated_data['billable']})")
             # instance.id = instance.id
             try:
                 instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
@@ -288,54 +288,62 @@ class EntrySerializer(serializers.Serializer):
             logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
             raise e
 
-class TagsForSerializer(serializers.Serializer):
+class TagsForSerializer(serializers.ModelSerializer):
     '''
     Input is of the form: 
     {
+        "entryid": "adasdfadf ada"
         "archived": true,
         "id": "64c777ddd3fcab07cfbb210c",
         "name": "Sprint1",
         "workspaceId": "64a687e29ae1f428e7ebe303"
     }
     '''
-    id = serializers.CharField()
-    name = serializers.CharField()
-    workspaceId = serializers.CharField()
     entryid = serializers.SerializerMethodField(method_name='get_entryid')
-
-    def create(self,validated_data:dict):
-        try: 
-            logger = setup_background_logger('DEBUG')
-            logger.info('Create Tag Called')
-            
-            tag = Tagsfor.objects.create(
-                id = validated_data.get('id'),
-                entryid = Entry.objects.get(
-                    id=self.context.get('entryid'),
-                    workspaceId=validated_data.get('workspaceId')
-                ),
-                workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
-                name = validated_data.get('name')
-            )
-            return tag
-        except Exception as e:
-            logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
-            raise e 
     
-    def update( self , instance: Tagsfor, validated_data):
+    class Meta:
+        model= Tagsfor
+        fields = "__all__"
+
+    
+    
+    # def create(self,validated_data:dict):
+    #     try: 
+    #         logger = setup_background_logger('DEBUG')
+    #         logger.info('Create Tag Called')
+    #         entryInstnace = Entry.objects.get(
+    #                             id=self.get_entryid(),
+    #                             workspaceId=validated_data.get('workspaceId')
+    #                         )
+    #         tag = Tagsfor.objects.create(
+    #             id = validated_data.get('id'),
+    #             entryid = entryInstnace,
+    #             workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')),
+    #             name = validated_data.get('name')
+    #         )
+    #         return tag
+    #     except Exception as e:
+    #         logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
+    #         raise e 
+    
+    def update(self, instance, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Tag Called')
         try:
+            instance.name = validated_data.get('name', instance.name)
+            
+            # Ensuring that primary key fields are not changed
             # instance.id = instance.id
-            instance.name = validated_data.get('name') or instance.name
-            # instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
-            # instance.entryid = Entry.objects.get(id=self.context.get('entryid'), workspace=validated_data.get('workspaceId')) or instance.entryid
-            instance.save(force_update=True)
+            # instance.workspace = instance.workspace
+            # instance.entryid = instance.entryid
+
+            # Save the instance
+            logger.warning(f"\tUpdate on Tags For Entry is a Forbidden Opperation. Returning...")
             return instance
-        except Exception as e: 
-            logger.warning(f'UnknownError: {dumps(str(e), indent = 4)}')
-            raise e 
-    
+        except Exception as e:
+            logger.warning(f'UnknownError: {dumps(str(e), indent=4)}')
+            raise e
+
 class CategorySerializer(serializers.ModelSerializer): 
     '''
     Input is of the form: 
