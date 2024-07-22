@@ -152,10 +152,9 @@ def updateTags(inputdata: dict):
         logger = setup_background_logger(loggerLevel)
         logger.info(f'updateTags Function called')
 
-        workspaceId = inputdata.get('timesheet').get('workspaceId')
-        timeId = inputdata.get('timesheet').get("id")
-        tags_data = inputdata.get('entry').get('tags')
-        entry_id = inputdata.get('entry').get("id")
+        workspaceId = inputdata['workspaceId']
+        tags_data = inputdata.get('tags')
+        entry_id = inputdata.get("id")
         # Get existing tags associated with the entry
         def deleteOldTags():
             try: 
@@ -183,20 +182,18 @@ def updateTags(inputdata: dict):
                 tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspace = workspaceId)
                 serializer = TagsForSerializer(data=tag, instance=tagObj, context={
                     'workspaceId': workspaceId,
-                    'timeid': timeId,
                     'entryid': entry_id
                 })
                 logger.warning('Updating Tag')
             except Tagsfor.DoesNotExist:
                 serializer = TagsForSerializer(data=tag, context={
                     'workspaceId': workspaceId,
-                    'timeid': timeId,
                     'entryid': entry_id
                 })
                 logger.info(f'Creating new tag')
             if serializer.is_valid():
                 serializer.save()
-                logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag["id"]} 202 ACCEPTED') 
+                logger.info(f'UpdateTags on Entry: E-{entry_id}-T-{tag["id"]} 202 ACCEPTED') 
                 data_lines = dumps(serializer.validated_data, indent=4).split('\n')
                 reversed_data = '\n'.join(data_lines[::-1])
                 logger.info(f'{reversed_data}')
@@ -210,7 +207,7 @@ def updateTags(inputdata: dict):
         deleteOldTags()
         for i in range(0, len(tags_data)):
             updateTagSync(tags_data[i])
-            logger.info(f'Update TagsFor on Timesheet{timeId}: Complete ')
+            logger.info(f'Update TagsFor on Entry {entry_id}: Complete ')
         return tags_data
     except Exception as e: 
         if not  isinstance(e, ValidationError):
@@ -239,11 +236,7 @@ def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread
             reversed_data = reverseForOutput(entries)
             logger.info(f'{reversed_data}') 
             if (len(entries['tags']) != 0):
-                data = {
-                    'timesheet': inputData,
-                    'entry': entries
-                }
-                updateTags(data)
+                updateTags(entries)
             return serializer.validated_data
         else: 
             logger.error(f'{serializer.errors}')

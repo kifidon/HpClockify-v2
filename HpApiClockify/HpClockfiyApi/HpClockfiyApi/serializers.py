@@ -301,7 +301,6 @@ class TagsForSerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
     workspaceId = serializers.CharField()
-    timeid = serializers.SerializerMethodField(method_name='get_timeid')
     entryid = serializers.SerializerMethodField(method_name='get_entryid')
 
     def create(self,validated_data:dict):
@@ -313,10 +312,8 @@ class TagsForSerializer(serializers.Serializer):
                 id = validated_data.get('id'),
                 entryid = Entry.objects.get(
                     id=self.context.get('entryid'),
-                    timesheetId= self.context.get('timeid') , 
                     workspaceId=validated_data.get('workspaceId')
                 ),
-                timeid = Timesheet.objects.get(id=self.context.get('timeid')),
                 workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
                 name = validated_data.get('name')
             )
@@ -333,7 +330,6 @@ class TagsForSerializer(serializers.Serializer):
             instance.name = validated_data.get('name') or instance.name
             # instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
             # instance.entryid = Entry.objects.get(id=self.context.get('entryid'), workspace=validated_data.get('workspaceId')) or instance.entryid
-            instance.timeid = Timesheet.objects.get(id=self.context.get('timeid')) or instance.timeid
             instance.save(force_update=True)
             return instance
         except Exception as e: 

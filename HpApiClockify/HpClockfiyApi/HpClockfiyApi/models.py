@@ -111,7 +111,6 @@ class Entry(models.Model):
 class Tagsfor(models.Model):
     id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, entryID, timeID, workspace_id) found, that is not supported. The first column is selected.
     entryid = models.ForeignKey('Entry', models.DO_NOTHING, db_column='entryID', to_field='id')  # Field name made lowercase.
-    timeid = models.ForeignKey(Timesheet, models.DO_NOTHING, db_column='timeID', to_field='id')  # Field name made lowercase.
     workspace = models.ForeignKey('Workspace', models.DO_NOTHING, db_column='workspace_id')
     name = models.CharField(max_length=50, blank=True, null=True)
     class Meta:
