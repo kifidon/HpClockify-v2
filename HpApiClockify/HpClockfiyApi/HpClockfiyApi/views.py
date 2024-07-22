@@ -238,7 +238,7 @@ async def quickBackup(request: ASGIRequest):
     try: 
         result = await main() # General String for return output
     except Exception as e:
-        logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
+        logger.info(f'Quickbackup: {str(e)}')
     finally: 
         response = JsonResponse(data = result, status=status.HTTP_200_OK, safe=False)
         return response

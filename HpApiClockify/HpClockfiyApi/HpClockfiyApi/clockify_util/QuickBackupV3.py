@@ -174,7 +174,8 @@ async def main(): # Move the sql connection to the thread to increase performanc
     (ProjectEvent()),
     (PolicyEvent()),
     (HolidayEvent()),
-    (UserGroupEvent())
+    (UserGroupEvent()),
+    (TimeOffEvent())
     )
     return 'Opperation Complete. View Logging For errors'
 
