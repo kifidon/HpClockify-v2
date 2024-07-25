@@ -412,7 +412,7 @@ def ReportGenerate(month = None, year = None):
             cursor.execute(
                 f'''
                 Select 
-                    Cast(SUM(en.duration * en.rate/100) as Decimal(10,2))
+                    Cast(SUM(en.duration * 18.75) as Decimal(10,2))
                 From Entry en
                 inner join Timesheet ts on ts.id = en.time_sheet_id
                 inner join EmployeeUser eu on eu.id = ts.emp_id
@@ -458,6 +458,7 @@ def ReportGenerate(month = None, year = None):
                     logger.debug(f'Writing to row {row}')
                 row += 1
                 worksheet.write(row,3, "LABOUR" )
+                row += 1
                 labourDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
                 logger.info(f'Length - {len(labourData)}')
                 row += len(labourData)
@@ -466,6 +467,7 @@ def ReportGenerate(month = None, year = None):
                 df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
                 row += 1
                 worksheet.write(row,3, "EQUIPMENT" )
+                row += 1
                 equipDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
                 row += len(equipmentData)
                 row += 1
@@ -475,15 +477,11 @@ def ReportGenerate(month = None, year = None):
                 # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
                 # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
                 
-
         return folder_path        
-
-
-                    
-
 
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+
 def main():
     ReportGenerate('07','24')
     # MonthylyProjReport('2024-02-25', '2024-03-24')
