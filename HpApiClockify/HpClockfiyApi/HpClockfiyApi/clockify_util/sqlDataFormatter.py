@@ -1,4 +1,4 @@
-from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle
+from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle, reverseForOutput
 from .ClockifyPushV3 import getWID, pushApprovedTime, pushTimeOff
 from .ClockifyPullV3 import getDetailedEntryReport
 import pyodbc
@@ -293,10 +293,150 @@ def DailyTimeEntryReport():
         logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
         pass
         
+def ReportGenerate(month = None, year = None):
+    logger = setup_background_logger()
+    try: 
+        if month is None or year is None:
+            month, year = getMonthYear()
+        else:
+            month = getAbbreviation(month, reverse=True)
+        logger.info(f'Biling Report Generating for - {month}-{year}')
 
+        if int(month) -1 == 0: 
+            previousMonth = '12'
+            previousYear = str(int(year) - 1).rjust(2, '0')
+        else: 
+            previousMonth = str(int(month) -1 ).rjust(2, '0')
+            previousYear = year
+#
+        endDate = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
+        startDate = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
+        # Calculate the most recent previous Saturday
+        endDate = (endDate - timedelta(days=(endDate.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+        startDate = (startDate - timedelta(days=(startDate.weekday()+ 1) %7)).strftime('%Y-%m-%d')
+        logger.debug(f'Date Range: {startDate}-{endDate}')
+        cursor, conn = sqlConnect()
+        cursor.execute(
+            f'''
+            select p.id, p.code, p.title from Project p 
+            where exists(
+                select en.id from Entry en 
+                where en.billable = 1 and 
+                en.project_id = p.id 
+                and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
+            )
+            '''
+        )
+
+        pIds = cursor.fetchall()
+        logger.debug(f'{len(pIds)} Projects')
+        current_dir = settings.BASE_DIR
+        # current_dir = r"C:\Users\TimmyIfidon\Desktop"
+        folder_name = f"HP-IND-{year}-{month}"
+        folder_path = os.path.join(current_dir, folder_name)
+        logger.debug(f'Created Folder at {folder_path}')
+        for pId in pIds:
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path )
+            file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
+            
+            logger.debug('Getting Labor Data')
+            cursor.execute(
+                f'''
+                Select 
+                    eu.name, 
+                    eu.role, 
+                    SUM(en.duration), 
+                    'hr' as [Unit Cost] ,
+                    Cast(en.rate/100 as Decimal(10,2)),
+                    cast(
+                        sum(en.duration * en.rate/100) as decimal(10,2)
+                    )
+                From Entry en
+                inner join Timesheet ts on ts.id = en.time_sheet_id
+                inner join EmployeeUser eu on eu.id = ts.emp_id
+                inner join Project p on p.id = en.project_id
+                where p.id = '{pId[0]}'
+                    and en.billable = 1
+                    and ts.[status] = 'APPROVED'
+                group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
+                order by eu.name 
+                '''
+            )
+            labourData = cursor.fetchall()
+            logger.debug('Aquired Labor Data')
+            logger.debug('Getting Equipment Data')
+            cursor.execute(
+                f'''
+                Select 
+                    eu.name, 
+                    eu.role, 
+                    SUM(en.duration), 
+                    'hr' as [Unit Cost] ,
+                    Cast('18.75' as Decimal(10,2)),
+                    cast(
+                        sum(en.duration * 18.75) as decimal(10,2)
+                    )
+                From Entry en
+                inner join Timesheet ts on ts.id = en.time_sheet_id
+                inner join EmployeeUser eu on eu.id = ts.emp_id
+                inner join Project p on p.id = en.project_id
+                where p.id = '{pId[0]}'
+                    and eu.hasTruck = 1 
+                    and en.billable = 1
+                    and ts.[status] = 'APPROVED'
+                group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
+                ''')
+            equipmentData = cursor.fetchall()
+            logger.debug('Aquired Equipment Data')
+
+            labourData = [['' if val is None else val for val in data] for data in labourData]
+            equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
+            logger.debug(equipmentData)
+            # logger.debug(labourData)
+            labourDF = pd.DataFrame(labourData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
+            equipDF = pd.DataFrame(equipmentData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
+
+            with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+                writer.sheets['Sheet1'] = writer.book.add_worksheet("Hill Plain - Monthly LEM")
+                worksheet = writer.sheets['Hill Plain - Monthly LEM']
+                worksheet.write(1,0, "Hill Plain - Monthly LEM (Indirects)" )
+                headers = {
+                    "Project Name:": pId[2],
+                    "Project Number:": pId[1],
+                    "Invoice Month:" : getAbbreviation(month, year),
+                    "Time Period Start:": startDate,
+                    "Time Period End:": endDate
+                }
+
+                logger.info(reverseForOutput(headers))
+
+                row = 2
+                for key, value in headers.items():
+                    worksheet.write(row, 0, key)
+                    worksheet.write(row, 1, None)
+                    worksheet.write(row, 2, value)
+                    row += 1
+                    logger.debug(f'Writing to row {row}')
+                row += 1
+                worksheet.write(row,3, "LABOUR" )
+                labourDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
+                row += len(labourData)
+                row += 1
+                worksheet.write(row,3, "EQUIPMENT" )
+                equipDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
+                row += len(equipmentData)
+        return folder_path        
+
+
+                    
+
+
+    except Exception as e: 
+        logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
 def main():
-    
-    MonthylyProjReport('2024-02-25', '2024-03-24')
+    ReportGenerate('07','24')
+    # MonthylyProjReport('2024-02-25', '2024-03-24')
    
 
 if __name__ == "__main__": 

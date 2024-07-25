@@ -1,6 +1,6 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from .sqlDataFormatter import MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
+from .sqlDataFormatter import ReportGenerate, MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
 import asyncio
 import datetime
 import pytz
@@ -147,12 +147,18 @@ def CreateTextFile():
         file.write("--------------------------------------------------------------------\n")
     file.close()
     logger.info(filePath, end="")
-         
+
+def billingReport(month= None, year = None):
+    file_path = (ReportGenerate(month, year ))
+    logger.info(f" {file_path}")
+    return file_path 
+
+#depreciated         
 def monthlyBillable(month = None, year = None):
     file_path = (MonthylyProjReport(month, year ))
     logger.info(f" {file_path}")
     return file_path
-    
+#depreciated
 def monthlyBillableEqp(month = None, year = None):
     file_path = (MonthylyProjReportEqp(month, year))
     logger.info(f" {file_path}")

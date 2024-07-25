@@ -33,7 +33,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import main, billingReport, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
@@ -265,7 +265,7 @@ def timesheets(request: ASGIRequest):
     
     return response
 
-
+#depreciated
 @api_view(['GET'])
 def monthlyBillableReport(request, month = None, year= None):
     '''
@@ -284,7 +284,7 @@ def monthlyBillableReport(request, month = None, year= None):
     logger.info('BillableReport Called')
     folder_path = monthlyBillable(month, year )
     return download_text_file(folder_path)
-
+#depreciated
 @api_view(['GET'])
 def monthlyBillableReportEquipment(request, month = None, year= None):
     '''
@@ -302,6 +302,12 @@ def monthlyBillableReportEquipment(request, month = None, year= None):
     logger = setup_server_logger(loggerLevel)
     logger.info('BillableReport Called for Equipment')
     folder_path = monthlyBillableEqp(month, year )
+    return download_text_file(folder_path)
+
+def billableReport(request, month= None, year = None):
+    logger = setup_server_logger(loggerLevel)
+    logger.info(f'BillableReport Called for {month}-{year}')
+    folder_path = billingReport(month, year )
     return download_text_file(folder_path)
 
 @api_view(['GET'])

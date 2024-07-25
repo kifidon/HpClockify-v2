@@ -25,10 +25,14 @@ urlpatterns = [
     path('task', views.viewTaskLog),
 
     path('quickBackup', views.quickBackup),
+    path('billing', views.billableReport),
+    path('billing/<str:month>/<str:year>/', views.billableReport),
+    #depreciated
     path('billableReport', views.monthlyBillableReport),
     path('billableReport/<str:month>/<str:year>/', views.monthlyBillableReport),
     path('billableReportEqp', views.monthlyBillableReportEquipment),
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
+    
     path('payroll', views.weeklyPayrollReport),
     path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
     path('getTime', views.dailyTimeEntry),
