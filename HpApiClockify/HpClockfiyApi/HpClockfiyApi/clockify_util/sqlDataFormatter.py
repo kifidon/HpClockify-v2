@@ -1,6 +1,7 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle, reverseForOutput
 from .ClockifyPushV3 import getWID, pushApprovedTime, pushTimeOff
 from .ClockifyPullV3 import getDetailedEntryReport
+from decimal import Decimal
 import pyodbc
 import os
 import pandas as pd
@@ -309,11 +310,13 @@ def ReportGenerate(month = None, year = None):
             previousMonth = str(int(month) -1 ).rjust(2, '0')
             previousYear = year
 #
-        endDate = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
-        startDate = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
+        endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
+        startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
         # Calculate the most recent previous Saturday
-        endDate = (endDate - timedelta(days=(endDate.weekday() + 2) % 7)).strftime('%Y-%m-%d')
-        startDate = (startDate - timedelta(days=(startDate.weekday()+ 1) %7)).strftime('%Y-%m-%d')
+        endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+        if(endDate[-2:] == "25"):
+            endDate = (endDateObj -timedelta(days=7) - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+        startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
         logger.debug(f'Date Range: {startDate}-{endDate}')
         cursor, conn = sqlConnect()
         cursor.execute(
@@ -339,7 +342,7 @@ def ReportGenerate(month = None, year = None):
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
-            
+
             logger.debug('Getting Labor Data')
             cursor.execute(
                 f'''
@@ -387,12 +390,47 @@ def ReportGenerate(month = None, year = None):
                     and ts.[status] = 'APPROVED'
                 group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
                 ''')
+    
             equipmentData = cursor.fetchall()
             logger.debug('Aquired Equipment Data')
 
+            cursor.execute(
+                f'''
+                Select 
+                    Cast(SUM(en.duration * en.rate/100) as Decimal(10,2))
+                From Entry en
+                inner join Timesheet ts on ts.id = en.time_sheet_id
+                inner join EmployeeUser eu on eu.id = ts.emp_id
+                inner join Project p on p.id = en.project_id
+                where p.id = '{pId[0]}'
+                    and en.billable = 1
+                    and ts.[status] = 'APPROVED'
+                '''
+            )
+            labourTotal = cursor.fetchone()
+
+            cursor.execute(
+                f'''
+                Select 
+                    Cast(SUM(en.duration * en.rate/100) as Decimal(10,2))
+                From Entry en
+                inner join Timesheet ts on ts.id = en.time_sheet_id
+                inner join EmployeeUser eu on eu.id = ts.emp_id
+                inner join Project p on p.id = en.project_id
+                where p.id = '{pId[0]}'
+                    and en.billable = 1
+                    and ts.[status] = 'APPROVED'
+                    and eu.hasTruck = 1 
+                '''
+            )
+            equipmentTotal = cursor.fetchone()
             labourData = [['' if val is None else val for val in data] for data in labourData]
             equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
-            logger.debug(equipmentData)
+            labourTotal = str(labourTotal[0])
+            logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
+            equipmentTotal = str(equipmentTotal[0])
+            
+
             # logger.debug(labourData)
             labourDF = pd.DataFrame(labourData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
             equipDF = pd.DataFrame(equipmentData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
@@ -421,11 +459,23 @@ def ReportGenerate(month = None, year = None):
                 row += 1
                 worksheet.write(row,3, "LABOUR" )
                 labourDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
+                logger.info(f'Length - {len(labourData)}')
                 row += len(labourData)
+                row += 1
+                df = pd.DataFrame([], columns=["SUB TOTAL", None, f"{labourTotal}"])
+                df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
                 row += 1
                 worksheet.write(row,3, "EQUIPMENT" )
                 equipDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
                 row += len(equipmentData)
+                row += 1
+                df = pd.DataFrame([], columns=["SUB TOTAL", None, f"{equipmentTotal}"])
+                df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
+                row += 1
+                # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
+                # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
+                
+
         return folder_path        
 
 
