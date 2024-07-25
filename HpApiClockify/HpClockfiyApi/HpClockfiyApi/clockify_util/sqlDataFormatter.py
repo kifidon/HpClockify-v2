@@ -402,7 +402,7 @@ def ReportGenerate(month = None, year = None):
                 inner join Timesheet ts on ts.id = en.time_sheet_id
                 inner join EmployeeUser eu on eu.id = ts.emp_id
                 inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}'
+                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
                     and en.billable = 1
                     and ts.[status] = 'APPROVED'
                 '''
@@ -417,7 +417,7 @@ def ReportGenerate(month = None, year = None):
                 inner join Timesheet ts on ts.id = en.time_sheet_id
                 inner join EmployeeUser eu on eu.id = ts.emp_id
                 inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}'
+                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
                     and en.billable = 1
                     and ts.[status] = 'APPROVED'
                     and eu.hasTruck = 1 
