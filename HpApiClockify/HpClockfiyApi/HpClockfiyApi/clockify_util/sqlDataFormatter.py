@@ -453,16 +453,21 @@ def ReportGenerate(month = None, year = None):
                 # Merged cells Title Format
                 mergeCells = workbook.add_format({'align': 'center', 'bold': True})
                 mergeCells.set_center_across()
-                mergeCells.set_bg_color('yellow')
+                mergeCells.set_bg_color('#FCD5B4') 
                 mergeCells.set_font_size(24)
                 mergeCells.set_border(2)
                 worksheet.merge_range(0,0,1,8, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
 
                 #subTotals Format
                 subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
-                subTotals.set_bg_color('cyan')              
+                subTotals.set_bg_color('#FFFF99')              
                 subTotals.set_font_size(14)              
                 subTotals.set_italic()              
+                #GrandTotal Format
+                grandTotalFormat = workbook.add_format({'align': 'left', 'bold': True}) 
+                grandTotalFormat.set_bg_color('#FCD5B4')              
+                grandTotalFormat.set_font_size(14)              
+                grandTotalFormat.set_italic()              
                 
                 #File headers info 
                 headers = {
@@ -470,7 +475,8 @@ def ReportGenerate(month = None, year = None):
                     "Project Number:": pId[1],
                     "Invoice Month:" : getAbbreviation(month, year),
                     "Time Period Start:": startDate,
-                    "Time Period End:": endDate
+                    "Time Period End:": endDate,
+                    "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%m")
                 }
                 logger.info(reverseForOutput(headers))
 
@@ -486,19 +492,31 @@ def ReportGenerate(month = None, year = None):
                     logger.debug(f'Writing to row {row}')
                 row += 1
                 
+                #insert image 
+                worksheet.insert_image("H4",
+                                        r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                                       {'x_scale': 0.04, 'y_scale': 0.04})
+
                 #table headers Formater 
+
                 headersFormat = workbook.add_format({'align': 'center', 'bold': True})
                 headersFormat.set_center_across()
-                headersFormat.set_bg_color('yellow')
+                headersFormat.set_bg_color('#F2F2F2')
                 headersFormat.set_font_size(16)
                 headersFormat.set_border(1)
                 #dollar value formats 
                 numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
                 numFormat.set_border(1)
                 #dollar bold value formats 
-                boldNum = workbook.add_format({'align': 'right', 'bold': True, 'num_format': '$#,##0.00'})
+                boldNum = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
                 boldNum.set_num_format(7)
-                boldNum.set_bg_color('cyan')
+                boldNum.set_font_size(14)
+                boldNum.set_bg_color('#FFFF99')
+                #Grand total value formats 
+                gt = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
+                gt.set_num_format(7)
+                gt.set_font_size(14)
+                gt.set_bg_color('#FCD5B4')
                 # table data format
                 dataFormat = workbook.add_format()
                 dataFormat.set_border(1)
@@ -529,13 +547,13 @@ def ReportGenerate(month = None, year = None):
                     row += 1
                 logger.info(f'Labour Items - {len(labourData)}')
                 #sub Total
-                worksheet.merge_range(row,0,row,1,'SUB TOTAL', subTotals)
-                worksheet.merge_range(row,2,row,3, labourTotal, boldNum)
+                worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
+                worksheet.merge_range(row,7,row,8, labourTotal, boldNum)
                 row += 1
             # equipment Table 
                 if type(equipmentTotal) is float:
                     row += 1
-                    worksheet.merge_range(row,0,row,8, 'Equipment', headersFormat)
+                    worksheet.merge_range(row,0,row,8, 'EQUIPMENT', headersFormat)
                     row += 1
 
                     worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
@@ -555,15 +573,17 @@ def ReportGenerate(month = None, year = None):
                         worksheet.merge_range( row,7,row, 8 , rowData[5], numFormat)
                         row += 1
 
-                    worksheet.merge_range(row,0,row,1,'SUB TOTAL', subTotals)
-                    worksheet.merge_range(row,2,row,3, equipmentTotal, boldNum)
+                    worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
+                    worksheet.merge_range(row,7 ,row,8, equipmentTotal, boldNum)
                     row += 1
-                
-                worksheet.merge_range(row,0,row, 1, "GRAND TOTAL", subTotals)
-                worksheet.merge_range(row,2,row,3,grandTotal, boldNum)
+                worksheet.merge_range(row,5,row, 6, "GRAND TOTAL", grandTotalFormat)
+                worksheet.merge_range(row,7,row,8,grandTotal, gt)
                 # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
                 # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
                 
+                
+                writer.close()
+
         return folder_path        
 
     except Exception as e: 
