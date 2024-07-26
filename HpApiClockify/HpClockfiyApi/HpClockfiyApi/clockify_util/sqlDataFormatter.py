@@ -496,7 +496,7 @@ def ReportGenerate(month = None, year = None):
                 worksheet.insert_image("H4",
                                         # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
                                         r"C:\Users\Script\Desktop\unnamed.png",
-                                       {'x_scale': 0.04, 'y_scale': 0.04})
+                                       {'x_scale': 0.4, 'y_scale': 0.4})
 
                 #table headers Formater 
 
