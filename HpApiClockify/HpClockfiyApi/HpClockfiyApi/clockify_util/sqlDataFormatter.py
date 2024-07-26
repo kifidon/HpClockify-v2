@@ -297,6 +297,7 @@ def DailyTimeEntryReport():
 def ReportGenerate(month = None, year = None):
     logger = setup_background_logger()
     try: 
+        #obtain date range for this month 
         if month is None or year is None:
             month, year = getMonthYear()
         else:
@@ -309,16 +310,20 @@ def ReportGenerate(month = None, year = None):
         else: 
             previousMonth = str(int(month) -1 ).rjust(2, '0')
             previousYear = year
-#
+
+    #format date strings
         endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
         startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
         # Calculate the most recent previous Saturday
         endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
         if(endDate[-2:] == "25"):
             endDate = (endDateObj -timedelta(days=7) - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+        # most recent previous Sunday before the 25th of this month 
         startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
         logger.debug(f'Date Range: {startDate}-{endDate}')
         cursor, conn = sqlConnect()
+        
+    #Get Relavant projects  
         cursor.execute(
             f'''
             select p.id, p.code, p.title from Project p 
@@ -330,20 +335,22 @@ def ReportGenerate(month = None, year = None):
             )
             '''
         )
-
         pIds = cursor.fetchall()
         logger.debug(f'{len(pIds)} Projects')
+
+        # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
-        # current_dir = r"C:\Users\TimmyIfidon\Desktop"
         folder_name = f"HP-IND-{year}-{month}"
         folder_path = os.path.join(current_dir, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
+
         for pId in pIds:
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
-
+        #Get billing Data 
             logger.debug('Getting Labor Data')
+            #labour data 
             cursor.execute(
                 f'''
                 Select 
@@ -369,6 +376,7 @@ def ReportGenerate(month = None, year = None):
             labourData = cursor.fetchall()
             logger.debug('Aquired Labor Data')
             logger.debug('Getting Equipment Data')
+            #Equipment Data 
             cursor.execute(
                 f'''
                 Select 
@@ -390,10 +398,9 @@ def ReportGenerate(month = None, year = None):
                     and ts.[status] = 'APPROVED'
                 group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
                 ''')
-    
             equipmentData = cursor.fetchall()
             logger.debug('Aquired Equipment Data')
-
+            #labour Totals
             cursor.execute(
                 f'''
                 Select 
@@ -408,7 +415,7 @@ def ReportGenerate(month = None, year = None):
                 '''
             )
             labourTotal = cursor.fetchone()
-
+            # equipment totals
             cursor.execute(
                 f'''
                 Select 
@@ -424,21 +431,40 @@ def ReportGenerate(month = None, year = None):
                 '''
             )
             equipmentTotal = cursor.fetchone()
+            
+            #format results for opperations 
             labourData = [['' if val is None else val for val in data] for data in labourData]
             equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
-            labourTotal = str(labourTotal[0])
+            if equipmentTotal[0] is not None:
+                grandTotal = labourTotal[0] + equipmentTotal[0]
+                equipmentTotal = float(equipmentTotal[0])
+            else: 
+                grandTotal = labourTotal[0]
+            labourTotal = float(labourTotal[0])
             logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
-            equipmentTotal = str(equipmentTotal[0])
+            grandTotal = float(grandTotal)
             
-
-            # logger.debug(labourData)
-            labourDF = pd.DataFrame(labourData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
-            equipDF = pd.DataFrame(equipmentData, columns=['Staff Member', 'Role', 'QTY', 'Unit Cost', 'Rate', 'Amount'])
-
             with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
-                writer.sheets['Sheet1'] = writer.book.add_worksheet("Hill Plain - Monthly LEM")
-                worksheet = writer.sheets['Hill Plain - Monthly LEM']
-                worksheet.write(1,0, "Hill Plain - Monthly LEM (Indirects)" )
+                #Generate file and initilize writers and formats 
+                workbook = writer.book
+                worksheet = workbook.add_worksheet("Hill Plain - Monthly LEM")
+                writer.sheets['Hill Plain - Monthly LEM'] = worksheet        
+
+                # Merged cells Title Format
+                mergeCells = workbook.add_format({'align': 'center', 'bold': True})
+                mergeCells.set_center_across()
+                mergeCells.set_bg_color('yellow')
+                mergeCells.set_font_size(24)
+                mergeCells.set_border(2)
+                worksheet.merge_range(0,0,1,8, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+
+                #subTotals Format
+                subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
+                subTotals.set_bg_color('cyan')              
+                subTotals.set_font_size(14)              
+                subTotals.set_italic()              
+                
+                #File headers info 
                 headers = {
                     "Project Name:": pId[2],
                     "Project Number:": pId[1],
@@ -446,34 +472,95 @@ def ReportGenerate(month = None, year = None):
                     "Time Period Start:": startDate,
                     "Time Period End:": endDate
                 }
-
                 logger.info(reverseForOutput(headers))
 
+                #bold Text format 
+                bold_format = workbook.add_format({'bold':True})
+                bold_format.set_italic()
                 row = 2
+                #write file headers
                 for key, value in headers.items():
-                    worksheet.write(row, 0, key)
-                    worksheet.write(row, 1, None)
+                    worksheet.merge_range(row, 0,row,1, key, bold_format)
                     worksheet.write(row, 2, value)
                     row += 1
                     logger.debug(f'Writing to row {row}')
                 row += 1
-                worksheet.write(row,3, "LABOUR" )
+                
+                #table headers Formater 
+                headersFormat = workbook.add_format({'align': 'center', 'bold': True})
+                headersFormat.set_center_across()
+                headersFormat.set_bg_color('yellow')
+                headersFormat.set_font_size(16)
+                headersFormat.set_border(1)
+                #dollar value formats 
+                numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
+                numFormat.set_border(1)
+                #dollar bold value formats 
+                boldNum = workbook.add_format({'align': 'right', 'bold': True, 'num_format': '$#,##0.00'})
+                boldNum.set_num_format(7)
+                boldNum.set_bg_color('cyan')
+                # table data format
+                dataFormat = workbook.add_format()
+                dataFormat.set_border(1)
+                #table column format 
+                columnFormat = workbook. add_format({'align': 'center', 'bold': True})
+                columnFormat.set_border(1)
+
+            # Table  Data 
+                worksheet.merge_range(row,0,row,8, 'LABOUR', headersFormat)
                 row += 1
-                labourDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
-                logger.info(f'Length - {len(labourData)}')
-                row += len(labourData)
+                
+                #write column names 
+                worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
+                worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
+                worksheet.write( row,4, 'Qty', columnFormat)
+                worksheet.write( row,5, 'Unit Cost', columnFormat)
+                worksheet.write( row,6, 'Rate', columnFormat)
+                worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
                 row += 1
-                df = pd.DataFrame([], columns=["SUB TOTAL", None, f"{labourTotal}"])
-                df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
+
+                for rowData in labourData:
+                    worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
+                    worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
+                    worksheet.write( row,4, rowData[2], dataFormat)
+                    worksheet.write( row,5, rowData[3], dataFormat)
+                    worksheet.write( row,6, rowData[4], numFormat)
+                    worksheet.merge_range( row,7,row, 8, rowData[5], numFormat)
+                    row += 1
+                logger.info(f'Labour Items - {len(labourData)}')
+                #sub Total
+                worksheet.merge_range(row,0,row,1,'SUB TOTAL', subTotals)
+                worksheet.merge_range(row,2,row,3, labourTotal, boldNum)
                 row += 1
-                worksheet.write(row,3, "EQUIPMENT" )
-                row += 1
-                equipDF.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 1, index=False)
-                row += len(equipmentData)
-                row += 1
-                df = pd.DataFrame([], columns=["SUB TOTAL", None, f"{equipmentTotal}"])
-                df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
-                row += 1
+            # equipment Table 
+                if type(equipmentTotal) is float:
+                    row += 1
+                    worksheet.merge_range(row,0,row,8, 'Equipment', headersFormat)
+                    row += 1
+
+                    worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
+                    worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
+                    worksheet.write( row,4, 'Qty', columnFormat)
+                    worksheet.write( row,5, 'Unit Cost', columnFormat)
+                    worksheet.write( row,6, 'Rate', columnFormat)
+                    worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
+                    row += 1
+
+                    for rowData in equipmentData:
+                        worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
+                        worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
+                        worksheet.write( row,4, rowData[2], dataFormat)
+                        worksheet.write( row,5, rowData[3], dataFormat)
+                        worksheet.write( row,6, rowData[4], numFormat)
+                        worksheet.merge_range( row,7,row, 8 , rowData[5], numFormat)
+                        row += 1
+
+                    worksheet.merge_range(row,0,row,1,'SUB TOTAL', subTotals)
+                    worksheet.merge_range(row,2,row,3, equipmentTotal, boldNum)
+                    row += 1
+                
+                worksheet.merge_range(row,0,row, 1, "GRAND TOTAL", subTotals)
+                worksheet.merge_range(row,2,row,3,grandTotal, boldNum)
                 # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
                 # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
                 
