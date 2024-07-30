@@ -203,51 +203,51 @@ def MonthylyProjReportEqp(month = None, year = None):
         logging.error(f"Error: {str(e)}")
         return None
 
-def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
-    if startDate is None or endDate is None:
-        start, end = getCurrentPaycycle()
-        startDate = start
-        endDate = end
-    current_dir = settings.BASE_DIR
-    folder_name = f"PayrollLog-{startDate}-{endDate}"
-    folder_path = os.path.join(current_dir, folder_name)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path )
-    file_path = os.path.join(folder_path, f"{folder_name}-Data.xlsx")
-    
-    cursor, conn = sqlConnect()
-    
-    try:
-        cursor.execute(
-            '''
-            SELECT att.name, att.Date, att.RegularHrs, att.Overtime, att.TotalHours , att.TimeOff, att.policy_name, att.Holiday  FROM AttendanceApproved att
-            WHERE att.Date BETWEEN ? AND ?
+# def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
+    #     if startDate is None or endDate is None:
+    #         start, end = getCurrentPaycycle()
+    #         startDate = start
+    #         endDate = end
+    #     current_dir = settings.BASE_DIR
+    #     folder_name = f"PayrollLog-{startDate}-{endDate}"
+    #     folder_path = os.path.join(current_dir, folder_name)
+    #     if not os.path.exists(folder_path):
+    #         os.makedirs(folder_path )
+    #     file_path = os.path.join(folder_path, f"{folder_name}-Data.xlsx")
 
-            Union ALL
+    #     cursor, conn = sqlConnect()
 
-            Select tt.name,Null, Sum(tt.RegularHrs), Sum(tt.Overtime), Sum(tt.TotalHours), Sum(tt.TimeOff), 'Policy_name', 'Holiday' From AttendanceApproved tt
-            WHERE [Date] BETWEEN ? AND ?
-            Group By tt.name
+    #     try:
+    #         cursor.execute(
+    #             '''
+    #             SELECT att.name, att.Date, att.RegularHrs, att.Overtime, att.TotalHours , att.TimeOff, att.policy_name, att.Holiday  FROM AttendanceApproved att
+    #             WHERE att.Date BETWEEN ? AND ?
 
-            ORDER BY [name], Date DESC
-            ''', ( startDate, endDate, startDate, endDate)
-        )
-        rows = cursor.fetchall()
+    #             Union ALL
 
-        rows = [['' if val is None else val for val in row] for row in rows]
-        df = pd.DataFrame(rows, columns = ['Name', 'Date', 'Regular Hours', 'Overtime', 'Total', 'Paid Time Off', 'Reason', 'Holiday'])
-        if not (df.empty):
-            df.to_excel(file_path, index = False)
-        # Combine the directory path with the file name
-        cleanUp(conn, cursor) 
-        
-        return folder_path 
-    except pyodbc.Error as e:
-        logging.error( f"{get_current_time()} - ERROR: SQL Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
-    except FileNotFoundError as e:
-        logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
-    except PermissionError as e:
-        logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
+    #             Select tt.name,Null, Sum(tt.RegularHrs), Sum(tt.Overtime), Sum(tt.TotalHours), Sum(tt.TimeOff), 'Policy_name', 'Holiday' From AttendanceApproved tt
+    #             WHERE [Date] BETWEEN ? AND ?
+    #             Group By tt.name
+
+    #             ORDER BY [name], Date DESC
+    #             ''', ( startDate, endDate, startDate, endDate)
+    #         )
+    #         rows = cursor.fetchall()
+
+    #         rows = [['' if val is None else val for val in row] for row in rows]
+    #         df = pd.DataFrame(rows, columns = ['Name', 'Date', 'Regular Hours', 'Overtime', 'Total', 'Paid Time Off', 'Reason', 'Holiday'])
+    #         if not (df.empty):
+    #             df.to_excel(file_path, index = False)
+    #         # Combine the directory path with the file name
+    #         cleanUp(conn, cursor) 
+
+    #         return folder_path 
+    #     except pyodbc.Error as e:
+    #         logging.error( f"{get_current_time()} - ERROR: SQL Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
+    #     except FileNotFoundError as e:
+    #         logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
+    #     except PermissionError as e:
+    #         logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
 
 def DailyTimeEntryReport():
     try:
@@ -607,21 +607,16 @@ def NonBillableReportGen(start = None, end = None):
             Select
                 eu.name, 
                 eu.manager,
-                p.code,
-                p.title,
                 SUM(case when en.billable = 1 then en.duration else 0 end) as Billable,
                 Sum(case when en.billable = 0 then en.duration else 0 end) as NonBillable
             From Entry en 
             Inner join Timesheet ts on ts.id = en.time_sheet_id
             inner join EmployeeUser eu on eu.id = ts.emp_id
-            inner join Project p on p.id = en.project_id
             where Cast(en.start_time as Date) between '2024-07-07' and '2024-07-14' 
             Group by 
                 eu.name, 
-                eu.manager,
-                p.code,
-                p.title
-            order by p.code
+                eu.manager
+            order by eu.name
             '''
             )
         data = cursor.fetchall()
@@ -664,7 +659,7 @@ def NonBillableReportGen(start = None, end = None):
             textFormat.set_border(1)
 
             #write Data
-            worksheet.merge_range(row,0,row+1,11 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
+            worksheet.merge_range(row,0,row+1,9 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
             row += 2
 
             headers = {
@@ -687,22 +682,18 @@ def NonBillableReportGen(start = None, end = None):
             
             worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
             worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
-            worksheet.write(row,4, 'Project Number', columnNameFormat)
-            worksheet.write(row,5, 'Project Name', columnNameFormat)
-            worksheet.write(row,6, 'Billable', columnNameFormat)
-            worksheet.write(row,7, 'Non-Billable', columnNameFormat)
-            worksheet.write(row,8, 'Total', columnNameFormat)
-            worksheet.merge_range(row,9,row,11, 'Notes', columnNameFormat)
+            worksheet.write(row,4, 'Billable', columnNameFormat)
+            worksheet.write(row,5, 'Non-Billable', columnNameFormat)
+            worksheet.write(row,6, 'Total', columnNameFormat)
+            worksheet.merge_range(row,7,row,9, 'Notes', columnNameFormat)
             row += 1
             for rowData in data:
                 worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                 worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
                 worksheet.write(row,4, rowData[2], textFormat)
                 worksheet.write(row,5, rowData[3], textFormat)
-                worksheet.write(row,6, rowData[4], textFormat)
-                worksheet.write(row,7, rowData[5], textFormat)
-                worksheet.write(row,8, rowData[5] + rowData[4], textFormat)
-                worksheet.merge_range(row,9,row, 11 ,'', textFormat)
+                worksheet.write(row,6, rowData[3] + rowData[2], textFormat)
+                worksheet.merge_range(row,7,row, 9 ,'', textFormat)
                 row+= 1
             
             writer.close()
@@ -714,7 +705,165 @@ def NonBillableReportGen(start = None, end = None):
 def Payroll(start = None, end = None): 
     logger = setup_background_logger()
     try:
-        pass
+        if start is None or end is None:
+            start = (datetime.now() - timedelta(days = (14 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
+            end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
+        logger.info(f'Biling Report Generating for - {start}-{end}')
+
+        cursor, conn = sqlConnect()
+
+        #obtain relavant data 
+        cursor.execute(
+            f'''
+            SELECT 
+                at.name, 
+                at.[Type], 
+                at.[date], 
+                at.RegularHrs, 
+                at.Accrued,
+                at.Overtime,
+                at.TimeOff,
+                at.policy_name,
+                at.TotalHours,
+                at.Holiday
+            from AttendanceApproved at
+            where at.date between '{start}' and '{end}'
+            order by at.name
+            '''
+        )
+        data = cursor.fetchall()
+
+        cursor.execute(f'''
+        SELECT 
+            at.name, 
+            Null as Type, 
+            Null as [day], 
+            SUM(at.RegularHrs) as Reg, 
+            SUM(at.Accrued) as Banked,
+            SUM(at.Overtime) as OT,
+            SUM(at.TimeOff) as PTO,
+            'Policy Name' as reason,
+            SUM(at.TotalHours) as Total,
+            Null as holiday
+        from AttendanceApproved at
+        where at.date between '{start}' and '{end}'
+        group by at.name
+        order by at.name
+        '''
+        )
+        totalsData = cursor.fetchall()
+        data = [['' if val is None else val for val in row] for row in data]
+        totalsData = [['' if val is None else val for val in row] for row in totalsData]
+
+         # Generate Folder for spreadsheets
+        current_dir = settings.BASE_DIR
+        folder_name = f"Weekly Report-payroll-{start}-{end}"
+        folder_path = os.path.join(current_dir, folder_name)
+        logger.debug(f'Created Folder at {folder_path}')
+        if not os.path.exists(folder_path):
+                os.makedirs(folder_path )
+        file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
+
+        
+
+        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+            #Generate file and initilize writers and formats 
+            workbook = writer.book
+            worksheet = workbook.add_worksheet("Hill Plain - Payroll")
+            writer.sheets['Hill Plain - Payroll'] = worksheet 
+            
+            row = 0 #initilize row pointer 
+
+            #formats
+            titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
+            titleFormat.set_font_size(20)
+            titleFormat.set_bg_color('#D9D9D9')
+            #file Heaaders
+            headerFormat = workbook.add_format({'bold': True, "italic": True})
+            #columnNameFormat 
+            columnNameFormat = workbook.add_format({'bold': True})
+            columnNameFormat.set_border(1)
+            columnNameFormat.set_bg_color('#808080')
+            columnNameFormat.set_font_color('#ffffff')
+            # Text Data Format 
+            textFormat = workbook.add_format()
+            textFormat.set_border(1)
+            # date Data Format 
+            dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+            dateFormat.set_border(1)
+            dateFormat.set_border(1)
+
+            #totals
+            totalFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+            totalFormat.set_border(1)
+            totalFormat.set_bg_color('#D9D9D9')
+            logger.info('Writing data')
+
+        #write data 
+            worksheet.merge_range(row,0,row+1,13 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
+            row += 2
+
+            headers = {
+                "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+                "Date Range Start:": start,
+                "Date Range End:": end
+            }
+            for key, value in headers.items():
+                worksheet.merge_range(row,0,row,1,key, headerFormat)
+                worksheet.merge_range(row,2,row,3,value)
+                row += 1
+            row += 1
+
+            #write columns 
+            worksheet.merge_range(row,0,row,1, 'Staff Member', columnNameFormat)
+            worksheet.write(row,2,'Type', columnNameFormat)
+            worksheet.write(row,3,'Date', columnNameFormat)
+            worksheet.write(row,4,'REG', columnNameFormat)
+            worksheet.write(row,5,'BANKED', columnNameFormat)
+            worksheet.write(row,6,'OT', columnNameFormat)
+            worksheet.write(row,7,'Used PTO', columnNameFormat)
+            worksheet.merge_range(row,8,row,9,'Policy', columnNameFormat)
+            worksheet.write(row,10,'Total Paid', columnNameFormat)
+            worksheet.write(row,11,'Holidy', columnNameFormat)
+            row += 1
+            currentEmp = None
+            previousEmp = None
+            i = 0
+            while i < len(totalsData): 
+                for rowData in data:
+                    currentEmp = str(rowData[0])
+                    if currentEmp is not None and previousEmp is not None and currentEmp != previousEmp:
+                            logger.info(totalsData[i])
+                            worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
+                            worksheet.write(row,2,totalsData[i][1], totalFormat)
+                            worksheet.write(row,3,totalsData[i][2], totalFormat)
+                            worksheet.write(row,4,totalsData[i][3], totalFormat)
+                            worksheet.write(row,5,totalsData[i][4], totalFormat)
+                            worksheet.write(row,6,totalsData[i][5], totalFormat)
+                            worksheet.write(row,7,totalsData[i][6], totalFormat)
+                            worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
+                            worksheet.write(row,10,totalsData[i][8], totalFormat)
+                            worksheet.write(row,11,totalsData[i][9], totalFormat)
+                            i += 1
+                            row+=1
+                    worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
+                    worksheet.write(row,2,rowData[1], textFormat)
+                    worksheet.write(row,3,rowData[2], dateFormat)
+                    worksheet.write(row,4,rowData[3], textFormat)
+                    worksheet.write(row,5,rowData[4], textFormat)
+                    worksheet.write(row,6,rowData[5], textFormat)
+                    worksheet.write(row,7,rowData[6], textFormat)
+                    worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
+                    worksheet.write(row,10,rowData[8], textFormat)
+                    worksheet.write(row,11,rowData[9], textFormat)
+                    previousEmp=str(rowData[0])
+                    row+=1
+                break
+        
+            writer.close()
+        return folder_path
+            
+
     except Exception as e:
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
 
