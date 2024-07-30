@@ -1,6 +1,7 @@
+'''Combine all the report generator caller functions into one function that selectrs the report generator. This should simplify the code and internal dependancies'''
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from .sqlDataFormatter import ReportGenerate, MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
+from .sqlDataFormatter import BillableReportGenerate, NonBillableReportGen, MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
 import asyncio
 import datetime
 import pytz
@@ -149,7 +150,7 @@ def CreateTextFile():
     logger.info(filePath, end="")
 
 def billingReport(month= None, year = None):
-    file_path = (ReportGenerate(month, year ))
+    file_path = (BillableReportGenerate(month, year ))
     logger.info(f" {file_path}")
     return file_path 
 
@@ -161,6 +162,11 @@ def monthlyBillable(month = None, year = None):
 #depreciated
 def monthlyBillableEqp(month = None, year = None):
     file_path = (MonthylyProjReportEqp(month, year))
+    logger.info(f" {file_path}")
+    return file_path
+
+def NonBillableReport(start = None, end = None):
+    file_path = NonBillableReportGen(start, end)
     logger.info(f" {file_path}")
     return file_path
 

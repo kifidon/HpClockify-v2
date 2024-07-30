@@ -151,10 +151,11 @@ def updateTags(inputdata: dict):
     try:
         logger = setup_background_logger(loggerLevel)
         logger.info(f'updateTags Function called')
-
+        logger.debug(dumps(inputdata, indent =4))
         workspaceId = inputdata['workspaceId']
         tags_data = inputdata.get('tags')
         entry_id = inputdata.get("id")
+        
         # Get existing tags associated with the entry
         def deleteOldTags():
             try: 
@@ -200,6 +201,7 @@ def updateTags(inputdata: dict):
         
         deleteOldTags()
         for i in range(0, len(tags_data)):
+            logger.debug(dumps(tags_data, indent =4))
             updateTagSync(tags_data[i])
             logger.info(f'Update TagsFor on Entry {entry_id}: Complete ')
         return tags_data
@@ -267,11 +269,9 @@ async def approvedEntries(request: ASGIRequest):
     logger.info('\tWaiting for Approved Entry Semaphore')
     async with approvedEntrySemaphore:
         logger.info('\tAquired Approved Entry Semaphore')
-        retryFlag = True
         retryCount = 0
-        while retryFlag and retryCount < MAX_RETRY:
-            retryFlag += 1
-            retryFlag = False
+        while  retryCount < MAX_RETRY:
+            retryCount += 1
             try:
                 logger.debug(type(request.body))
                 inputData = bytes_to_dict(request.body)
@@ -306,11 +306,11 @@ async def approvedEntries(request: ASGIRequest):
     
             except Exception as e:
                 logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-                response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                response = JsonResponse(data = str(e), status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
                 
                 if 'deadlocked' in str(e):
                     logger.debug(f'Caught Deadlock error: {str(e)}')
-                    retryFlag = await pauseOnDeadlock('approvedEntries', inputData['id'])
+                    await pauseOnDeadlock('approvedEntries', inputData['id'])
                 else:
                     break
 

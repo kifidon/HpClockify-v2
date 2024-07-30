@@ -299,7 +299,7 @@ class TagsForSerializer(serializers.ModelSerializer):
         "workspaceId": "64a687e29ae1f428e7ebe303"
     }
     '''
-    entryid = serializers.SerializerMethodField(method_name='get_entryid')
+    # entryid = serializers.SerializerMethodField(method_name='get_entryid')
     
     class Meta:
         model= Tagsfor

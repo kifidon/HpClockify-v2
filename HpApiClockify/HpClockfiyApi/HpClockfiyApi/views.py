@@ -33,7 +33,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, billingReport, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import main, NonBillableReport, billingReport, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
@@ -48,6 +48,176 @@ import base64
 loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
+
+###########################################################################################################################################################################################################
+
+#depreciated
+@api_view(['GET'])
+def monthlyBillableReport(request, month = None, year= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('BillableReport Called')
+    folder_path = monthlyBillable(month, year )
+    return download_text_file(folder_path)
+#depreciated
+@api_view(['GET'])
+def monthlyBillableReportEquipment(request, month = None, year= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('BillableReport Called for Equipment')
+    folder_path = monthlyBillableEqp(month, year )
+    return download_text_file(folder_path)
+
+def billableReport(request, month= None, year = None):
+    logger = setup_server_logger(loggerLevel)
+    logger.info(f'BillableReport Called for {month}-{year}')
+    folder_path = billingReport(month, year )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def dailyTimeEntry(request):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('Daily Entry Report Called')
+    folder_path = dailyEntries( )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def weeklyPayrollReport(request, start_date=None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = weeklyPayroll(start_date, end_date )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def viewServerLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
+    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-5000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='application/json')
+    else:
+        return HttpResponse('logger file not found', status=404)
+
+@api_view(['GET'])
+def viewTaskLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
+    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-10000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='application/json')
+    else:
+        return HttpResponse('logger file not found', status=404)
+    
+@api_view(['GET', 'POST'])
+def bankedHrs(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger.info(f'{request.method}: bankedHours ')
+    try:
+        SqlClockPull.main()
+        return Response(data='Operation Completed', status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f'{str(e)}')
+        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
+
+@api_view(['GET'])
+def billableNonBillable(reqiest:ASGIRequest, start = None, end = None):
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = NonBillableReport(start, end )
+    return download_text_file(folder_path)
+###########################################################################################################################################################################################################
 
 def aunthenticateRequst(request: ASGIRequest, secret: str): 
     '''
@@ -264,166 +434,6 @@ def timesheets(request: ASGIRequest):
     logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     
     return response
-
-#depreciated
-@api_view(['GET'])
-def monthlyBillableReport(request, month = None, year= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called')
-    folder_path = monthlyBillable(month, year )
-    return download_text_file(folder_path)
-#depreciated
-@api_view(['GET'])
-def monthlyBillableReportEquipment(request, month = None, year= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called for Equipment')
-    folder_path = monthlyBillableEqp(month, year )
-    return download_text_file(folder_path)
-
-def billableReport(request, month= None, year = None):
-    logger = setup_server_logger(loggerLevel)
-    logger.info(f'BillableReport Called for {month}-{year}')
-    folder_path = billingReport(month, year )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def dailyTimeEntry(request):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('Daily Entry Report Called')
-    folder_path = dailyEntries( )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def weeklyPayrollReport(request, start_date=None, end_date= None):
-    '''
-    Function Description: 
-       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Payroll Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger()
-    logger.info(f'Weekly Payroll Report Called')
-    folder_path = weeklyPayroll(start_date, end_date )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def viewServerLog(request):
-    '''
-    Function Description: 
-       Displays Server log file through the browser.
-
-       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
-       to the database 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): 
-    '''
-    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
-    if os.path.exists(log_file_path):
-        with open(log_file_path, 'r') as file:
-            # Read all lines from the file
-            lines = file.readlines()
-            # Extract the last 1000 lines
-            last_1000_lines = lines[-5000:]
-            # Reverse the order of the lines
-            reversed_lines = reversed(last_1000_lines)
-            # Join the lines into a single string
-            log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='application/json')
-    else:
-        return HttpResponse('logger file not found', status=404)
-
-@api_view(['GET'])
-def viewTaskLog(request):
-    '''
-    Function Description: 
-       Displays Server log file through the browser.
-
-       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
-       to the database 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): 
-    '''
-    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
-    if os.path.exists(log_file_path):
-        with open(log_file_path, 'r') as file:
-            # Read all lines from the file
-            lines = file.readlines()
-            # Extract the last 1000 lines
-            last_1000_lines = lines[-5000:]
-            # Reverse the order of the lines
-            reversed_lines = reversed(last_1000_lines)
-            # Join the lines into a single string
-            log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='application/json')
-    else:
-        return HttpResponse('logger file not found', status=404)
-    
-@api_view(['GET', 'POST'])
-def bankedHrs(request: ASGIRequest):
-    '''
-    Function Description: 
-        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Payroll Report File to be directly uploaded into ACC
-    '''
-    logger.info(f'{request.method}: bankedHours ')
-    try:
-        SqlClockPull.main()
-        return Response(data='Operation Completed', status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f'{str(e)}')
-        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 @api_view(['POST'])
 def getClients(request: ASGIRequest):
@@ -851,9 +861,7 @@ async def newExpense(request: ASGIRequest):
         return response
 
 
-
 entrySemaphore = asyncio.Semaphore(1)
-
 def processEntry(inputData):
     try:
         entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
@@ -971,7 +979,6 @@ async def newEntry(request:ASGIRequest):
     await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
     return response
             
-        
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
     '''
