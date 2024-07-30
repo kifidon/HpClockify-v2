@@ -157,7 +157,7 @@ def updateTags(inputdata: dict):
         entry_id = inputdata.get("id")
         
         # Get existing tags associated with the entry
-        def deleteOldTags():
+        ''' def deleteOldTags():
             try: 
                 existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspaceId=workspaceId))
                     # Extract tag ids from the existing tags
@@ -175,10 +175,12 @@ def updateTags(inputdata: dict):
                 logger.info('No tags to delete')
                 pass
                 # Find new tags to create
-
+'''
+        
         def updateTagSync(tag): # as thread 
             # Create new tags
             logger.debug(f"Tags Data - {dumps(tags_data, indent= 4)}")
+            tag['recordId'] = hash50(entry_id, tag['id'], workspaceId)
             try: 
                 tag['entryid'] = entry_id
                 tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspaceId = workspaceId)
@@ -199,7 +201,7 @@ def updateTags(inputdata: dict):
 
                 raise ValidationError(serializer.errors)
         
-        deleteOldTags()
+        # deleteOldTags()
         for i in range(0, len(tags_data)):
             logger.debug(dumps(tags_data, indent =4))
             updateTagSync(tags_data[i])

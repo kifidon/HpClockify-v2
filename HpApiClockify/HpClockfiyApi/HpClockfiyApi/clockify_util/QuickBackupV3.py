@@ -1,7 +1,7 @@
 '''Combine all the report generator caller functions into one function that selectrs the report generator. This should simplify the code and internal dependancies'''
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from .sqlDataFormatter import BillableReportGenerate, NonBillableReportGen, MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet, DailyTimeEntryReport
+from .sqlDataFormatter import *
 import asyncio
 import datetime
 import pytz
@@ -176,7 +176,7 @@ def dailyEntries():
     return file_path
     
 def weeklyPayroll(start_date = None, end_date = None):
-    file_path = WeeklyTimeSheet(start_date, end_date)
+    file_path = Payroll(start_date, end_date)
     logger.info(f" {file_path}")
     return file_path
 

@@ -29,6 +29,8 @@ urlpatterns = [
     path('billing/<str:month>/<str:year>/', views.billableReport),
     path('billingSummary', views.billableNonBillable),
     path('billingSummary/<str:month>/<str:year>/', views.billableNonBillable),
+    path('payroll', views.weeklyPayrollReport),
+    path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
 
     #depreciated
     path('billableReport', views.monthlyBillableReport),
@@ -36,8 +38,6 @@ urlpatterns = [
     path('billableReportEqp', views.monthlyBillableReportEquipment),
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
     
-    path('payroll', views.weeklyPayrollReport),
-    path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
     path('getTime', views.dailyTimeEntry),
     
     path('timeSheets', views.timesheets),
