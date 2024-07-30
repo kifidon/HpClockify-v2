@@ -91,33 +91,34 @@ def getProjects(workspaceId, key, page =1):
         return dict()
 
 async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
-    if entry and expense:
-        logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
-        return []
-    logger.info(f'FindTimesheet called for {timeId} on page {page} ')
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
-    async with httpx.AsyncClient(timeout=300) as client:
-        response = await client.get(url, headers={'X-Api-Key': key})
-        if response.status_code == 200:
-            for timesheet in response.json():
-                if timesheet['approvalRequest']['id'] == timeId:
-                    logger.info(f'Timesheet found on page {page}')
-                    if entry:
-                        logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
-                        logger.debug(f'FindTimesheet executed {page}')
-                        return timesheet['entries']
-                    elif expense:
-                        logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
-                        logger.debug(f'FindTimesheet executed {page}')
-                        return timesheet['expenses']
-                    else:
-                        return []
-            # Not found on this page, try next page
-            logger.debug(f'FindTimesheet executed - Not Found in range {page}')
+    while page < 10:
+        if entry and expense:
+            logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
             return []
-        else:
-            raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
-
+        logger.info(f'FindTimesheet called for {timeId} on page {page} ')
+        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
+        async with httpx.AsyncClient(timeout=300) as client:
+            response = await client.get(url, headers={'X-Api-Key': key})
+            if response.status_code == 200:
+                for timesheet in response.json():
+                    if timesheet['approvalRequest']['id'] == timeId:
+                        logger.info(f'Timesheet found on page {page}')
+                        if entry:
+                            logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['entries']
+                        elif expense:
+                            logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['expenses']
+                        else:
+                            return []
+                # Not found on this page, try next page
+                logger.info(f'FindTimesheet executed - Not Found in range {page}')
+                page += 1
+            else:
+                raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
+    return []
 async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
     """
     Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
