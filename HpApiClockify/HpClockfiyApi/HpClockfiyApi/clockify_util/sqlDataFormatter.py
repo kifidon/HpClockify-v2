@@ -660,6 +660,10 @@ def NonBillableReportGen(start = None, end = None):
             # Text Data Format 
             textFormat = workbook.add_format()
             textFormat.set_border(1)
+            # Total  Data Format 
+            totalFormat = workbook.add_format({'bold': True})
+            totalFormat.set_border(1)
+            
 
             #write Data
             worksheet.merge_range(row,0,row+1,9 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
@@ -988,16 +992,16 @@ def TimeStatus(start = None, end = None):
                 row+=1
                 statuses = {
                     '1': [
-                        'APPROVED', approvedFormat
+                        'APPROVED', approvedFormat, 'Manager has approved timesheet.'
                     ],
                     '2': [
-                        'SUBMITTED', submittedFormat
+                        'SUBMITTED', submittedFormat, 'Employee has submitted time for approval. Waiting on managers approval.'
                     ],
                     '3': [
-                        'NO TIME', missingFormat
+                        'NO TIME', missingFormat, 'Time has not been recorded and no PTO\'s submitted. Unknown time entry.'
                     ],
                     '4': [
-                        'NOT APPLICABLE', timeOffFormat
+                        'NOT APPLICABLE', timeOffFormat, 'No Entries need. Time Off/Vacation'
                     ]
                 }
                 for key, value in statuses.items():
