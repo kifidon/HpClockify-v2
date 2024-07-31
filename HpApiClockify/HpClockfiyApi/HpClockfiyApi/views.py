@@ -33,7 +33,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, NonBillableReport, billingReport, dailyEntries, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import *
 from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
@@ -132,6 +132,25 @@ def weeklyPayrollReport(request, start_date=None, end_date= None):
     logger = setup_server_logger()
     logger.info(f'Weekly Payroll Report Called')
     folder_path = weeklyPayroll(start_date, end_date )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def TimeStatusEvent(request, start_date=None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = TimeStatusCaller(start_date, end_date )
     return download_text_file(folder_path)
 
 @api_view(['GET'])
