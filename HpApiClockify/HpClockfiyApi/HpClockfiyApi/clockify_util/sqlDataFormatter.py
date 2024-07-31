@@ -614,6 +614,7 @@ def NonBillableReportGen(start = None, end = None):
             Inner join Timesheet ts on ts.id = en.time_sheet_id
             inner join EmployeeUser eu on eu.id = ts.emp_id
             where Cast(en.start_time as Date) between '{start}' and '{end}'
+            and eu.status = 'ACTIVE'
             Group by 
                 eu.name, 
                 eu.manager
