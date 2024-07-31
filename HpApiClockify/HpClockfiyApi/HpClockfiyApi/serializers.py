@@ -1,17 +1,7 @@
 from rest_framework import serializers
 from . Loggers import setup_background_logger
-from .models import(
-    Employeeuser,
-    Workspace,
-    Timesheet,
-    Entry,
-    Project,
-    Tagsfor,
-    Expense, 
-    Category,
-    TimeOffRequests,
-    FilesForExpense
-)
+from .models import *
+
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
 from datetime import date
@@ -109,7 +99,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         except Exception: 
             return 'No Role Specified'
     
-    def get_start_date(sekf, obj): 
+    def get_start_date(self, obj): 
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
@@ -275,7 +265,7 @@ class EntrySerializer(serializers.Serializer):
         logger.info('Update Entry Called')
         logger.debug(validated_data)
         try:
-            logger.debug(validated_data['billable'])
+            logger.debug(f"Billlable -({validated_data['billable']})")
             # instance.id = instance.id
             try:
                 instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
@@ -296,60 +286,64 @@ class EntrySerializer(serializers.Serializer):
             return instance
         except Exception as e:
             logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
-            return instance
+            raise e
 
-class TagsForSerializer(serializers.Serializer):
+class TagsForSerializer(serializers.ModelSerializer):
     '''
     Input is of the form: 
     {
+        "entryid": "adasdfadf ada"
         "archived": true,
         "id": "64c777ddd3fcab07cfbb210c",
         "name": "Sprint1",
         "workspaceId": "64a687e29ae1f428e7ebe303"
     }
     '''
-    id = serializers.CharField()
-    name = serializers.CharField()
-    workspaceId = serializers.CharField()
-    timeid = serializers.SerializerMethodField(method_name='get_timeid')
-    entryid = serializers.SerializerMethodField(method_name='get_entryid')
-
-    def create(self,validated_data:dict):
-        try: 
-            logger = setup_background_logger('DEBUG')
-            logger.info('Create Tag Called')
-            
-            tag = Tagsfor.objects.create(
-                id = validated_data.get('id'),
-                entryid = Entry.objects.get(
-                    id=self.context.get('entryid'),
-                    timesheetId= self.context.get('timeid') , 
-                    workspaceId=validated_data.get('workspaceId')
-                ),
-                timeid = Timesheet.objects.get(id=self.context.get('timeid')),
-                workspace = Workspace.objects.get(id= validated_data.get('workspaceId')),
-                name = validated_data.get('name')
-            )
-            return tag
-        except Exception as e:
-            logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
-            raise e 
+    # entryid = serializers.SerializerMethodField(method_name='get_entryid')
     
-    def update( self , instance: Tagsfor, validated_data):
+    class Meta:
+        model= Tagsfor
+        fields = "__all__"
+
+    
+    
+    # def create(self,validated_data:dict):
+    #     try: 
+    #         logger = setup_background_logger('DEBUG')
+    #         logger.info('Create Tag Called')
+    #         entryInstnace = Entry.objects.get(
+    #                             id=self.get_entryid(),
+    #                             workspaceId=validated_data.get('workspaceId')
+    #                         )
+    #         tag = Tagsfor.objects.create(
+    #             id = validated_data.get('id'),
+    #             entryid = entryInstnace,
+    #             workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')),
+    #             name = validated_data.get('name')
+    #         )
+    #         return tag
+    #     except Exception as e:
+    #         logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
+    #         raise e 
+    
+    def update(self, instance, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Tag Called')
         try:
+            instance.name = validated_data.get('name', instance.name)
+            
+            # Ensuring that primary key fields are not changed
             # instance.id = instance.id
-            instance.name = validated_data.get('name') or instance.name
-            # instance.workspace =  Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspace
-            # instance.entryid = Entry.objects.get(id=self.context.get('entryid'), workspace=validated_data.get('workspaceId')) or instance.entryid
-            instance.timeid = Timesheet.objects.get(id=self.context.get('timeid')) or instance.timeid
-            instance.save(force_update=True)
+            # instance.workspace = instance.workspace
+            # instance.entryid = instance.entryid
+
+            # Save the instance
+            logger.warning(f"\tUpdate on Tags For Entry is a Forbidden Opperation. Returning...")
             return instance
-        except Exception as e: 
-            logger.warning(f'UnknownError: {dumps(str(e), indent = 4)}')
-            return instance
-    
+        except Exception as e:
+            logger.warning(f'UnknownError: {dumps(str(e), indent=4)}')
+            raise e
+
 class CategorySerializer(serializers.ModelSerializer): 
     '''
     Input is of the form: 
@@ -490,3 +484,80 @@ class FileExpenseSerializer(serializers.ModelSerializer):
     class Meta: 
         model = FilesForExpense
         fields = "__all__"
+
+#########################################################################################################################################################################################################
+class LemSheetSerializer(serializers.ModelSerializer):
+    lem_sheet_date = serializers.DateField(input_formats=['%m/%d/%Y', '%Y-%m-%d'])
+    class Meta:
+        model = LemSheet
+        fields = '__all__'
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Equipment
+        fields = '__all__'
+
+class LemWorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LemWorker
+        fields = '__all__'
+
+class LemEntrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LemEntry
+        fields = '__all__'
+
+class EquipEntrySerializer(serializers.ModelSerializer):
+    '''
+    {
+        "lemId": "461fb94fbedf7499259ba46606260df60c6a00323e62c",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "equipId": "919394",
+        "isUnitRate": 1,
+        "qty": "9"
+    }
+    '''
+    class Meta:
+        model = EquipEntry
+        fields = '__all__'
+
+class WorkerRateSheetSerializer(serializers.ModelSerializer):
+    '''
+    {
+        "clientId": "65c25a26c642257db282938b",
+        "roleId": "36ba9e042df56922a8917f834bc7e951ea2d7f33e81d7",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "workRate": 32,
+        "travelRate": 42,
+        "calcRate": 12,
+        "isRole": true
+    }
+    '''
+    class Meta:
+        model = WorkerRateSheet
+        fields = '__all__'
+
+class EqpRateSheetSerializer(serializers.ModelSerializer):
+    '''
+    {
+        "clientId": "65c25a26c642257db282938b",
+        "equipId": "919394",
+        "workspaceId": "65c249bfedeea53ae19d7dad",
+        "unitRate": 322,
+        "dayRate": 4122,
+        "isRole": false
+    }
+    '''
+    class Meta:
+        model = EqpRateSheet
+        fields = '__all__'
+
+class ClientRepSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientRep
+        fields = '__all__'

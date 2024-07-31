@@ -1,5 +1,6 @@
 import pyodbc
 import copy
+import json
 # import logging
 from .. Loggers import setup_background_logger, setup_server_logger
 from .ClockifyPullV3 import getApiKey, getWorkspaces,getWorkspaceUsers, getProjects, getApprovedRequests, getHolidays, getClients, getPolocies, getTimeOff, getUserGroups
@@ -48,7 +49,10 @@ def pushWorkspaces(conn, cursor):
 def getWID(wSpace_Name):
     count = 0
     while True:
-        quickCursor, quickConn = sqlConnect()
+        try:
+            quickCursor, quickConn = sqlConnect()
+        except pyodbc.Error as p: 
+            return 'INVALID'
         quickCursor.execute('''SELECT id FROM Workspace WHERE name = ? ''', wSpace_Name)
         row = quickCursor.fetchone()
         if row is not None:
@@ -62,9 +66,11 @@ def getWID(wSpace_Name):
     if check and row is not None:
         return row[0]
     elif check and row is None:
-        return logger.error("Invalid Workspace Name")
+        logger.error("Invalid Workspace Name")
+        return 'INVALID'
     else:
         logger.error("An error occured on the system. Please Contact Administrator. Cannot close connection.")
+        return 'INVALID'
 
 def pushUsers(wkSpaceID, conn, cursor):
     """
@@ -189,17 +195,21 @@ def deleteProjects(conn, cursor, wkSpaceID):
         )
         oldProjects = cursor.fetchall()
         for delete in oldProjects:
-            if delete[0] not in newProj:
-                cursor.execute(
-                    '''
-                    DELETE FROM Project
-                    WHERE 
-                        id = ? and
-                        workspace_id = ?
-                    ''', (delete[0], wkSpaceID)
-                )
-                logger.info(f"\t\t\tDeleted...{deleted}")
-                deleted += 1
+            try:
+                if delete[0] not in newProj:
+                    cursor.execute(
+                        '''
+                        DELETE FROM Project
+                        WHERE 
+                            id = ? and
+                            workspace_id = ?
+                        ''', (delete[0], wkSpaceID)
+                    )
+                    logger.info(f"\t\t\tDeleted...{deleted}")
+                    deleted += 1
+            except pyodbc.IntegrityError as e:
+                logger.warning(f"Can't delete project: {e}") 
+                continue
     except Exception as  exc :
         conn.rollback()  # Roll back changes if an exception occurs
         logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
@@ -357,18 +367,19 @@ def pushClients(wkSpaceID, conn, cursor):
     clients = getClients(wkSpaceID, key)
     try:
         for client in clients:
+            logger.debug(json.dumps(client))
             cID = client['id']
             cEmail = client['email']
             cAddress = client['address']
             cName = client ['name']
-            CNotes = client['note']
+            cLongName = client['note']
             try:
                 cursor.execute(
                     '''
                     INSERT INTO Client ( id, email, address, name, workspace_id, longName)
                     VALUES (?, ?, ?, ?, ?, ?)
                     ''',
-                    (cID, cEmail, cAddress, cName, wkSpaceID, CNotes)
+                    (cID, cEmail, cAddress, cName, wkSpaceID, cLongName)
                 )
                 logger.info(f"Adding Client information...({count})")
                 count += 1
@@ -385,8 +396,11 @@ def pushClients(wkSpaceID, conn, cursor):
                         ((cEmail is not None or oldClient[0] is not None) and cEmail != oldClient[0])
                         or ((cAddress is not None or oldClient[1] is not None) and cAddress != oldClient[1])
                         or ((cName is not None or oldClient[2] is not None) and cName != oldClient[2])
-                        or ((CNotes is not None or oldClient[3] is not None) and cName != oldClient[3])
+                        or ((cLongName is not None or oldClient[3] is not None) and cLongName != oldClient[3])
                     ):
+                        
+                        logger.debug(cLongName)
+                        logger.debug(oldClient)
                         cursor.execute(
                             '''
                             Update Client
@@ -398,9 +412,9 @@ def pushClients(wkSpaceID, conn, cursor):
                             where 
                                 id = ? and workspace_id = ?
                             ''',
-                            (cEmail, cAddress, cName, cID, wkSpaceID, CNotes)
+                            (cEmail, cAddress, cName, cLongName, cID, wkSpaceID )
                         )
-                        logger.info(f"\tUpdating Client information...({update})")
+                        logger.info(f"\tUpdating Client information...({cName})")
                         update += 1
                     else:
                         exists += 1
@@ -413,19 +427,19 @@ def pushClients(wkSpaceID, conn, cursor):
         return f"Operation failed. Changes rolled back. Contact administer of problem persists"
     else:
         conn.commit()
-        logger.error("Committing changes...")  # Commit changes if no exceptions occurred                    
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                    
         return(f"Client: {count} new records. {exists} unchanged. {update} updated.\n")
 
 def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
-    update = 0 ; exists = 0; count = 0
+    update = 0; exists = 0; count = 0
     try:
         for tag in tags: 
             cursor.execute(
                 '''
                 select id, entryID, timeID, name, workspace_id
                 from TagsFor
-                where id = ? and entryID = ? and timeID = ? and workspace_id =?
-                ''', (tag["id"], enID, aID, wkSpaceID)
+                where id = ? and entryID = ? and workspace_id =?
+                ''', (tag["id"], enID, wkSpaceID)
             )
             existingTag = cursor.fetchone()
             if existingTag is None: # insert new 
@@ -446,8 +460,8 @@ def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
                         '''
                         Update TagFor
                         set name = ?
-                        where id = ? and workspace_id = ?
-                        ''', (tag["name"], tag["id"], wkSpaceID)
+                        where id = ? and workspace_id = ?, and entryId = ?
+                        ''', (tag["name"], tag["id"], wkSpaceID, enID)
                     )
                     update += 1
                     logger.info(f"\t\t\tUpdating tag name {existingTag[3]} to {tag['name']}")
@@ -527,7 +541,9 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
     deleteEntries(conn, cursor, entries, aID) # delete stale entries before inserting, as to minimize transactions
     try:
         for entry in entries:
-            approval = entry['approvalRequestId']
+            approval = entry['approvalRequestId'] or aID
+            if entry['approvalRequestId'] is not None and entry['approvalRequestId'] != '' and entry['approvalRequestId'] != aID:
+                logger.critical("Critical logic error - Timesheet ID and 'approvalRequestId' do not match")
             eID = entry['id']
             duration = timeDuration(entry['timeInterval']['duration'])
             description = entry['description']
@@ -546,8 +562,8 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                         '''
                         SELECT time_sheet_id, duration, description, billable, project_id, type, start_time, end_time, rate 
                         FROM Entry
-                        WHERE id = ?  and time_sheet_id = ?  and workspace_id = ?
-                        ''', (eID, approval, wkSpaceID)
+                        WHERE id = ?  and workspace_id = ?
+                        ''', (eID, wkSpaceID)
                     )
                     oldEntry = cursor.fetchone()
                     if(oldEntry is None): # insert new 
@@ -573,32 +589,25 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                         break
                     else: # update entry
                         try:
-                            # if true then update 
-                            if (oldEntry[6] != startTime or oldEntry[7] != endTime or round(oldEntry[1],2) != round(duration, 2) or 
-                            oldEntry[4] != projectID or oldEntry[2] != description or round(float(oldEntry[8]),2) != round(float(rate), 2) or 
-                            oldEntry[3] != billable or oldEntry[0] != approval or oldEntry[5] != type):  
-                                cursor.execute(
-                                    '''
-                                    UPDATE Entry
-                                    SET 
-                                        duration = ?,
-                                        description = ?,
-                                        billable = ?,
-                                        project_id = ?,
-                                        type = ?,
-                                        start_time = ?,
-                                        end_time = ?,
-                                        rate = ?
-                                    WHERE id = ? and time_sheet_id = ? and workspace_id = ?
-                                    ''',
-                                    (duration, description, billable, projectID, type, startTime, endTime, rate, eID, approval, wkSpaceID)
-                                )
-                                logger.info(f"\tUpdating Entry information...({startTime})")
-                                update += 1
-                                break
-                            else:  # entry exists
-                                exists += 1
-                                break
+                            cursor.execute(
+                                '''
+                                UPDATE Entry
+                                SET 
+                                    duration = ?,
+                                    description = ?,
+                                    billable = ?,
+                                    project_id = ?,
+                                    type = ?,
+                                    start_time = ?,
+                                    end_time = ?,
+                                    rate = ?
+                                WHERE id = ? and workspace_id = ?
+                                ''',
+                                (duration, description, billable, projectID, type, startTime, endTime, rate, eID,  wkSpaceID)
+                            )
+                            logger.info(f"\tUpdating Entry information...({startTime})")
+                            update += 1
+                            break
                         except pyodbc.IntegrityError as ex:
                             if "FOREIGN KEY constraint" in str(ex): # update projects and re try for this entry
                                 logger.info(pushProjects(wkSpaceID, conn, cursor) + ". Called from Entries Function. (Update) \n")
@@ -615,8 +624,10 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
                                 logger.info(f"\tstaleEntry for TimeSheet{approval}- Project ({projectID}) No Longer Exists")
                             break
                         # Loop through this record again after adding reference 
-                    else: # unkonwn error 
-                        raise
+                    elif 'PRIMARY KEY constraint' in str(e): 
+                        logger.warning(f'Trying to insert a douplicate record - {eID}. Skipping operation and proceding to the next')
+                        break
+                        
             if len(tags)!= 0:
                 logger.info(pushTags(wkSpaceID, conn, cursor, tags, approval, enID=eID))            
     except Exception as  exc :
@@ -625,7 +636,8 @@ def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
         logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
         raise
     else: # Commit changes in Timesheet function  if no exceptions occurredand check to delete 
-        logger.info(f"\t\tEntry:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
+        conn.commit()
+        logger.info(f"\t\tEntry:  {count} new records. {update} updated. {deleted} deleted.")
         return(FK_ConstraintOnEntry)
 '''
 def pushExpenses(approve, timesheetID, conn, cursor):
@@ -728,9 +740,14 @@ def updateApprovals(update, count, exists, cursor, aID, userID, startDateO, endD
             return update, count, exists, False, FK_ConstraintOnEntry
         else:
             raise
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno}) - (str)')
+        logger.warning(f'Skipping operaiion')
+        return update, count, exists, True , FK_ConstraintOnEntry
 
 #deprecitated 
 def pushApprovedTime(wkSpaceID, conn, cursor, stat):
+
     """
     Pushes approved time data to the database. TimeSheets should not be updated. Include deletion in a future update 
 

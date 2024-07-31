@@ -1,6 +1,7 @@
+'''Combine all the report generator caller functions into one function that selectrs the report generator. This should simplify the code and internal dependancies'''
 from .hpUtil import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from .sqlDataFormatter import MonthylyProjReport, MonthylyProjReportEqp, WeeklyTimeSheet
+from .sqlDataFormatter import *
 import asyncio
 import datetime
 import pytz
@@ -147,19 +148,40 @@ def CreateTextFile():
         file.write("--------------------------------------------------------------------\n")
     file.close()
     logger.info(filePath, end="")
-         
+
+def billingReport(month= None, year = None):
+    file_path = (BillableReportGenerate(month, year ))
+    logger.info(f" {file_path}")
+    return file_path 
+
+#depreciated         
 def monthlyBillable(month = None, year = None):
     file_path = (MonthylyProjReport(month, year ))
     logger.info(f" {file_path}")
     return file_path
-    
-def monthlyBillableEqp(start_date = None, end_date = None):
-    file_path = (MonthylyProjReportEqp(start_date, end_date ))
+#depreciated
+def monthlyBillableEqp(month = None, year = None):
+    file_path = (MonthylyProjReportEqp(month, year))
+    logger.info(f" {file_path}")
+    return file_path
+
+def NonBillableReport(start = None, end = None):
+    file_path = NonBillableReportGen(start, end)
+    logger.info(f" {file_path}")
+    return file_path
+
+def dailyEntries():
+    file_path = DailyTimeEntryReport()
     logger.info(f" {file_path}")
     return file_path
     
 def weeklyPayroll(start_date = None, end_date = None):
-    file_path = WeeklyTimeSheet(start_date, end_date)
+    file_path = Payroll(start_date, end_date)
+    logger.info(f" {file_path}")
+    return file_path
+
+def TimeStatusCaller(start_date = None, end_date = None):
+    file_path = TimeStatus(start_date, end_date)
     logger.info(f" {file_path}")
     return file_path
 
@@ -169,7 +191,8 @@ async def main(): # Move the sql connection to the thread to increase performanc
     (ProjectEvent()),
     (PolicyEvent()),
     (HolidayEvent()),
-    (UserGroupEvent())
+    (UserGroupEvent()),
+    (TimeOffEvent())
     )
     return 'Opperation Complete. View Logging For errors'
 

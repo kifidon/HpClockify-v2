@@ -4,11 +4,13 @@ import pyodbc
 import asyncio 
 import httpx
 import time
+from json import loads
+from datetime import datetime, timedelta
 from httpcore import ConnectTimeout
+
 from .hpUtil import get_current_time , dumps, sqlConnect, cleanUp
 from .. Loggers import setup_background_logger
-
-logger = setup_background_logger('DEBUG')
+logger = setup_background_logger()
 
 MAX_RETRIES = 3
 DELAY = 2 #seconds 
@@ -89,33 +91,34 @@ def getProjects(workspaceId, key, page =1):
         return dict()
 
 async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
-    if entry and expense:
-        logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
-        return []
-    logger.info(f'FindTimesheet called for {timeId} on page {page} ')
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
-    async with httpx.AsyncClient(timeout=300) as client:
-        response = await client.get(url, headers={'X-Api-Key': key})
-        if response.status_code == 200:
-            for timesheet in response.json():
-                if timesheet['approvalRequest']['id'] == timeId:
-                    logger.info(f'Timesheet found on page {page}')
-                    if entry:
-                        logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
-                        logger.debug(f'FindTimesheet executed {page}')
-                        return timesheet['entries']
-                    elif expense:
-                        logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
-                        logger.debug(f'FindTimesheet executed {page}')
-                        return timesheet['expenses']
-                    else:
-                        return []
-            # Not found on this page, try next page
-            logger.debug(f'FindTimesheet executed - Not Found in range {page}')
+    while page < 10:
+        if entry and expense:
+            logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
             return []
-        else:
-            raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
-
+        logger.info(f'FindTimesheet called for {timeId} on page {page} ')
+        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
+        async with httpx.AsyncClient(timeout=300) as client:
+            response = await client.get(url, headers={'X-Api-Key': key})
+            if response.status_code == 200:
+                for timesheet in response.json():
+                    if timesheet['approvalRequest']['id'] == timeId:
+                        logger.info(f'Timesheet found on page {page}')
+                        if entry:
+                            logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['entries']
+                        elif expense:
+                            logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['expenses']
+                        else:
+                            return []
+                # Not found on this page, try next page
+                logger.info(f'FindTimesheet executed - Not Found in range {page}')
+                page += 1
+            else:
+                raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
+    return []
 async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
     """
     Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
@@ -149,6 +152,7 @@ async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryF
             if dataAll != 0:
                 output = []
                 for data in dataAll:
+                    logger.info('Temp store Entry data in dict() object')
                     if data is not None:
                         output.extend(data)           
                 return output 
@@ -370,7 +374,7 @@ def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
     headers = {
         'X-Api-Key': key
     }
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=5"    
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=100&sort-column=UPDATED_AT"    
     response = requests.get(url, headers=headers)
     # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
     #     pass
@@ -393,8 +397,52 @@ def getCategories(workspaceId, page):
         return response.json()
     else:
         raise(Exception('Failed to pull from Clockify'))
+    
 
+def getDetailedEntryReport(workspaceId):
+    logger.info('Pulling Detailed Expense Report')
+    try:
+        print('Pulling Detailed Expense Report')
+        key = getApiKey()
+        headers = {
+            "X-Api-Key": key
+        }
+        url = f'https://reports.api.clockify.me/v1/workspaces/{workspaceId}/reports/detailed'
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        #convert to strings
+        today = today.strftime('%Y-%m-%dT00:00:00.000Z')
+        yesterday = yesterday.strftime('%Y-%m-%dT00:00:00.000Z') 
+        requestBody = {
+            "approvalState":  "ALL",
+            "dateRangeEnd": today,
+            "dateRangeStart": yesterday,
+            "dateRangeType": "YESTERDAY",
+            "exportType": "JSON",
+            "sortOrder": "ASCENDING",
+            "detailedFilter": {
+                "options": {
+                    "totals": "CALCULATE"
+                },
+                "page": 1,
+                "pageSize": 200,
+                "sortColumn": "USER"
+            }
+        }
+        response = requests.post(url=url, headers=headers, json=requestBody)
+        if response.status_code== 200: 
+            output = loads(response.content)
+            return output 
+        else: 
+            logger.critical(response.text)
+            print(response.text)
+    except Exception as e :
+        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+        raise e
+    
 def main():
+
+    # detailedEntryReport('65c249bfedeea53ae19d7dad')
     pass
 if __name__ == "__main__":
     main()

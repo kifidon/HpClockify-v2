@@ -25,12 +25,23 @@ urlpatterns = [
     path('task', views.viewTaskLog),
 
     path('quickBackup', views.quickBackup),
+    path('billing', views.billableReport),
+    path('billing/<str:month>/<str:year>/', views.billableReport),
+    path('billingSummary', views.billableNonBillable),
+    path('billingSummary/<str:start_date>/<str:end_date>/', views.billableNonBillable),
+    path('payroll', views.weeklyPayrollReport),
+    path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
+    path('timeStatus', views.TimeStatusEvent),
+    path('timeStatus/<str:start_date>/<str:end_date>/', views.TimeStatusEvent),
+
+    #depreciated
     path('billableReport', views.monthlyBillableReport),
     path('billableReport/<str:month>/<str:year>/', views.monthlyBillableReport),
     path('billableReportEqp', views.monthlyBillableReportEquipment),
-    path('billableReportEqp/<str:start_date>/<str:end_date>/', views.monthlyBillableReportEquipment),
-    path('payroll', views.weeklyPayrollReport),
-    path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
+    path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
+    
+    path('getTime', views.dailyTimeEntry),
+    
     path('timeSheets', views.timesheets),
     
     path('HpClockifyApi/bankedHours', views.bankedHrs),
@@ -47,6 +58,14 @@ urlpatterns = [
     path('HpClockifyApi/deleteExpense', views.deleteExpense),
     path('HpClockifyApi/deleteEntry', views.deleteEntry),
     path('HpClockifyApi/requestFiles', views.requestFilesForExpense),
+    
+    path('HpClockifyApi/lemSheet', views.lemSheet),
+    path('HpClockifyApi/lemEntry', views.LemWorkerEntry),
+    path('HpClockifyApi/equipmentEntry', views.equipmentEntries),
+    path('HpClockifyApi/recordName', views.insertRoleOrEquipment),
+    path('HpClockifyApi/rateSheet', views.rateSheets),
+    
+    path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
     
     path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
     path('HpClockifyApi/task/Entry', tasks.approvedEntries),

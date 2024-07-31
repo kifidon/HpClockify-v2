@@ -47,7 +47,7 @@ class Employeeuser(models.Model):
     status = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
-    Truck = models.IntegerField(max_length=1, blank= False, null = False, default=0, db_column='hasTruck')
+    Truck = models.IntegerField(blank= False, null = True, default=0, db_column='hasTruck')
     class Meta:
         managed = False
         db_table = 'EmployeeUser'
@@ -109,10 +109,10 @@ class Entry(models.Model):
         return self.id or ""
     
 class Tagsfor(models.Model):
-    id = models.CharField(primary_key=True, max_length=50)  # The composite primary key (id, entryID, timeID, workspace_id) found, that is not supported. The first column is selected.
-    entryid = models.ForeignKey('Entry', models.DO_NOTHING, db_column='entryID', to_field='id')  # Field name made lowercase.
-    timeid = models.ForeignKey(Timesheet, models.DO_NOTHING, db_column='timeID', to_field='id')  # Field name made lowercase.
-    workspace = models.ForeignKey('Workspace', models.DO_NOTHING, db_column='workspace_id')
+    recordId = models.CharField(max_length= 50, primary_key=True)
+    id = models.CharField(max_length=50)  # The composite primary key (id, entryID, timeID, workspace_id) found, that is not supported. The first column is selected.
+    entryid = models.ForeignKey(Entry, models.DO_NOTHING, db_column='entryID')  # Field name made lowercase.
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspace_id')
     name = models.CharField(max_length=50, blank=True, null=True)
     class Meta:
         managed = False
@@ -149,7 +149,7 @@ class Expense(models.Model):
     quantity = models.FloatField( blank=True, null=True)
     subTotal = models.FloatField( blank=True, null=True)
     taxes = models.FloatField( blank=True, null=True)
-    status = models.CharField( default = 'PENDING', blank= True, null=True)
+    status = models.CharField( max_length = 50, default = 'PENDING', blank= True, null=True)
     
 
     class Meta:
@@ -195,6 +195,119 @@ class BackGroundTaskResult(models.Model):
     class Meta:
         managed = False
         db_table = 'BackGroundTaskDjango'
+
+##################################################################################################################################################################################################
+
+class LemSheet(models.Model):
+    id = models.CharField(max_length = 50, primary_key=True) #  date, and project
+    clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
+    lem_sheet_date = models.DateField(blank=False, null=False)
+    lemNumber = models.CharField(max_length = 10, blank = False, null = False)
+    description = models.TextField(blank=True, null=True )
+    notes = models.TextField(blank = True, null= True)
+    projectId = models.ForeignKey(Project, on_delete=models.CASCADE, db_column= 'projectId')
+    projectManagerId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='projectManagerId')
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = 'LemSheet'
+        constraints = [
+            models.UniqueConstraint(fields=['id', 'workspaceId'], name='unique_client_lem')
+        ]
+
+class Role(models.Model):
+    id = models.CharField(max_length = 50, primary_key= True) #hashed by name
+    name = models.CharField(max_length = 50, blank= False, null = False)
+    class Meta: 
+        managed = False
+        db_table = 'Role'
+
+class Equipment(models.Model):
+    id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    name = models.CharField(max_length=50, null=False, blank= False)
+    class Meta: 
+        managed = False
+        db_table = 'Equipment'
+        
+class LemWorker(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    empId = models.ForeignKey(Employeeuser, on_delete= models.CASCADE, db_column='empId') # 
+    roleId = models.ForeignKey(Role, on_delete=models.DO_NOTHING, db_column='roleId')
+    class Meta: 
+        managed = False
+        db_table = 'LemWorker'
+        constraints = [
+            models.UniqueConstraint(fields=['empId', 'roleId'], name='unique_emp_role')
+        ]
+
+class LemEntry(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)# hashed by lemId and workerId
+    lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId') 
+    workerId = models.ForeignKey(LemWorker, on_delete=models.DO_NOTHING, db_column='workerId')
+    work = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    travel = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    calc = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    meals = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    hotel = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = 'LemEntry'
+        constraints = [
+            models.UniqueConstraint(fields=['workerId', 'lemId', 'workspaceId'], name='unique_worker_entry')
+        ]
+
+class EquipEntry(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50)
+    lemId = models.ForeignKey(LemSheet, on_delete=models.CASCADE, db_column='lemId')
+    equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId')
+    isUnitRate = models.BooleanField()
+    qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.00)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = "EquipEntry"
+
+class WorkerRateSheet(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    clientId = models.ForeignKey(Client, on_delete= models.CASCADE, db_column='clientId', blank=False, null=False)
+    roleId = models.ForeignKey(Role, on_delete=models.DO_NOTHING, db_column='roleId', blank=False, null= False)
+    workRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    travelRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    calcRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = 'WorkerRateSheet'
+        constraints = [
+            models.UniqueConstraint(fields=['clientId', 'roleId', 'workspaceId'], name='unique_client_role')
+        ]
+
+class EqpRateSheet(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    clientId = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='clientId', blank=False, null=False)
+    equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId', blank=False, null=False)
+    unitRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    dayRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = 'EqpRateSheet'
+        constraints = [
+            models.UniqueConstraint(fields=['clientId', 'equipId', 'workspaceId'], name='unique_client_equip')
+        ]
+
+class ClientRep(models.Model):
+    _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
+    empId = models.ForeignKey(Employeeuser, on_delete=models.DO_NOTHING, db_column='empId', blank=False, null=False)
+    clientId = models.ForeignKey(Client, on_delete=models.CASCADE, db_column='clientId', blank= False, null=False)
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    class Meta:
+        managed = False
+        db_table = 'ClientRep'
+        constraints = [
+            models.UniqueConstraint(fields=['empId', 'clientId', 'workspaceId'], name='unique_client_rep')
+        ]
 
 ##################################################################################################################################################################################################
 class AuthGroup(models.Model):

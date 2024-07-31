@@ -1,21 +1,12 @@
 
-from .serializers import (
-    ExpenseSerializer, 
-    CategorySerializer,
-    EntrySerializer,
-    TagsForSerializer
-)
-from .models import (
-    Category,
-    Entry,
-    Tagsfor, 
-    Expense,
-    BackGroundTaskResult
-)
+from .serializers import *
+from .models import *
 from django.utils import timezone
 from django.core.handlers.asgi import ASGIRequest
 from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db import  utils 
+
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from asgiref.sync import sync_to_async
@@ -24,12 +15,12 @@ from json import loads, dumps
 from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
-from .clockify_util.hpUtil import taskResult, bytes_to_dict, check_category_for_deletion, reverseForOutput, timeZoneConvert, get_current_time
-
+from .clockify_util.hpUtil import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, pauseOnDeadlock
+from random import randint
+import time 
 import requests
 import asyncio
-
-
+MAX_RETRY = 3
 loggerLevel = 'WARNING'
 logger = setup_background_logger(loggerLevel) #pass level argument 
 
@@ -90,7 +81,7 @@ async def retryExpenses(request: ASGIRequest):
             def pushCategories(category:dict):
                 try: 
                     try: #try update otherwise insert for Categories 
-                        categoryInstanece = Category.objects.get(pk=category['id'])
+                        categoryInstanece = Category.objects.get(pk=category["id"])
                         serializer = CategorySerializer(data= category, instance=categoryInstanece)
                         logger.info(f'Existing Category... Updatiing')
                     except Category.DoesNotExist:
@@ -160,22 +151,22 @@ def updateTags(inputdata: dict):
     try:
         logger = setup_background_logger(loggerLevel)
         logger.info(f'updateTags Function called')
-
-        workspaceId = inputdata.get('timesheet').get('workspaceId')
-        timeId = inputdata.get('timesheet').get('id')
-        tags_data = inputdata.get('entry').get('tags')
-        entry_id = inputdata.get('entry').get('id')
+        logger.debug(dumps(inputdata, indent =4))
+        workspaceId = inputdata['workspaceId']
+        tags_data = inputdata.get('tags')
+        entry_id = inputdata.get("id")
+        
         # Get existing tags associated with the entry
-        def deleteOldTags():
+        ''' def deleteOldTags():
             try: 
-                existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspace=workspaceId))
+                existing_tags = list(Tagsfor.objects.filter(entryid=entry_id, workspaceId=workspaceId))
                     # Extract tag ids from the existing tags
                 existing_tag_ids = []
                 for tag in existing_tags: 
                     existing_tag_ids.append(tag.id) 
                 existing_tag_ids = set(existing_tag_ids)
                     # Extract tag ids from the request payload
-                request_tag_ids = set(tag['id'] for tag in tags_data)
+                request_tag_ids = set(tag["id"] for tag in tags_data)
                     # Find tags to delete
                 tags_to_delete = existing_tag_ids - request_tag_ids
                 Tagsfor.objects.filter(id__in=tags_to_delete).delete()
@@ -184,31 +175,25 @@ def updateTags(inputdata: dict):
                 logger.info('No tags to delete')
                 pass
                 # Find new tags to create
-
+'''
+        
         def updateTagSync(tag): # as thread 
             # Create new tags
-            logger.debug(dumps(tags_data, indent= 4))
+            logger.debug(f"Tags Data - {dumps(tags_data, indent= 4)}")
+            tag['recordId'] = hash50(entry_id, tag['id'], workspaceId)
             try: 
-                tagObj = Tagsfor.objects.get(id=tag['id'], entryid = entry_id, workspace = workspaceId)
-                serializer = TagsForSerializer(data=tag, instance=tagObj, context={
-                    'workspaceId': workspaceId,
-                    'timeid': timeId,
-                    'entryid': entry_id
-                })
+                tag['entryid'] = entry_id
+                tagObj = Tagsfor.objects.get(id=tag["id"], entryid = entry_id, workspaceId = workspaceId)
+                serializer = TagsForSerializer(data=tag, instance=tagObj, partial=True)
                 logger.warning('Updating Tag')
             except Tagsfor.DoesNotExist:
-                serializer = TagsForSerializer(data=tag, context={
-                    'workspaceId': workspaceId,
-                    'timeid': timeId,
-                    'entryid': entry_id
-                })
+                serializer = TagsForSerializer(data=tag )
                 logger.info(f'Creating new tag')
             if serializer.is_valid():
+                logger.info("Saving Tag Data for entry")
                 serializer.save()
-                logger.info(f'UpdateTags on timesheet({timeId}): E-{entry_id}-T-{tag['id']} 202 ACCEPTED') 
-                data_lines = dumps(serializer.validated_data, indent=4).split('\n')
-                reversed_data = '\n'.join(data_lines[::-1])
-                logger.info(f'{reversed_data}')
+                logger.info("Opperation Succsesful")
+                logger.info(f'UpdateTags on Entry: E-{entry_id}-T-{tag["id"]} 202 ACCEPTED') 
                 return tags_data
             else: 
                 #  (serializer.validated_data)
@@ -216,15 +201,48 @@ def updateTags(inputdata: dict):
 
                 raise ValidationError(serializer.errors)
         
-        deleteOldTags()
+        # deleteOldTags()
         for i in range(0, len(tags_data)):
+            logger.debug(dumps(tags_data, indent =4))
             updateTagSync(tags_data[i])
-            logger.info(f'Update TagsFor on Timesheet{timeId}: Complete ')
+            logger.info(f'Update TagsFor on Entry {entry_id}: Complete ')
         return tags_data
     except Exception as e: 
         if not  isinstance(e, ValidationError):
             logger.info(f'Unhandled Exception ({e.__traceback__.tb_lineno}): {str(e)} ')
             raise e
+
+approvedEntrySemaphore = asyncio.Semaphore(2)
+
+def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread
+    logger.info('\t\tExecuting Task') 
+    try: 
+        #refactoring 
+        entries['workspaceId']= workspaceId
+        entries['timesheetId'] = entries['approvalRequestId']
+        try: # try and update if exists, otherwise create
+            entry = Entry.objects.get(id = entries["id"], workspaceId = workspaceId )
+            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
+            logger.info(f'Updating Entry {entries["id"]}')
+        except Entry.DoesNotExist:
+            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
+            logger.warning(f'Creating new Entry on timesheet {timeId}')
+
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries["id"]} 202 ACCEPTED') 
+            reversed_data = reverseForOutput(entries)
+            logger.info(f'{reversed_data}') 
+            if (len(entries['tags']) != 0):
+                updateTags(entries)
+            return serializer.validated_data
+        else: 
+            logger.error(f'{serializer.errors}')
+            raise ValidationError(serializer.errors)
+    except Exception as e:
+        logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
+        raise e
+                    
 
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest): 
@@ -245,88 +263,62 @@ async def approvedEntries(request: ASGIRequest):
     caller = 'Approved Entry Function Called'
     logger.info(caller)
     logger.debug(type(request))
-    if request.method == 'POST':
-        try:
-            logger.debug(type(request.body))
-            inputData = bytes_to_dict(request.body)
-            logger.debug(dumps(inputData,indent=4))
-            key = ClockifyPullV3.getApiKey()
-            
-            timeId = inputData.get('id')
-            workspaceId = inputData.get('workspaceId')
-            stat = inputData.get('status').get('state') or None
-        
-            if stat == 'APPROVED':
-                allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
-                if len(allEntries) == 0:
-                    logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
-                    response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
-                    asyncio.create_task(saveTaskResult(response, inputData, caller))
-                    return response
-                def syncUpdateEntries(entries): # create thread 
-                    try: 
-                        #refactoring 
-                        entries['workspaceId']= workspaceId
-                        entries['timesheetId'] = entries['approvalRequestId']
-                        try: # try and update if exists, otherwise create
-                            entry = Entry.objects.get(id = entries['id'], workspaceId = workspaceId )
-                            serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})
-                            logger.info(f'Updating Entry {entries['id']}')
-                        except Entry.DoesNotExist:
-                            serializer = EntrySerializer(data=entries, context = {'workspaceId': workspaceId,'approvalRequestId': timeId})
-                            logger.warning(f'Creating new Entry on timesheet {timeId}')
-
-                        if serializer.is_valid():
-                            serializer.save()
-                            logger.info(f'UpdateEntries on timesheet({timeId}): E-{entries['id']} 202 ACCEPTED') 
-                            reversed_data = reverseForOutput(entries)
-                            logger.info(f'{reversed_data}') 
-                            if (len(entries['tags']) != 0):
-                                data = {
-                                    'timesheet': inputData,
-                                    'entry': entries
-                                }
-                                updateTags(data)
-                            return serializer.validated_data
-                        else: 
-                            logger.error(f'{serializer.errors}')
-                            raise ValidationError(serializer.errors)
-                    except Exception as e:
-                        logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
-                        raise  e
-                    
-                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
-                tasks = []
-                if len(allEntries) != 0:
-                    for i in range(0,len(allEntries)): # updates all entries async 
-                        tasks.append(
-                            updateAsync(allEntries[i])
-                        )
-                    await asyncio.gather(*tasks)
-                    logger.info(f'Entries added for timesheet {timeId}') 
-                    response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
-                    asyncio.create_task(saveTaskResult(response, inputData, caller))
-                    return response
-                else: 
-                    logger.warning(f'No entries were found on timesheet with id {timeId}. Review Clockify. 304 NOT_MODIFIED')
-                    response =  JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                    asyncio.create_task(saveTaskResult(response, inputData, caller))
-                    return response
-            else:
-                    logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-                    response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                    asyncio.create_task(saveTaskResult(response, inputData, caller))
-                    return response
-    
-        except Exception as e:
-            logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-            response = JsonResponse(data = None, status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
-            asyncio.create_task(saveTaskResult(response, inputData, caller))
-            return response
-    else:
+    if request.method != 'POST':
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
-        return response
+        return response           
+   
+    logger.info('\tWaiting for Approved Entry Semaphore')
+    async with approvedEntrySemaphore:
+        logger.info('\tAquired Approved Entry Semaphore')
+        retryCount = 0
+        while  retryCount < MAX_RETRY:
+            retryCount += 1
+            try:
+                logger.debug(type(request.body))
+                inputData = bytes_to_dict(request.body)
+                logger.debug(dumps(inputData,indent=4))
+                key = ClockifyPullV3.getApiKey()
+                
+                timeId = inputData.get("id")
+                workspaceId = inputData.get('workspaceId')
+                stat = inputData.get('status').get('state') or None
+            
+                if stat != 'APPROVED':
+                    logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
+                    response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                    break
+                
+                allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+
+                if len(allEntries) == 0: #timesheet has no entries 
+                    logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
+                    response =  JsonResponse(data = {f'Message': f'No Entry for timesheet {timeId}'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+                    
+                    break
+            
+                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                '''May cause SQL server deadlock on resources'''
+                for i in range(0,len(allEntries)): # updates all entries sync 
+                    await updateAsync(allEntries[i], workspaceId, timeId, inputData)
+                    logger.info('\tTask Complete')
+                response = JsonResponse(data = 'Approved Entries Opperation Completed Succesfully', status=status.HTTP_201_CREATED, safe=False)
+                logger.info(f'All Entries added for timesheet {timeId}') 
+                break
+    
+            except Exception as e:
+                logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+                response = JsonResponse(data = str(e), status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
+                
+                if 'deadlocked' in str(e):
+                    logger.debug(f'Caught Deadlock error: {str(e)}')
+                    await pauseOnDeadlock('approvedEntries', inputData['id'])
+                else:
+                    break
+
+    logger.info('\tSemaphore Released')
+    asyncio.create_task(saveTaskResult(response, inputData, caller))
+    return response
 
 @csrf_exempt
 async def approvedExpenses(request:ASGIRequest):
@@ -337,7 +329,7 @@ async def approvedExpenses(request:ASGIRequest):
         inputData = bytes_to_dict(request.body)
         logger.debug(f'InputData\n{reverseForOutput(inputData)}')
         key = ClockifyPullV3.getApiKey()
-        timeId = inputData.get('id')
+        timeId = inputData.get("id")
         workspaceId = inputData.get('workspaceId')
         stat = inputData.get('status').get('state') or None
 
@@ -350,13 +342,13 @@ async def approvedExpenses(request:ASGIRequest):
                 return response
             def syncUpdateExpense(expense):
                 #refactoring 
-                expense['categoryId'] = expense['category']['id']
-                expense[ 'projectId'] = expense['project']['id']
+                expense['categoryId'] = expense['category']["id"]
+                expense[ 'projectId'] = expense['project']["id"]
                 expense['timesheetId'] = expense['approvalRequestId']
                 try:
                     try:
                         approvalID = expense['approvalRequestId'] if expense['approvalRequestId'] is not None else timeId
-                        expenseObj = Expense.objects.get(id=expense['id'], workspaceId = workspaceId)
+                        expenseObj = Expense.objects.get(id=expense["id"], workspaceId = workspaceId)
 
                         serializer = ExpenseSerializer(instance=expenseObj, data=expense)
                         logger.info('Updating Expense...')
@@ -365,7 +357,7 @@ async def approvedExpenses(request:ASGIRequest):
                         logger.warning(f'Creating new Expense on timesheet {timeId}')
                     if serializer.is_valid():
                         serializer.save()
-                        logger.info(f'UpdateExpense on timesheet({timeId}): EX-{expense['id']} 202 ACCEPTED')
+                        logger.info(f'UpdateExpense on timesheet({timeId}): EX-{expense["id"]} 202 ACCEPTED')
                         logger.info(reverseForOutput(expense))
                         return serializer.validated_data
                     else:
@@ -402,4 +394,52 @@ async def approvedExpenses(request:ASGIRequest):
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
-        
+
+
+def postThreadLemEntryTask(inputData: dict):
+    logger = setup_background_logger()
+    try:
+        inputData["workerId"] = LemWorker.objects.get(empId = inputData['empId'], roleId= inputData['roleId']).pk  #refactoring
+        inputData["_id"] = hash50(inputData['lemId'], inputData['workerId'], inputData['workspaceId'])
+        logger.debug(inputData["_id"])
+        logger.debug(reverseForOutput(inputData))
+        serializer = LemEntrySerializer(data=inputData)
+        if serializer.is_valid():
+            serializer.save() 
+            logger.info("Succsesfully saved Lem Entry")
+            return True
+        else:
+            for key, value in serializer.errors.items():
+                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(serializer.error_messages)
+    except Exception as e: 
+            logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+            raise e
+
+@csrf_exempt
+async def lemEntrytTask(request: ASGIRequest): 
+    logger = setup_background_logger()
+    try:
+        logger.info('Inserting Lem Entry Information')
+
+        inputData = bytes_to_dict(request.body)
+        logger.debug(inputData)
+        logger.debug(type(inputData) )
+        if request.method == 'POST':
+            post = sync_to_async(postThreadLemEntryTask, thread_sensitive=True)
+            await post(inputData)
+            return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+        else: #do this later if needed
+            return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Revew Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.error(reverseForOutput(inputData))
+                raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
+    except Exception as e:
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(response.content)
+        return response
+    

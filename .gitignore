@@ -1,0 +1,24 @@
+# Ignore the virtual environment directory
+.venv/
+*.xlsx
+
+# Other common items to ignore
+*.pyc
+__pycache__/
+.DS_Store
+.env
+*.log
+.idea/
+.vscode/
+node_modules/
+HpApiClockify/HpClockfiyApi/*.xlsx
+__pycache__/
+*.log
+*.xlsx
+*.pyc
+*.pyo
+.vscode/
+.venv/
+.github/
+.gitattributes
+HpApiClockify/HpClockfiyApi/HpClockfiyApi/migrations/

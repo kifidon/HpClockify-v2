@@ -11,17 +11,54 @@ from django.http import JsonResponse, HttpResponse
 import os 
 import shutil
 import hashlib
+import random
+
+retrySem = asyncio.Semaphore(1)
+
+async def pauseOnDeadlock(caller, recordID):
+    logger = setup_background_logger()
+    logger.info('\t\tWaiting for Deadlock Semaphore')
+    try:
+        async with retrySem:
+            logger.info('\t\tAquired Deadlock Semaphore')
+            logger.warning(f'DEADLOCK OCCURED WHILE EXECUTING {caller} - Record ID is {recordID}')
+            pauseFor = random.randint(1, 5)
+            logger.info(f'Pausing for {pauseFor}s')
+            for i in range(pauseFor):
+                logger.info('\t\tWaiting..........')
+                await asyncio.sleep(1)
+            logger.info('\tResuming after pause')
+    except Exception as e:
+        logger.error(f'Exception during pauseOnDeadlock: {str(e)}')
+    finally:
+        logger.info(f'\t\tDeadlock Semaphore released')
+
 
 def create_hash(user_id, category_id, date_string):
     # Concatenate the user ID, category ID, and date string
     combined_string = user_id + category_id + date_string
-    
+    combined_string = combined_string.lower()
     # Calculate the SHA-256 hash of the combined string
     hash_object = hashlib.sha256(combined_string.encode())
     
     # Get the hexadecimal representation of the hash and truncate it to 64 characters
     hash_id = hash_object.hexdigest()[:64]
     
+    return hash_id
+
+
+def hash50(vall1, vall2 = None, vall3 = None):
+    logger = setup_background_logger()
+    # Concatenate the user ID, category ID, and date string
+    combined_string = vall1 + (vall2 or '') + (vall3 or '')
+    combined_string = combined_string.lower()
+    logger.debug(f"Hash String: {combined_string}")
+    # Calculate the SHA-256 hash of the combined string
+    hash_object = hashlib.sha256(combined_string.encode())
+    
+    # Get the hexadecimal representation of the hash and truncate it to 64 characters
+    hash_id = hash_object.hexdigest()[:45]
+    logger.debug(f"ID: {hash_id}")
     return hash_id
 
 def download_text_file(folder_path = None):
@@ -112,9 +149,9 @@ def check_category_for_deletion(category_id, categories):
     return True
 
 def bytes_to_dict(byte_string):
-    logger = setup_background_logger('DEBUG')
+    logger = setup_background_logger()
     try:
-
+        logger.debug(f"byte to string - {byte_string}")
         # Decode the byte string into a regular string
         json_string = byte_string.decode('utf-8')
 
@@ -124,16 +161,21 @@ def bytes_to_dict(byte_string):
             for key, value in data.items():
                 try:
                     data[key] = ast.literal_eval(value[0])
-                except SyntaxError:
+                except Exception:
                     data[key] = value[0]
-            print(data)
+            logger.debug(f"Output dict - {data}")
             return data
         else:
-            return loads(json_string)
+            output = loads(json_string)
+            logger.debug(dumps(output, indent=4))
+            return output
     except JSONDecodeError as e:
         # Handle JSON decoding errors
         logger.error(f"Error decoding JSON: {e} at {e.__traceback__.tb_lineno}")
         return None
+    except Exception as e:
+        logger.error(f"({e.__traceback__.tb_lineno} - {str(e)}")
+        raise e
 
 def count_working_days(start_date, end_date, conn, cursor ):
     """
@@ -176,7 +218,7 @@ def getCurrentPaycycle():
 
     # Calculate the most recent Sunday (start of this week)
     start_of_this_week = current_date - timedelta(days=current_date.weekday() + 1)
-    # Adjust if the start of the week falls on a Sunday
+    
     if start_of_this_week.weekday() != 6:
         start_of_this_week += timedelta(days=-7)
 
@@ -313,6 +355,7 @@ def sqlConnect():
         tuple: A tuple containing a cursor object and a connection object if the connection is successful, otherwise dict().
     """
     try:
+        logger = setup_background_logger()
         #server info 
         server = 'hpcs.database.windows.net'
         database = 'hpdb'
@@ -326,8 +369,8 @@ def sqlConnect():
         cursor = conn.cursor()
         return cursor, conn
     except pyodbc.Error as e:
-        print(f"Error: {e}")
-        return None ,None
+        logger.critical(f"Error: {e}")
+        raise e
 
 def cleanUp(conn, cursor):
     """

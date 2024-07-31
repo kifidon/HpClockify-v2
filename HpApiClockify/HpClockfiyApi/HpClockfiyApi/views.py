@@ -25,42 +25,218 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils  #, transaction
-from .serializers import (
-    EmployeeUserSerializer,
-    FileExpenseSerializer,
-    TimesheetSerializer,
-    TimeOffSerializer,
-    ExpenseSerializer,
-    EntrySerializer,
-
-)
-from .models import(
-    TimeOffRequests,
-    FilesForExpense,
-    Employeeuser,
-    Timesheet,
-    Expense,
-    Entry,
-)
+from .serializers import *
+from .models import*
 from asgiref.sync import sync_to_async
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response 
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .clockify_util.QuickBackupV3 import main, TimesheetEvent, monthlyBillableEqp, monthlyBillable, weeklyPayroll, ClientEvent, ProjectEvent,  PolicyEvent
+from .clockify_util.QuickBackupV3 import *
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
 from . Loggers import setup_server_logger
 from . import settings
-
+from rest_framework.exceptions import ErrorDetail
 from json.decoder import JSONDecodeError
+from datetime import datetime
+import time 
 import httpx
 import base64
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger(loggerLevel)
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
+
+###########################################################################################################################################################################################################
+
+#depreciated
+@api_view(['GET'])
+def monthlyBillableReport(request, month = None, year= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('BillableReport Called')
+    folder_path = monthlyBillable(month, year )
+    return download_text_file(folder_path)
+#depreciated
+@api_view(['GET'])
+def monthlyBillableReportEquipment(request, month = None, year= None):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('BillableReport Called for Equipment')
+    folder_path = monthlyBillableEqp(month, year )
+    return download_text_file(folder_path)
+
+def billableReport(request, month= None, year = None):
+    logger = setup_server_logger(loggerLevel)
+    logger.info(f'BillableReport Called for {month}-{year}')
+    folder_path = billingReport(month, year )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def dailyTimeEntry(request):
+    '''
+    Function Description: 
+       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Billable Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger(loggerLevel)
+    logger.info('Daily Entry Report Called')
+    folder_path = dailyEntries( )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def weeklyPayrollReport(request, start_date=None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = weeklyPayroll(start_date, end_date )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def TimeStatusEvent(request, start_date=None, end_date= None):
+    '''
+    Function Description: 
+       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
+       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
+
+       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = TimeStatusCaller(start_date, end_date )
+    return download_text_file(folder_path)
+
+@api_view(['GET'])
+def viewServerLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
+    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-5000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='application/json')
+    else:
+        return HttpResponse('logger file not found', status=404)
+
+@api_view(['GET'])
+def viewTaskLog(request):
+    '''
+    Function Description: 
+       Displays Server log file through the browser.
+
+       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
+       to the database 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): 
+    '''
+    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-10000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='application/json')
+    else:
+        return HttpResponse('logger file not found', status=404)
+    
+@api_view(['GET', 'POST'])
+def bankedHrs(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger.info(f'{request.method}: bankedHours ')
+    try:
+        SqlClockPull.main()
+        return Response(data='Operation Completed', status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f'{str(e)}')
+        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
+
+@api_view(['GET'])
+def billableNonBillable(reqiest:ASGIRequest, start_date = None, end_date = None):
+    logger = setup_server_logger()
+    logger.info(f'Weekly Payroll Report Called')
+    folder_path = NonBillableReport(start_date, end_date )
+    return download_text_file(folder_path)
+###########################################################################################################################################################################################################
 
 def aunthenticateRequst(request: ASGIRequest, secret: str): 
     '''
@@ -77,7 +253,6 @@ def aunthenticateRequst(request: ASGIRequest, secret: str):
     '''
     logger.info('Validating Request...')
     signature = request.headers.get('Clockify-Signature') 
-    logger.debug(signature)
     if secret == signature:
         logger.info('Request Validated!')
         return True
@@ -252,7 +427,7 @@ async def quickBackup(request: ASGIRequest):
     try: 
         result = await main() # General String for return output
     except Exception as e:
-        logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
+        logger.info(f'Quickbackup: {str(e)}')
     finally: 
         response = JsonResponse(data = result, status=status.HTTP_200_OK, safe=False)
         return response
@@ -278,141 +453,6 @@ def timesheets(request: ASGIRequest):
     logger.info(f'Quickbackup:  {response.data}, {response.status_code}')
     
     return response
-
-
-@api_view(['GET'])
-def monthlyBillableReport(request, month = None, year= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called')
-    folder_path = monthlyBillable(month, year )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def monthlyBillableReportEquipment(request, start_date = None, end_date= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called for Equipment')
-    folder_path = monthlyBillableEqp(start_date, end_date )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def weeklyPayrollReport(request, start_date=None, end_date= None):
-    '''
-    Function Description: 
-       Calls format function to build the payroll report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Payroll Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger()
-    logger.info(f'Weekly Payroll Report Called')
-    folder_path = weeklyPayroll(start_date, end_date )
-    return download_text_file(folder_path)
-
-@api_view(['GET'])
-def viewServerLog(request):
-    '''
-    Function Description: 
-       Displays Server log file through the browser.
-
-       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
-       to the database 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): 
-    '''
-    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
-    if os.path.exists(log_file_path):
-        with open(log_file_path, 'r') as file:
-            # Read all lines from the file
-            lines = file.readlines()
-            # Extract the last 1000 lines
-            last_1000_lines = lines[-5000:]
-            # Reverse the order of the lines
-            reversed_lines = reversed(last_1000_lines)
-            # Join the lines into a single string
-            log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='application/json')
-    else:
-        return HttpResponse('logger file not found', status=404)
-
-@api_view(['GET'])
-def viewTaskLog(request):
-    '''
-    Function Description: 
-       Displays Server log file through the browser.
-
-       In future versions impliment a submission form to have the user log in. This data should not be completly public as it contains all the data passed 
-       to the database 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): 
-    '''
-    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
-    if os.path.exists(log_file_path):
-        with open(log_file_path, 'r') as file:
-            # Read all lines from the file
-            lines = file.readlines()
-            # Extract the last 1000 lines
-            last_1000_lines = lines[-5000:]
-            # Reverse the order of the lines
-            reversed_lines = reversed(last_1000_lines)
-            # Join the lines into a single string
-            log_contents = ''.join(reversed_lines)
-        return HttpResponse(log_contents, content_type='application/json')
-    else:
-        return HttpResponse('logger file not found', status=404)
-    
-@api_view(['GET', 'POST'])
-def bankedHrs(request: ASGIRequest):
-    '''
-    Function Description: 
-        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Payroll Report File to be directly uploaded into ACC
-    '''
-    logger.info(f'{request.method}: bankedHours ')
-    try:
-        SqlClockPull.main()
-        return Response(data='Operation Completed', status=status.HTTP_200_OK)
-    except Exception as e:
-        logger.error(f'{str(e)}')
-        return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 @api_view(['POST'])
 def getClients(request: ASGIRequest):
@@ -788,7 +828,7 @@ async def newExpense(request: ASGIRequest):
                             return True
                         else:
                             for key, value in serializer.errors.items():
-                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
                             raise ValidationError(serializer.errors)
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
@@ -813,7 +853,7 @@ async def newExpense(request: ASGIRequest):
                             return True
                         else:
                             for key, value in serializer.errors.items():
-                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
                             raise ValidationError(serializer.errors)
                     except Expense.DoesNotExist as e:
                         logger.critical(f'input id is {inputData['id']}')
@@ -839,6 +879,39 @@ async def newExpense(request: ASGIRequest):
         logger.error(response.content)
         return response
 
+
+entrySemaphore = asyncio.Semaphore(1)
+def processEntry(inputData):
+    try:
+        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+        serializer = EntrySerializer(instance=entry, data= inputData )
+        logger.info(f'Update path taken for Entry')
+    except Entry.DoesNotExist:
+        serializer = EntrySerializer(data = inputData )
+        logger.info(f'Insert path taken for Entry')
+    if serializer.is_valid():
+        serializer.save()
+        logger.info('\tOperation Complete')
+        # do the rest 
+        return True, 'V'
+    else:
+        logger.warning(f'Serializer could not be saved: {serializer.errors}')
+        for key, value in serializer.errors.items():
+            logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+            # Check if the value is an instance of ErrorDetail
+            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                # Print the key and each error code and message
+                for error_detail in value:
+                    code = error_detail.code
+                    field = key
+                    '''
+                    include check for other foreign keys to know which foreign key 
+                    constraint is violated and which function should handle it
+                    '''
+                    if code == 'does_not_exist': 
+                        return False, 'C' # C for category P for Project, F for file in later updates 
+        return False, 'X' # Unknown, Raise error (BAD Request)
+
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
     '''
@@ -863,70 +936,68 @@ async def newEntry(request:ASGIRequest):
     logger.info(caller)
     secret = 'e2kRQ3xauRrfFqkyBMsgRaCLFagJqmCE' #newEntry 
     secret2 = 'Ps4GN6oxDKYh9Q33F1BULtCI7rcgxqXW' #updateEntry  
-    try:
-        if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
-            if request.method == 'POST':
-                try:
-                    inputData = loads(request.body)
-                    RetryFlag = False 
-                except Exception:
-                    logger.warning('Unknown Exception, attempting to handle')
-                    inputData = request.POST
-                    RetryFlag = True
-                logger.debug(reverseForOutput(inputData))
-
-                def processEntry(inputData):
+    retryFlag = True
+    maxRetries = 3
+    retryCount = 0
+    logger.info('\tWaiting for Semaphore')
+    async with entrySemaphore: # only 3 concurent tasks
+        logger.info('\tSemaphore Aquired')
+        while retryFlag and maxRetries > retryCount:
+            if retryCount > 0: 
+                logger.info('\tRetrying....')
+            retryCount += 1
+            retryFlag = False
+            try:
+                if aunthenticateRequst(request, secret) or aunthenticateRequst(request, secret2):
+                    #Get input Data 
                     try:
-                        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-                        serializer = EntrySerializer(instance=entry, data= inputData )
-                        logger.info(f'Update path taken for Entry')
-                    except Entry.DoesNotExist:
-                        serializer = EntrySerializer(data = inputData )
-                        logger.info(f'Insert path taken for Entry')
-                    if serializer.is_valid():
-                        serializer.save()
-                        # do the rest 
-                        return True, 'V'
+                        inputData = loads(request.body)
+                    except Exception:
+                        logger.warning('Unknown Exception, attempting to handle')
+                        inputData = request.POST
+
+                    #assert POST
+                    if request.method != 'POST':
+                        response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
+                        asyncio.create_task(saveTaskResult(response, inputData, caller))
+                        break
+
+                    # store data
+                    logger.debug(reverseForOutput(inputData))
+                    processEntryAsync = sync_to_async(processEntry)
+                    result = await processEntryAsync(inputData)
+                    
+                    # generate response
+                    if result[0]:
+                        response = JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                        break
                     else:
-                        #force backgroung task 
-                        logger.warning(f'Serializer could not be saved: {serializer.errors}')
-                        for key, value in serializer.errors.items():
-                            logger.info(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-                            # Check if the value is an instance of ErrorDetail
-                            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                                # Print the key and each error code and message
-                                for error_detail in value:
-                                    code = error_detail.code
-                                    field = key
-                                    '''
-                                    include check for other foreign keys to know which foreign key 
-                                    constraint is violated and which function should handle it
-                                    '''
-                                    if code == 'does_not_exist': 
-                                        return False, 'C' # C for category P for Project, F for file in later updates 
-                        return False, 'X' # Unknown, Raise error (BAD Request)
-                
-                processEntryAsync = sync_to_async(processEntry)
-                result = await processEntryAsync(inputData)
-                if result[0]:
-                    return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                        response =  JsonResponse(
+                            data= {
+                                'Message': 'Post Data could not be validated. Review Logs'
+                                },
+                                status=status.HTTP_400_BAD_REQUEST
+                        )    
+                        break
+
+                else: #invalid security key
+                    response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+                    await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+                    break
+
+            except Exception as e: 
+                response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+                logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+                if 'deadlocked' in str(e):
+                    retryFlag = await pauseOnDeadlock('newEntry', inputData.get('id', ''))
                 else:
-                    return JsonResponse(
-                        data= {
-                            'Message': 'Post Data could not be validated. Review Logs'
-                            },
-                            status=status.HTTP_400_BAD_REQUEST
-                    )
-        else:
-            response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-            await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
-            return response
-    except Exception as e: 
-        response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
-        logger.error(response.content.decode('utf-8'))
-        await saveTaskResult(response, loads(request.body), caller )
-        return response
-    
+                    break
+        if maxRetries <= retryCount:
+            response = JsonResponse(data={'Message': 'Failed to process request after multiple attempts.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    logger.info('Entry Semaphore Released')
+    await saveTaskResult(response, dumps(loads(request.body)), 'NewEntry Function')
+    return response
+            
 @csrf_exempt
 async def deleteEntry(request:ASGIRequest):
     '''
@@ -945,40 +1016,53 @@ async def deleteEntry(request:ASGIRequest):
     logger = setup_server_logger(loggerLevel)
     logger.info('Delete Entry Function called')
     secret = '0IQNBiGEAejNMlFmdQc8NWEiMe1Uzg01'
-    if aunthenticateRequst(request, secret):
-        inputData = loads(request.body)
-        logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
-        
-        if request.method == 'POST':
-            
-            def deleteEntry():
-                try:
-                    expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
-                    expense.delete()
-                    logger.info('Entry Deleted...')
-                    return True
-                except Entry.DoesNotExist:
-                    logger.warning('Entry was not deleted successfully')
-                    return False
-            
-            deleteAsync =  sync_to_async(deleteEntry)
-            result = await deleteAsync()
-            
-            if result:
-                response = JsonResponse(data = {
-                        'Message': 'Expense Deleted',
-                        'data': inputData
-                    }, status=status.HTTP_200_OK)
-                logger.debug(response)
+    retryFlag = True
+    caller = 'deleteEntry'
+    while retryFlag:
+        retryFlag = False
+        try:
+            if aunthenticateRequst(request, secret):
+                inputData = loads(request.body)
+                logger.debug(f'Input data: \n{dumps(inputData, indent= 4)}')
+                
+                if request.method == 'POST':
+                    
+                    def deleteEntry():
+                        try:
+                            expense = Entry.objects.get(id=inputData['id'], workspaceId = inputData['workspaceId'])
+                            expense.delete()
+                            logger.info('Entry Deleted...')
+                            return True
+                        except Entry.DoesNotExist:
+                            logger.warning('Entry was not deleted successfully')
+                            return False
+                    
+                    deleteAsync =  sync_to_async(deleteEntry)
+                    result = await deleteAsync()
+                    
+                    if result:
+                        response = JsonResponse(data = {
+                                'Message': 'Expense Deleted',
+                                'data': inputData
+                            }, status=status.HTTP_200_OK)
+                        logger.debug(response)
+                        return response
+                    else: 
+                        response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
+                        logger.debug(response)
+                        return response
+            else:
+                response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+                await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
                 return response
-            else: 
-                response = JsonResponse(data=None, status= status.HTTP_204_NO_CONTENT, safe=False)
-                logger.debug(response)
+        except Exception as e: 
+            response = JsonResponse(data= {'Message': f'({e.__traceback__.tb_lineno}): {str(e)}'}, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+            logger.error(response.content.decode('utf-8'))
+            await saveTaskResult(response, loads(request.body), caller )
+            if 'deadlocked' in str(e):
+                retryFlag = await pauseOnDeadlock(caller, inputData['id']  or '')
+            else:
                 return response
-    else:
-        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        await saveTaskResult(response, dumps(loads(request.body)), 'DeleteEntry Function')
-        return response
 
 @csrf_exempt
 async def deleteExpense(request: ASGIRequest):
@@ -1045,7 +1129,7 @@ def requestFilesForExpense(request:ASGIRequest):
                 return JsonResponse(data='SUCCSESFUL', status = status.HTTP_201_CREATED, safe= False)
             else: 
                 for key, value in serializer.errors.items():
-                    logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                    logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
                 raise ValidationError(serializer.errors)
         except ValidationError as e:
             return JsonResponse(data={'Message': 'Invalid Input data. Could not serialize image'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1055,4 +1139,562 @@ def requestFilesForExpense(request:ASGIRequest):
             taskResult(response=response, inputData=inputData, caller='requestFilesForExpense')
             return response
 
+#########################################################################################################################################################################################################
+
+# @api_view(["PUT", "POST", "GET"])
+def postThreadLemSheet(inputData):
+    try:
+        inputData["id"] = hash50(inputData['clientId'], inputData['lem_sheet_date'], inputData['projectId'])
+        #gen LemNumber
+        lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
+        # logger.debug(type(lems))
+        inputData['lemNumber'] = 'LEM-' + str(lems.count() + 1).zfill(4)
+        serializer = LemSheetSerializer(data=inputData)
+        if serializer.is_valid():
+            serializer.save()
+            return True
+        else:
+            for key, value in serializer.errors.items():
+                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(serializer.errors)
+    except ValidationError as v:
+        return False
+    except utils.IntegrityError as c:
+        if "PRIMARY KEY constraint" in str(c):
+            logger.error(reverseForOutput(inputData))
+            raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
+    except Exception as e: 
+        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+        raise e
+
+@csrf_exempt
+async def lemSheet(request:ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.info(request.method)
+        logger.debug(reverseForOutput(inputData))
+        if request.method == 'POST':
             
+
+            post = sync_to_async(postThreadLemSheet, thread_sensitive= True)
+            try:
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData['id'], status= status.HTTP_201_CREATED, safe=False)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            except utils.IntegrityError as c:
+                return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
+        else: #do this later if needed
+            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except Exception as e:
+        response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \\n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        logger.error(response.content)
+        return response
+
+# @api_view(['PUT', 'POST', 'GET'])
+
+def postThreadLemWorker(inputData: dict):
+    logger = setup_server_logger()
+    try:
+        logger.info("Looking for LemWorker...")
+        lemworker = LemWorker.objects.get(
+            empId = inputData['empId'],
+            roleId= inputData['roleId'],
+        )
+        logger.info("Found!")
+        return True
+        # do not need to insert a new one
+    except LemWorker.DoesNotExist:
+        logger.info("Not Found!")
+        logger.info("Creating a new LemWorker Record")
+        try:
+            inputData["_id"] = hash50(inputData['empId'], inputData["roleId"])
+            workerSerializer = LemWorkerSerializer(data=inputData)
+            if workerSerializer.is_valid():
+                # save new worker role 
+                workerSerializer.save()
+                logger.info('New Lem Worker Added Successfully')
+                return True
+            else:
+                for key, value in workerSerializer.errors.items():
+                    logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                raise ValidationError(workerSerializer.errors)
+        except Exception as e: 
+            logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+            raise e
+        
+
+@csrf_exempt
+async def LemWorkerEntry(request:ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        logger.info(request.method)
+        if request.method == 'POST':
+            
+            post = sync_to_async(postThreadLemWorker, thread_sensitive= True)
+
+            await post(inputData)
+
+            url =  'http://localhost:5000/HpClockifyApi/task/lemEntry'
+            async with httpx.AsyncClient(timeout=300) as client:
+                await client.post(url=url, data=inputData)
+
+            return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            
+        else: #do this later if needed
+            return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Review Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.error(reverseForOutput(inputData))
+                raise(utils.IntegrityError("Server is trying to insert a douplicate record. Contact Adin if problem persists "))
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
+    except Exception as e:
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(response.content)
+        return response
+
+
+def postThreadEquipEntry(inputData: dict):
+    logger = setup_server_logger()
+    try:
+        inputData["_id"] = hash50(inputData["lemId"], inputData["equipId"], str(time.time())) 
+        logger.debug(dumps(inputData, indent=4))
+        threadSerializer = EquipEntrySerializer(data=inputData)
+        if threadSerializer.is_valid():
+            logger.info("Saving Expense Entry")
+            threadSerializer.save()
+            logger.info("Equip Entry saved succsesfully")
+            return True
+        else:
+            for key, value in threadSerializer.errors.items():
+                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+            raise ValidationError(threadSerializer.initial_data)
+    except Exception as e: 
+        logger.debug(f"Initial Data: {dumps(threadSerializer.initial_data, indent = 4)}")
+        logger.error(f"{type(e)} ({e.__traceback__.tb_lineno}) - {str(e)} ")
+        raise e
+        
+
+@csrf_exempt
+async def equipmentEntries(request: ASGIRequest):
+    logger = setup_server_logger()
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        logger.info(request.method)
+
+        if request.method == 'POST':
+            post = sync_to_async(postThreadEquipEntry, thread_sensitive= True)
+            result = await post(inputData)
+            if result:
+                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+
+        else: #do this later if needed
+            return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+    except ValidationError as v:
+            return JsonResponse(data="Invalid Request. Review Selections and try again. Contact admin if problem persists", status =status.HTTP_400_BAD_REQUEST, safe=False) 
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.critical(f"Primary Key Conflict on request - \n{reverseForOutput(inputData)}")
+            return JsonResponse(data = inputData, status= status.HTTP_409_CONFLICT, safe = False)
+    except Exception as e:
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(response.content)
+        return response
+    
+@api_view(["POST"])
+def insertRoleOrEquipment(request:ASGIRequest):
+    logger = setup_server_logger()
+    logger.info("Creating Hash id for new record")
+    try: 
+        inputData = loads(request.body)
+        logger.debug(reverseForOutput(inputData))
+        if request.method == 'POST':
+            inputData['id'] = hash50(inputData['name'])
+            if inputData['isRole']:
+                logger.info("Creating serializer for Role Table")
+                serializer = RoleSerializer(data=inputData)
+            else:
+                logger.info("Creating serializer for Equipment Table")                 
+                serializer = EquipmentSerializer(data=inputData)
+            if serializer.is_valid():
+                logger.info("Saving Request Data...")
+                serializer.save()
+                logger.info("Operation Completed Succesfully")
+                return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+            else:
+                for key, value in serializer.errors.items():
+                    logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                    if any('already exists' in str(v) for v in value):
+                        raise utils.IntegrityError('An entry with this id already exists')
+                raise ValidationError(serializer.initial_data)
+        else:
+            return JsonResponse(data='Method not implemented yet', status=status.HTTP_405_METHOD_NOT_ALLOWED, safe=False)
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.critical(f"Primary Key Conflict on request - \n{reverseForOutput(inputData)}")
+            return JsonResponse(data = 'A Record with this name already exists', status= status.HTTP_409_CONFLICT, safe = False)
+    except ValidationError as v:
+        logger.debug(f"Validation error - ({v.__traceback__.tb_lineno}) {str(v.args[0])}")
+        return JsonResponse(data='Invalid Requests. Check selections and try again. If problem persists, contact server admin', status=status.HTTP_400_BAD_REQUEST, safe=False)
+    except Exception as e:
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
+        return response
+
+
+@api_view(["POST"])
+def rateSheets(request: ASGIRequest): #maybe make async later 
+    logger = setup_server_logger()
+    logger.info("Inserting Data for Client Rate Sheet")
+    inputData = loads(request.body)
+    try:
+        if request.method == 'POST': 
+            if inputData['isRole']: # Worker rate sheet 
+                logger.info("Worker Rate sheet path")
+                inputData['_id'] = hash50(inputData['clientId'], inputData['roleId']) #maybe include workspace in this later 
+                #try update 
+                try:
+                    rates = WorkerRateSheet.objects.get(pk=inputData['_id'])
+                    serializer = WorkerRateSheetSerializer(instance=rates, data = inputData)
+                    logger.info("Updating rate sheet")
+                    updated = True
+                except WorkerRateSheet.DoesNotExist:
+                    serializer = WorkerRateSheetSerializer(data= inputData)
+                    logger.info("Creating new rate sheet recorde")
+                    updated = False
+                if serializer.is_valid():
+                    logger.info("Saving Changes")
+                    serializer.save()
+                    logger.info("opperaiton complete")
+                    if not updated:
+                        return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+                    else: return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                else:
+                    for key, value in serializer.errors.items():
+                        logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        if any('already exists' in str(v) for v in value):
+                            raise utils.IntegrityError('An record with this id already exists')
+                    raise ValidationError(serializer.initial_data)
+            else: #Eqp rate sheet 
+                logger.info('Equipment Rate sheet path')
+                inputData['_id'] = hash50(inputData['clientId'], inputData['equipId']) #maybe include workspace in this later 
+                #try update 
+                try:
+                    rates = EqpRateSheet.objects.get(pk=inputData['_id'])
+                    serializer = EqpRateSheetSerializer(instance=rates, data = inputData)
+                    logger.info("Updating rate sheet")
+                    updated = True
+                except EqpRateSheet.DoesNotExist:
+                    serializer = EqpRateSheetSerializer(data= inputData)
+                    logger.info("Creating new rate sheet recorde")
+                    updated = False
+                if serializer.is_valid():
+                    logger.info("Saving Changes")
+                    serializer.save()
+                    logger.info("opperaiton complete")
+                    if not updated:
+                        return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+                    else: return JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
+                else:
+                    for key, value in serializer.errors.items():
+                        logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                        if any('already exists' in str(v) for v in value):
+                            raise utils.IntegrityError('An record with this id already exists')
+                    raise ValidationError(serializer.initial_data)
+    except utils.IntegrityError as c:
+            if "PRIMARY KEY constraint" in str(c):
+                logger.critical(f"Primary Key Conflict on request - \n{reverseForOutput(inputData)}")
+            return JsonResponse(data = 'A Record with this name already exists', status= status.HTTP_409_CONFLICT, safe = False)
+    except ValidationError as v:
+        logger.debug(f"Validation error - ({v.__traceback__.tb_lineno}) {str(v.args[0])}")
+        return JsonResponse(data='Invalid Requests. Check selections and try again. If problem persists, contact server admin', status=status.HTTP_400_BAD_REQUEST, safe=False)
+    except KeyError as k:
+        logger.error(f"Missing or incorrect key. Check isRole: \n{reverseForOutput(inputData)}")
+        return JsonResponse(data='Internal server Key Error', status=status.HTTP_500_INTERNAL_SERVER_ERROR, safe= False)
+    except Exception as e:
+        response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
+        logger.error(f"{type(e)} ({e.__traceback__.tb_lineno}) - {str(e)}")
+        return response
+                
+
+# @api_view(["POST"])
+# def clientRep(request: ASGIRequest):
+#     logger.info("inserting new client rep")
+#     inputData = loads(request.body)
+#     if request.method == 'POST':
+#         try:
+#             serializer = 
+
+'''
+Future Proof   
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def lemWorker(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def lemEntry(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+        
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def equipEntry(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def eqpRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def workerRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def eqpRateSheet(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+        
+
+    @api_view(['PUT', 'POST', 'GET'])
+    @csrf_exempt
+    async def clientRep(request:ASGIRequest):
+        logger = setup_server_logger()
+        try: 
+            inputData = loads(request.body)
+            logger.debug(reverseForOutput(inputData))
+            logger.info(request.method)
+            if request.method == 'POST':
+                def postThread(inputData):
+                    try:
+                        serializer = LemSheetSerializer(data=inputData)
+                        if serializer.is_valid():
+                            serializer.save()
+                            return True
+                        else:
+                            for key, value in serializer.errors.items():
+                                logger.info(dumps({'Error Key': key, 'Error Value': value}, indent =4))
+                            raise ValidationError(serializer.errors)
+                    except ValidationError as v:
+                        return False
+                    except Exception as e: 
+                        logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
+                        raise e
+                post = sync_to_async(postThread, thread_sensitive= True)
+
+                result = await post(inputData)
+                if result:
+                    return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+            else: #do this later if needed
+                return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
+        except Exception as e:
+            response = JsonResponse(data={'Invalid Request': f'A problem occured while handling your request. If error continues, contact admin \n({e.__traceback__.tb_lineno}): {str(e)}'}, status=status.HTTP_501_NOT_IMPLEMENTED)
+            logger.error(response.content)
+            return response
+'''
+
