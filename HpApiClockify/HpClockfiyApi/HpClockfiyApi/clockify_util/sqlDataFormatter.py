@@ -315,11 +315,12 @@ def BillableReportGenerate(month = None, year = None):
         endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
         startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
         # Calculate the most recent previous Saturday
-        if(datetime.strptime(endDate,'%Y-%m-%d').weekday() != 5):
+        if(endDateObj.weekday() != 5):
             endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
-        # most recent previous Sunday before the 25th of this month 
-        if(datetime.strptime(endDate,'%Y-%m-%d').weekday() != 6):
+        else: endDate = f'20{year}-{month}-25'
+        if(startDateObj.weekday() != 6):
             startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
+        else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
         logger.debug(f'Date Range: {startDate}-{endDate}')
         cursor, conn = sqlConnect()
         
