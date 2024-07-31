@@ -875,145 +875,143 @@ def TimeStatus(start = None, end = None):
         if start is None or end is None:
             start = (datetime.now() - timedelta(days = (7 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
             end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
-        else: 
-            if datetime.strptime(start, '%Y-%m-%d') + timedelta(days=7) != datetime.strptime(end, '%Y-%m-%d'):
-                raise AssertionError('Date Range must be one week Apart')
-        logger.info(f'Biling Report Generating for - {start}-{end}')
+        while datetime.strptime(start, '%Y-%m-%d') + timedelta(day=6) <= datetime.strptime(end, '%Y-%m-%d'):
+            logger.info(f'Biling Report Generating for - {start}-{end}')
 
-        cursor, conn = sqlConnect()
+            cursor, conn = sqlConnect()
 
-        query = f'''
-            Select 
-                eu.name,
-                eu.manager,
-                Case 
-                    when Exists (
-                        select 1 from Timesheet ts 
-                        where ts.status = 'APPROVED' 
-                        and DATEADD(day ,1, ts.start_time) between '{start}' and '{end}'
-                        and ts.emp_id = eu.id
-                    ) then 1
-                    when Exists (
-                        select 1 from Timesheet ts 
-                        where ts.status = 'PENDING' 
-                        and DATEADD(day ,1, ts.start_time) between '{start}' and '{end}'
-                        and ts.emp_id = eu.id 
-                    ) then 2
-                    when not Exists (
-                        select 1 from AttendanceApproved ap
-                        where ap.name = eu.name 
-                        and ap.date between '{start}' and '{end}'
-                    ) then 3
-                    when Exists (
-                        select 1 from AttendanceApproved ap
-                        where ap.name = eu.name and ap.TimeOff != 0
-                        and ap.date between '{start}' and '{end}'
-                    ) then 4
-                    else 5
-                end as [Status]
-            From EmployeeUser eu
-            order by eu.name
-            '''
-        logger.debug(query)
-        #obtain relavant data 
-        cursor.execute(query)
-        data = cursor.fetchall()
-        data = [['' if val is None else val for val in row] for row in data]
-    
-         # Generate Folder for spreadsheets
-        current_dir = settings.BASE_DIR
-        folder_name = f"Weekly Report-Weekly Time Status-{start}-{end}"
-        folder_path = os.path.join(current_dir, folder_name)
-        logger.debug(f'Created Folder at {folder_path}')
-        if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
+            query = f'''
+                Select 
+                    eu.name,
+                    eu.manager,
+                    Case 
+                        when Exists (
+                            select 1 from Timesheet ts 
+                            where ts.status = 'APPROVED' 
+                            and DATEADD(day ,1, ts.start_time) between '{start}' and '{end}'
+                            and ts.emp_id = eu.id
+                        ) then 1
+                        when Exists (
+                            select 1 from Timesheet ts 
+                            where ts.status = 'PENDING' 
+                            and DATEADD(day ,1, ts.start_time) between '{start}' and '{end}'
+                            and ts.emp_id = eu.id 
+                        ) then 2
+                        when not Exists (
+                            select 1 from AttendanceApproved ap
+                            where ap.name = eu.name 
+                            and ap.date between '{start}' and '{end}'
+                        ) then 3
+                        when Exists (
+                            select 1 from AttendanceApproved ap
+                            where ap.name = eu.name and ap.TimeOff != 0
+                            and ap.date between '{start}' and '{end}'
+                        ) then 4
+                        else 5
+                    end as [Status]
+                From EmployeeUser eu
+                order by eu.name
+                '''
+            logger.debug(query)
+            #obtain relavant data 
+            cursor.execute(query)
+            data = cursor.fetchall()
+            data = [['' if val is None else val for val in row] for row in data]
+        
+            # Generate Folder for spreadsheets
+            current_dir = settings.BASE_DIR
+            folder_name = f"Weekly Report-Weekly Time Status-{start}-{end}"
+            folder_path = os.path.join(current_dir, folder_name)
+            logger.debug(f'Created Folder at {folder_path}')
+            if not os.path.exists(folder_path):
+                    os.makedirs(folder_path )
+            file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
 
-        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
-            #Generate file and initilize writers and formats 
-            workbook = writer.book
-            worksheet = workbook.add_worksheet("Hill Plain - Time Status ")
-            writer.sheets['Hill Plain - Time Status'] = worksheet 
-            
-            row = 0 #initilize row pointer 
+            with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+                #Generate file and initilize writers and formats 
+                workbook = writer.book
+                worksheet = workbook.add_worksheet("Hill Plain - Time Status ")
+                writer.sheets['Hill Plain - Time Status'] = worksheet 
+                
+                row = 0 #initilize row pointer 
 
-        #formats  
-            #title 
-            titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
-            titleFormat.set_font_size(20)
-            titleFormat.set_bg_color('#D9D9D9')
-            #file Heaaders
-            headerFormat = workbook.add_format({'bold': True, "italic": True})
-            #status formats  
-            approvedFormat = workbook.add_format()
-            approvedFormat.set_bg_color("#daf2d0")
-            approvedFormat.set_border(1)
-            submittedFormat = workbook.add_format()
-            submittedFormat.set_bg_color("#ffff99")
-            submittedFormat.set_border(1)
-            missingFormat = workbook.add_format()
-            missingFormat.set_bg_color("#f7c7ac")
-            missingFormat.set_border(1)
-            timeOffFormat = workbook.add_format()
-            timeOffFormat.set_bg_color("#caedfb")
-            timeOffFormat.set_border(1)
-            #columnNameFormat 
-            columnNameFormat = workbook.add_format({'bold': True, 'align': 'center'})
-            columnNameFormat.set_border(1)
-            columnNameFormat.set_bg_color('#d9d9d9')
-            # Text Data Format 
-            textFormat = workbook.add_format({ 'align': 'center'})
-            textFormat.set_border(1)
+            #formats  
+                #title 
+                titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
+                titleFormat.set_font_size(20)
+                titleFormat.set_bg_color('#D9D9D9')
+                #file Heaaders
+                headerFormat = workbook.add_format({'bold': True, "italic": True})
+                #status formats  
+                approvedFormat = workbook.add_format()
+                approvedFormat.set_bg_color("#daf2d0")
+                approvedFormat.set_border(1)
+                submittedFormat = workbook.add_format()
+                submittedFormat.set_bg_color("#ffff99")
+                submittedFormat.set_border(1)
+                missingFormat = workbook.add_format()
+                missingFormat.set_bg_color("#f7c7ac")
+                missingFormat.set_border(1)
+                timeOffFormat = workbook.add_format()
+                timeOffFormat.set_bg_color("#caedfb")
+                timeOffFormat.set_border(1)
+                #columnNameFormat 
+                columnNameFormat = workbook.add_format({'bold': True, 'align': 'center'})
+                columnNameFormat.set_border(1)
+                columnNameFormat.set_bg_color('#d9d9d9')
+                # Text Data Format 
+                textFormat = workbook.add_format({ 'align': 'center'})
+                textFormat.set_border(1)
 
-            #write Data
-            worksheet.merge_range(row,0,row+1,11 , 'Weekly Report - Weekly Report - Clockify - Time Entry Status', titleFormat)
-            row += 2
+                #write Data
+                worksheet.merge_range(row,0,row+1,11 , 'Weekly Report - Weekly Report - Clockify - Time Entry Status', titleFormat)
+                row += 2
 
-            headers = {
-                "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-                "Date Range Start:": start,
-                "Date Range End:": end
-            }
-            for key, value in headers.items():
-                worksheet.merge_range(row,0,row,1,key, headerFormat)
-                worksheet.merge_range(row,2,row,3,value)
+                headers = {
+                    "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+                    "Date Range Start:": start,
+                    "Date Range End:": end
+                }
+                for key, value in headers.items():
+                    worksheet.merge_range(row,0,row,1,key, headerFormat)
+                    worksheet.merge_range(row,2,row,3,value)
+                    row += 1
+                row -= 3
+        
+                worksheet.write(row,4, "LEGEND", headerFormat)
+                row+=1
+                statuses = {
+                    '1': [
+                        'APPROVED', approvedFormat
+                    ],
+                    '2': [
+                        'SUBMITTED', submittedFormat
+                    ],
+                    '3': [
+                        'NO TIME', missingFormat
+                    ],
+                    '4': [
+                        'NOT APPLICABLE', timeOffFormat
+                    ]
+                }
+                for key, value in statuses.items():
+                    worksheet.merge_range(row,4,row,5 , value[0], value[1])
+                    row += 1
+                row +=1 
+
+                worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
+                worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
+                worksheet.merge_range(row,4,row,5 ,'Status', columnNameFormat)
+                worksheet.merge_range(row,6,row,8, 'Notes', columnNameFormat)
                 row += 1
-            row -= 3
-    
-            worksheet.write(row,4, "LEGEND", headerFormat)
-            row+=1
-            statuses = {
-                '1': [
-                    'APPROVED', approvedFormat
-                ],
-                '2': [
-                    'SUBMITTED', submittedFormat
-                ],
-                '3': [
-                    'NO TIME', missingFormat
-                ],
-                '4': [
-                    'NOT APPLICABLE', timeOffFormat
-                ]
-            }
-            for key, value in statuses.items():
-                worksheet.merge_range(row,4,row,5 , value[0], value[1])
-                row += 1
-            row +=1 
-
-            worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
-            worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
-            worksheet.merge_range(row,4,row,5 ,'Status', columnNameFormat)
-            worksheet.merge_range(row,6,row,8, 'Notes', columnNameFormat)
-            row += 1
-            for rowData in data:
-                worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
-                worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
-                worksheet.merge_range(row,4,row,5, statuses[str(rowData[2])][0], statuses[str(rowData[2])][1])
-                worksheet.merge_range(row,6,row,8, '', textFormat)
-                row+= 1
-            
-            writer.close()
+                for rowData in data:
+                    worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
+                    worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
+                    worksheet.merge_range(row,4,row,5, statuses[str(rowData[2])][0], statuses[str(rowData[2])][1])
+                    worksheet.merge_range(row,6,row,8, '', textFormat)
+                    row+= 1
+                
+                writer.close()
 
         return folder_path
     except Exception as e: 
