@@ -840,7 +840,7 @@ def Payroll(start = None, end = None):
                 for rowData in data:
                     currentEmp = str(rowData[0])
                     if currentEmp is not None and previousEmp is not None and currentEmp != previousEmp:
-                            logger.info(totalsData[i])
+                            logger.debug(totalsData[i])
                             worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
                             worksheet.write(row,2,totalsData[i][1], totalFormat)
                             worksheet.write(row,3,totalsData[i][2], totalFormat)
@@ -975,7 +975,7 @@ def TimeStatus(start = None, end = None):
 
                 #write Data
                 worksheet.merge_range(row,0,row+1,11 , 'Weekly Report - Weekly Report - Clockify - Time Entry Status', titleFormat)
-                row += 2
+                row += 3
 
                 headers = {
                     "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
@@ -986,7 +986,7 @@ def TimeStatus(start = None, end = None):
                     worksheet.merge_range(row,0,row,1,key, headerFormat)
                     worksheet.merge_range(row,2,row,3,value)
                     row += 1
-                row -= 3
+                row -= 4
         
                 worksheet.write(row,4, "LEGEND", headerFormat)
                 row+=1
@@ -1006,12 +1006,13 @@ def TimeStatus(start = None, end = None):
                 }
                 for key, value in statuses.items():
                     worksheet.merge_range(row,4,row,5 , value[0], value[1])
+                    worksheet.write(row,6,value[2])
                     row += 1
                 row +=1 
 
                 worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
                 worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
-                worksheet.merge_range(row,4,row,5 ,'Status', columnNameFormat)
+                worksheet.merge_range(row,4,row,5,'Status', columnNameFormat)
                 worksheet.merge_range(row,6,row,8, 'Notes', columnNameFormat)
                 row += 1
                 for rowData in data:
