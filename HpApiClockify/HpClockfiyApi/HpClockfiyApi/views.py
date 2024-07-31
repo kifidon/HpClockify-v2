@@ -231,10 +231,10 @@ def bankedHrs(request: ASGIRequest):
         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
 @api_view(['GET'])
-def billableNonBillable(reqiest:ASGIRequest, start = None, end = None):
+def billableNonBillable(reqiest:ASGIRequest, start_date = None, end_date = None):
     logger = setup_server_logger()
     logger.info(f'Weekly Payroll Report Called')
-    folder_path = NonBillableReport(start, end )
+    folder_path = NonBillableReport(start_date, end_date )
     return download_text_file(folder_path)
 ###########################################################################################################################################################################################################
 

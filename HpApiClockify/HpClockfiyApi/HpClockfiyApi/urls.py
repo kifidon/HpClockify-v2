@@ -28,7 +28,7 @@ urlpatterns = [
     path('billing', views.billableReport),
     path('billing/<str:month>/<str:year>/', views.billableReport),
     path('billingSummary', views.billableNonBillable),
-    path('billingSummary/<str:month>/<str:year>/', views.billableNonBillable),
+    path('billingSummary/<str:start_date>/<str:end_date>/', views.billableNonBillable),
     path('payroll', views.weeklyPayrollReport),
     path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
     path('timeStatus', views.TimeStatusEvent),
