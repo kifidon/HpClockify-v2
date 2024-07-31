@@ -875,7 +875,10 @@ def TimeStatus(start = None, end = None):
         if start is None or end is None:
             start = (datetime.now() - timedelta(days = (7 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
             end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
-        while datetime.strptime(start, '%Y-%m-%d') + timedelta(day=6) <= datetime.strptime(end, '%Y-%m-%d'):
+        endRange = end
+        startRange = start
+        while datetime.strptime(start, '%Y-%m-%d')  <= datetime.strptime(endRange, '%Y-%m-%d'):
+            end = (datetime.strptime(start, '%Y-%m-%d') + timedelta(days=6)).strftime('%Y-%m-%d')
             logger.info(f'Biling Report Generating for - {start}-{end}')
 
             cursor, conn = sqlConnect()
@@ -920,12 +923,12 @@ def TimeStatus(start = None, end = None):
         
             # Generate Folder for spreadsheets
             current_dir = settings.BASE_DIR
-            folder_name = f"Weekly Report-Weekly Time Status-{start}-{end}"
+            folder_name = f"Weekly Report-Weekly Time Status-{startRange}-{endRange}"
             folder_path = os.path.join(current_dir, folder_name)
             logger.debug(f'Created Folder at {folder_path}')
             if not os.path.exists(folder_path):
                     os.makedirs(folder_path )
-            file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
+            file_path = os.path.join(folder_path, f"Time Status {start} to {end}.xlsx")
 
             with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
                 #Generate file and initilize writers and formats 
@@ -1012,7 +1015,8 @@ def TimeStatus(start = None, end = None):
                     row+= 1
                 
                 writer.close()
-
+            start = (datetime.strptime(start, '%Y-%m-%d') + timedelta(days=7)).strftime('%Y-%m-%d')
+            end = (datetime.strptime(end, '%Y-%m-%d') + timedelta(days=7)).strftime('%Y-%m-%d')
         return folder_path
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
