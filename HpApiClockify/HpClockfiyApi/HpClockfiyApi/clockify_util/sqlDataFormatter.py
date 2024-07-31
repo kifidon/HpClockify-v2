@@ -654,6 +654,7 @@ def NonBillableReportGen(start = None, end = None):
             #columnNameFormat 
             columnNameFormat = workbook.add_format({'bold': True})
             columnNameFormat.set_border(1)
+            columnNameFormat.set_bg_color('#d9d9d9')
             # Text Data Format 
             textFormat = workbook.add_format()
             textFormat.set_border(1)
@@ -671,7 +672,7 @@ def NonBillableReportGen(start = None, end = None):
                 worksheet.merge_range(row,0,row,1,key, headerFormat)
                 worksheet.merge_range(row,2,row,3,value)
                 row += 1
-            row -= 3
+            # row -= 3
     
             # worksheet.write(row,4, "Billable Legend", headerFormat)
             # row+=1
@@ -679,7 +680,7 @@ def NonBillableReportGen(start = None, end = None):
             # row += 1
             # worksheet.write(row,4, "Non-Billable", nBillableFormat)
             # row += 2
-            
+            row += 1
             worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
             worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
             worksheet.write(row,4, 'Billable', columnNameFormat)
