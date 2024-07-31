@@ -694,15 +694,23 @@ def NonBillableReportGen(start = None, end = None):
             worksheet.write(row,6, 'Total', columnNameFormat)
             worksheet.merge_range(row,7,row,9, 'Notes', columnNameFormat)
             row += 1
+            totalBillable = 0 
+            totalNonBillable = 0
             for rowData in data:
                 worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                 worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
                 worksheet.write(row,4, rowData[2], textFormat)
+                totalBillable += float(rowData[2])
                 worksheet.write(row,5, rowData[3], textFormat)
+                totalNonBillable+= float(rowData[3])
                 worksheet.write(row,6, rowData[3] + rowData[2], textFormat)
                 worksheet.merge_range(row,7,row, 9 ,'', textFormat)
                 row+= 1
             
+            worksheet.merge_range(row,2,row,3, 'Totals', columnNameFormat)
+            worksheet.write(row,4,totalBillable,columnNameFormat)
+            worksheet.write(row,5,totalNonBillable,columnNameFormat)
+            worksheet.write(row,6,(totalBillable+ totalNonBillable),columnNameFormat)
             writer.close()
 
         return folder_path
