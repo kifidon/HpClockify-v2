@@ -914,6 +914,7 @@ def TimeStatus(start = None, end = None):
                         else 5
                     end as [Status]
                 From EmployeeUser eu
+                where eu.status = 'ACTIVE'
                 order by eu.name
                 '''
             logger.debug(query)
