@@ -668,10 +668,14 @@ def NonBillableReportGen(start = None, end = None):
             # Total  Data Format 
             totalFormat = workbook.add_format({'bold': True})
             totalFormat.set_border(1)
+            # Total  Data Format 
+            subTotalFormat = workbook.add_format({'bold': True, 'align': 'right'})
+            subTotalFormat.set_bg_color('#DAEEF3')
+            subTotalFormat.set_border(1)
             
 
             #write Data
-            worksheet.merge_range(row,0,row+1,9 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
+            worksheet.merge_range(row,0,row+1,10 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
             row += 2
 
             headers = {
@@ -705,9 +709,17 @@ def NonBillableReportGen(start = None, end = None):
             totalNonBillable = 0
             current = None
             previous = None
+            subTotal = 0
             for rowData in data:
                 current = rowData[0]
                 if (current is not None or previous is not None) and current != previous:
+                    if subTotal!= 0 :
+                        worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
+                        worksheet.write(row,8,subTotal,subTotalFormat)
+                        worksheet.write(row,9, '', textFormat)
+                        worksheet.write(row,10, '', textFormat)
+                        row += 1
+                    subTotal = 0
                     worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                     worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
                     worksheet.write(row,4, '', textFormat)
@@ -724,16 +736,25 @@ def NonBillableReportGen(start = None, end = None):
                 worksheet.write(row, 6, rowData[4], textFormat)
                 totalBillable += float(rowData[4])
                 worksheet.write(row,7, rowData[5], textFormat)
-                totalNonBillable+= float(rowData[5])
+                totalNonBillable += float(rowData[5])
+                subTotal += float(rowData[4])
+                subTotal += float(rowData[5])
                 worksheet.write(row, 8, rowData[5] + rowData[4], textFormat)
                 worksheet.merge_range(row, 9, row, 10 ,'', textFormat)
                 previous = rowData[0]
                 row+= 1
             
-            worksheet.merge_range(row,2,row,3, 'Totals', columnNameFormat)
-            worksheet.write(row,4,totalBillable,columnNameFormat)
-            worksheet.write(row,5,totalNonBillable,columnNameFormat)
-            worksheet.write(row,6,(totalBillable+ totalNonBillable),columnNameFormat)
+            if subTotal!= 0 :
+                worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
+                worksheet.write(row,8,subTotal,subTotalFormat)
+                worksheet.write(row,9, '', textFormat)
+                worksheet.write(row,10, '', textFormat)
+                row += 1
+
+            worksheet.merge_range(row,5,row,6, 'Totals', columnNameFormat)
+            worksheet.write(row,6,totalBillable,columnNameFormat)
+            worksheet.write(row,7,totalNonBillable,columnNameFormat)
+            worksheet.write(row,8,(totalBillable+ totalNonBillable),columnNameFormat)
             writer.close()
 
         return folder_path
@@ -871,19 +892,19 @@ def Payroll(start = None, end = None):
                 for rowData in data:
                     currentEmp = str(rowData[0])
                     if currentEmp is not None and previousEmp is not None and currentEmp != previousEmp:
-                            logger.debug(totalsData[i])
-                            worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
-                            worksheet.write(row,2,totalsData[i][1], totalFormat)
-                            worksheet.write(row,3,totalsData[i][2], totalFormat)
-                            worksheet.write(row,4,totalsData[i][3], totalFormat)
-                            worksheet.write(row,5,totalsData[i][4], totalFormat)
-                            worksheet.write(row,6,totalsData[i][5], totalFormat)
-                            worksheet.write(row,7,totalsData[i][6], totalFormat)
-                            worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-                            worksheet.write(row,10,totalsData[i][8], totalFormat)
-                            worksheet.write(row,11,totalsData[i][9], totalFormat)
-                            i += 1
-                            row+=1
+                        logger.debug(totalsData[i])
+                        worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
+                        worksheet.write(row,2,totalsData[i][1], totalFormat)
+                        worksheet.write(row,3,totalsData[i][2], totalFormat)
+                        worksheet.write(row,4,totalsData[i][3], totalFormat)
+                        worksheet.write(row,5,totalsData[i][4], totalFormat)
+                        worksheet.write(row,6,totalsData[i][5], totalFormat)
+                        worksheet.write(row,7,totalsData[i][6], totalFormat)
+                        worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
+                        worksheet.write(row,10,totalsData[i][8], totalFormat)
+                        worksheet.write(row,11,totalsData[i][9], totalFormat)
+                        i += 1
+                        row+=1
                     worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                     worksheet.write(row,2,rowData[1], textFormat)
                     worksheet.write(row,3,rowData[2], dateFormat)
@@ -897,7 +918,19 @@ def Payroll(start = None, end = None):
                     previousEmp=str(rowData[0])
                     row+=1
                 break
-        
+            logger.debug(totalsData[i])
+            worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
+            worksheet.write(row,2,totalsData[i][1], totalFormat)
+            worksheet.write(row,3,totalsData[i][2], totalFormat)
+            worksheet.write(row,4,totalsData[i][3], totalFormat)
+            worksheet.write(row,5,totalsData[i][4], totalFormat)
+            worksheet.write(row,6,totalsData[i][5], totalFormat)
+            worksheet.write(row,7,totalsData[i][6], totalFormat)
+            worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
+            worksheet.write(row,10,totalsData[i][8], totalFormat)
+            worksheet.write(row,11,totalsData[i][9], totalFormat)
+            
+
             writer.close()
         return folder_path
             
