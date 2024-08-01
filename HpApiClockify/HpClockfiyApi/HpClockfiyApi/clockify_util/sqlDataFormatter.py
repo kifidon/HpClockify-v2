@@ -608,16 +608,21 @@ def NonBillableReportGen(start = None, end = None):
             Select
                 eu.name, 
                 eu.manager,
+                p.code,
+                p.title,
                 SUM(case when en.billable = 1 then en.duration else 0 end) as Billable,
                 Sum(case when en.billable = 0 then en.duration else 0 end) as NonBillable
             From Entry en 
             Inner join Timesheet ts on ts.id = en.time_sheet_id
+            inner join Project p on p.id = en.project_id
             inner join EmployeeUser eu on eu.id = ts.emp_id
             where Cast(en.start_time as Date) between '{start}' and '{end}'
             and eu.status = 'ACTIVE'
             Group by 
                 eu.name, 
-                eu.manager
+                eu.manager,
+                p.code,
+                p.title
             order by eu.name
             '''
             )
@@ -689,22 +694,40 @@ def NonBillableReportGen(start = None, end = None):
             row += 1
             worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
             worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
-            worksheet.write(row,4, 'Billable', columnNameFormat)
-            worksheet.write(row,5, 'Non-Billable', columnNameFormat)
-            worksheet.write(row,6, 'Total', columnNameFormat)
-            worksheet.merge_range(row,7,row,9, 'Notes', columnNameFormat)
+            worksheet.write(row,4, 'Project Code', columnNameFormat)
+            worksheet.write(row,5, 'Project Name', columnNameFormat)
+            worksheet.write(row,6, 'Billable', columnNameFormat)
+            worksheet.write(row,7, 'Non-Billable', columnNameFormat)
+            worksheet.write(row,8, 'Total', columnNameFormat)
+            worksheet.merge_range(row,9,row,10, 'Notes', columnNameFormat)
             row += 1
             totalBillable = 0 
             totalNonBillable = 0
+            current = None
+            previous = None
             for rowData in data:
-                worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
-                worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
-                worksheet.write(row,4, rowData[2], textFormat)
-                totalBillable += float(rowData[2])
-                worksheet.write(row,5, rowData[3], textFormat)
-                totalNonBillable+= float(rowData[3])
-                worksheet.write(row,6, rowData[3] + rowData[2], textFormat)
-                worksheet.merge_range(row,7,row, 9 ,'', textFormat)
+                current = rowData[0]
+                if (current is not None or previous is not None) and current != previous:
+                    worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
+                    worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
+                    worksheet.write(row,4, '', textFormat)
+                    worksheet.write(row,5, '', textFormat)
+                    worksheet.write(row,6, '', textFormat)
+                    worksheet.write(row,7, '', textFormat)
+                    worksheet.write(row,8, '', textFormat)
+                    worksheet.merge_range(row,9,row, 10 ,'', textFormat)
+                    row += 1
+                    worksheet.merge_range(row,0,row,3, '', textFormat)
+                else: worksheet.merge_range(row,0,row,3, '', textFormat)
+                worksheet.write(row, 4, rowData[2], textFormat)
+                worksheet.write(row, 5, rowData[3], textFormat)
+                worksheet.write(row, 6, rowData[4], textFormat)
+                totalBillable += float(rowData[4])
+                worksheet.write(row,7, rowData[5], textFormat)
+                totalNonBillable+= float(rowData[5])
+                worksheet.write(row, 8, rowData[5] + rowData[4], textFormat)
+                worksheet.merge_range(row, 9, row, 10 ,'', textFormat)
+                previous = rowData[0]
                 row+= 1
             
             worksheet.merge_range(row,2,row,3, 'Totals', columnNameFormat)
