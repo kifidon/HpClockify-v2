@@ -77,7 +77,7 @@ def download_text_file(folder_path = None):
         shutil.rmtree(temp_dir)
         os.remove(zip_file_path)
         return response
-    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form? (ex. /Feb/24/)\nReview Logs for more detail')
+    return HttpResponse( content='Could not pull billing report. Are you sure the date parameters are in the correct form?\nReview Logs for more detail @ https://hillplain-api.ngrok.app/')
 
 
 def count_working_daysV2(start_date:datetime, end_date: datetime, excludeDays=[] ):
