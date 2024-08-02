@@ -960,9 +960,9 @@ def TimeStatus(start = None, end = None):
         if start is None or end is None:
             start = (datetime.now() - timedelta(days = (7 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
             end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
+        else: start = (datetime.strptime(start, '%Y-%m-%d') - timedelta(days = 1 + datetime.strptime(start, '%Y-%m-%d').weekday() )).strftime('%Y-%m-%d')
         endRange = end
         startRange = start
-        start = (datetime.strptime(start, '%Y-%m-%d') - timedelta(days = 1 + datetime.strptime(start, '%Y-%m-%d').weekday() )).strftime('%Y-%m-%d')
         while datetime.strptime(start, '%Y-%m-%d')  <= datetime.strptime(endRange, '%Y-%m-%d'):
             end = (datetime.strptime(start, '%Y-%m-%d') + timedelta(days=6)).strftime('%Y-%m-%d')
             logger.info(f'Biling Report Generating for - {start}-{end}')
