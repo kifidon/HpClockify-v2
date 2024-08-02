@@ -8,7 +8,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOG_LEVEL ='INFO' ## Flag
+LOG_LEVEL = 'INFO' ## Flag
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
