@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from . Loggers import setup_background_logger
 from .models import *
-
+from rest_framework.exceptions import ValidationError
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
 from datetime import date
@@ -236,11 +236,11 @@ class EntrySerializer(serializers.Serializer):
         logger = setup_background_logger('DEBUG')
         logger.info('Create Entry Called')
         logger.debug(validated_data)
-        if validated_data.get('hourlyRate') is not None:
-            if validated_data['billable'] == True:
-                logger.warning('No Rate on billable Entry')
+        if validated_data['billable'] == True:
+            if validated_data.get('hourlyRate') is None:
+                logger.critical('No Rate on billable Entry')
+                raise ValidationError()
             Rate = validated_data.get('hourlyRate').get('amount')
-        else: Rate = -1
         try: 
             timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
         except Exception as e:
