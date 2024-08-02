@@ -275,18 +275,20 @@ class EntrySerializer(serializers.Serializer):
             # instance.id = instance.id
             try:
                 instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
+                approved = True
             except Exception as e:
                 instance.timesheetId
-
+                approved = False
                 logger.debug(type(e))
             instance.duration = timeDuration(validated_data.get('timeInterval').get('duration')) or instance.duration
             instance.description = validated_data.get('description') or instance.description
             instance.billable = validated_data['billable'] if validated_data['billable'] != None else instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
-            if validated_data.get('hourlyRate') is None and validated_data.get('billable') == True and instance.timesheetId is not None:  
+            if validated_data.get('hourlyRate') is None and validated_data.get('billable') == True and approved:  
                 logger.error('Silent Failure - Updating billable entry with Null rate is not allowed.')   
-                raise ValidationError('Billable entry is missing Rate')
-            instance.hourlyRate = validated_data.get('hourlyRate', {'amount': 0.0}).get('amount') 
+                raise Exception('Billable entry is missing Rate')
+            elif validated_data.get('hourlyRate') is not None: instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
+            else: instance.hourlyRate = 0
 
             instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
             instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
@@ -294,7 +296,7 @@ class EntrySerializer(serializers.Serializer):
             instance.save(force_update=True)
             return instance
         except Exception as e:
-            logger.warning(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
+            logger.error(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
             raise e
 
 class TagsForSerializer(serializers.ModelSerializer):

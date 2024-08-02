@@ -889,35 +889,37 @@ async def newExpense(request: ASGIRequest):
 entrySemaphore = asyncio.Semaphore(1)
 def processEntry(inputData):
     try:
-        entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
-        serializer = EntrySerializer(instance=entry, data= inputData )
-        logger.info(f'Update path taken for Entry')
-    except Entry.DoesNotExist:
-        serializer = EntrySerializer(data = inputData )
-        logger.info(f'Insert path taken for Entry')
-    if serializer.is_valid():
-        serializer.save()
-        logger.info('\tOperation Complete')
-        # do the rest 
-        return True, 'V'
-    else:
-        logger.warning(f'Serializer could not be saved: {serializer.errors}')
-        for key, value in serializer.errors.items():
-            logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-            # Check if the value is an instance of ErrorDetail
-            if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                # Print the key and each error code and message
-                for error_detail in value:
-                    code = error_detail.code
-                    field = key
-                    '''
-                    include check for other foreign keys to know which foreign key 
-                    constraint is violated and which function should handle it
-                    '''
-                    if code == 'does_not_exist': 
-                        return False, 'C' # C for category P for Project, F for file in later updates 
-        return False, 'X' # Unknown, Raise error (BAD Request)
-
+        try:
+            entry = Entry.objects.get(id=inputData['id'], workspaceId=inputData['workspaceId'])
+            serializer = EntrySerializer(instance=entry, data= inputData )
+            logger.info(f'Update path taken for Entry')
+        except Entry.DoesNotExist:
+            serializer = EntrySerializer(data = inputData )
+            logger.info(f'Insert path taken for Entry')
+        if serializer.is_valid():
+            serializer.save()
+            logger.info('\tOperation Complete')
+            # do the rest 
+            return True, 'V'
+        else:
+            logger.warning(f'Serializer could not be saved: {serializer.errors}')
+            for key, value in serializer.errors.items():
+                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                # Check if the value is an instance of ErrorDetail
+                if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
+                    # Print the key and each error code and message
+                    for error_detail in value:
+                        code = error_detail.code
+                        field = key
+                        '''
+                        include check for other foreign keys to know which foreign key 
+                        constraint is violated and which function should handle it
+                        '''
+                        if code == 'does_not_exist': 
+                            return False, 'C' # C for category P for Project, F for file in later updates 
+            return False, 'X' # Unknown, Raise error (BAD Request)
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno} - {str(e)})')
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
     '''
