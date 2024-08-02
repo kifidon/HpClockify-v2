@@ -674,10 +674,12 @@ def NonBillableReportGen(start = None, end = None):
             subTotalFormat = workbook.add_format({'bold': True, 'align': 'right'})
             subTotalFormat.set_bg_color('#DAEEF3')
             subTotalFormat.set_border(1)
-            
+            # rowTotals 
+            rowTotalFormat = workbook.add_format({'bold': True, 'align': 'right'})
+            rowTotalFormat.set_border(1)
 
             #write Data
-            worksheet.merge_range(row,0,row+1,10 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
+            worksheet.merge_range(row,0,row+1,11 , 'Weekly Report - Clockify - Billable vs Non-Billable', titleFormat)
             row += 2
 
             headers = {
@@ -701,48 +703,59 @@ def NonBillableReportGen(start = None, end = None):
             worksheet.merge_range(row,0,row,1, 'Employee Name', columnNameFormat)
             worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
             worksheet.write(row,4, 'Project Code', columnNameFormat)
-            worksheet.write(row,5, 'Project Name', columnNameFormat)
-            worksheet.write(row,6, 'Billable', columnNameFormat)
-            worksheet.write(row,7, 'Non-Billable', columnNameFormat)
-            worksheet.write(row,8, 'Total', columnNameFormat)
-            worksheet.merge_range(row,9,row,10, 'Notes', columnNameFormat)
+            worksheet.merge_range(row,5, row, 7 ,'Project Name', columnNameFormat)
+            worksheet.write(row,8, 'Billable', columnNameFormat)
+            worksheet.write(row,9, 'Non-Billable', columnNameFormat)
+            worksheet.merge_range(row,10, row,11, 'Notes', columnNameFormat)
             row += 1
             totalBillable = 0 
             totalNonBillable = 0
             current = None
             previous = None
             subTotal = 0
+            billingAmount = 0
+            nonBillingAmount = 0
             for rowData in data:
                 current = rowData[0]
                 if (current is not None or previous is not None) and current != previous:
+                    if billingAmount != 0 and nonBillingAmount != 0:
+                        worksheet.merge_range(row,0,row,3, '', textFormat)
+                        worksheet.write(row,4, '', textFormat)
+                        worksheet.merge_range(row,5,row,7, 'TOTAL', rowTotalFormat)
+                        worksheet.write(row,8,totalBillable,textFormat)
+                        worksheet.write(row,9,totalNonBillable,textFormat)
+                        worksheet.merge_range(row,10,row, 11, '', textFormat)
+                        row += 1
                     if subTotal!= 0 :
-                        worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
-                        worksheet.write(row,8,subTotal,subTotalFormat)
-                        worksheet.write(row,9, '', textFormat)
-                        worksheet.write(row,10, '', textFormat)
+                        worksheet.merge_range(row,0,row,8, 'GRAND TOTAL', subTotalFormat)
+                        worksheet.write(row,9,subTotal,subTotalFormat)
+                        worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
                     subTotal = 0
+                    billingAmount = 0
+                    nonBillingAmount = 0
+                    
                     worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                     worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
                     worksheet.write(row,4, '', textFormat)
-                    worksheet.write(row,5, '', textFormat)
-                    worksheet.write(row,6, '', textFormat)
-                    worksheet.write(row,7, '', textFormat)
+                    worksheet.merge_range(row,5, row, 7 , '', textFormat)
                     worksheet.write(row,8, '', textFormat)
-                    worksheet.merge_range(row,9,row, 10 ,'', textFormat)
+                    worksheet.write(row,9, '', textFormat)
+                    worksheet.merge_range(row,10,row, 11 ,'', textFormat)
                     row += 1
                     worksheet.merge_range(row,0,row,3, '', textFormat)
                 else: worksheet.merge_range(row,0,row,3, '', textFormat)
                 worksheet.write(row, 4, rowData[2], textFormat)
-                worksheet.write(row, 5, rowData[3], textFormat)
-                worksheet.write(row, 6, rowData[4], textFormat)
+                worksheet.merge_range(row,5, row, 7, rowData[3], textFormat)
+                worksheet.write(row, 8, rowData[4], textFormat)
                 totalBillable += float(rowData[4])
-                worksheet.write(row,7, rowData[5], textFormat)
+                worksheet.write(row,9, rowData[5], textFormat)
                 totalNonBillable += float(rowData[5])
+                worksheet.merge_range(row,10, row, 11 ,'', textFormat)
                 subTotal += float(rowData[4])
                 subTotal += float(rowData[5])
-                worksheet.write(row, 8, rowData[5] + rowData[4], textFormat)
-                worksheet.merge_range(row, 9, row, 10 ,'', textFormat)
+                billingAmount +=  rowData[5] 
+                nonBillingAmount += rowData[4]
                 previous = rowData[0]
                 row+= 1
             
