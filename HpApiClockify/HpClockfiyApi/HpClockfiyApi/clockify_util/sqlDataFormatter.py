@@ -329,8 +329,9 @@ def BillableReportGenerate(month = None, year = None):
             f'''
             select p.id, p.code, p.title from Project p 
             where exists(
-                select en.id from Entry en 
-                where en.billable = 1 and 
+                select en.id from Entry en
+                inner join TimeSheet ts on ts.id = en.time_sheet_id 
+                where en.billable = 1 and ts.status = 'APPROVED' and
                 en.project_id = p.id 
                 and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
             )
@@ -441,7 +442,8 @@ def BillableReportGenerate(month = None, year = None):
                 equipmentTotal = float(equipmentTotal[0])
             else: 
                 grandTotal = labourTotal[0]
-            labourTotal = float(labourTotal[0])
+            if labourTotal[0] is not None:
+                labourTotal = float(labourTotal[0])
             logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
             grandTotal = float(grandTotal)
             
