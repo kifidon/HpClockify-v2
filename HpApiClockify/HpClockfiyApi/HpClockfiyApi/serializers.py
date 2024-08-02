@@ -234,33 +234,38 @@ class EntrySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         logger = setup_background_logger('DEBUG')
-        logger.info('Create Entry Called')
-        logger.debug(validated_data)
-        if validated_data['billable'] == True:
-            if validated_data.get('hourlyRate') is None:
-                logger.critical('No Rate on billable Entry')
-                raise ValidationError()
-            Rate = validated_data.get('hourlyRate').get('amount')
-        else: Rate = 0
-        try: 
-            timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
+        try:
+            logger.info('Create Entry Called')
+            logger.debug(validated_data)
+            try: 
+                timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
+            except Exception as e:
+                timesheet = None 
+            if validated_data['billable'] == True:
+                if validated_data.get('hourlyRate') is None and timesheet is not None:
+                    logger.error('No Rate on billable Entry')
+                    raise ValidationError()
+                elif validated_data.get('hourlyRate') is None and timesheet is None:
+                    Rate = 0
+                else: Rate = validated_data.get('hourlyRate').get('amount')
+            else: Rate = 0
+            logger.debug(validated_data['billable'])
+            entry = Entry.objects.create(
+                id= validated_data['id'],
+                timesheetId = timesheet,
+                duration = timeDuration(validated_data.get('timeInterval').get('duration')),
+                description = validated_data.get('description'),
+                billable = validated_data['billable'] ,
+                project = Project.objects.get(id=validated_data.get('project').get('id')),
+                hourlyRate = Rate,
+                start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
+                end = timeZoneConvert(validated_data.get('timeInterval').get('end')),
+                workspaceId = Workspace.objects.get(id=validated_data.get('workspaceId')) ,
+            )
+            return entry
         except Exception as e:
-            timesheet = None 
-        logger.debug(validated_data['billable'])
-        entry = Entry.objects.create(
-            id= validated_data['id'],
-            timesheetId = timesheet,
-            duration = timeDuration(validated_data.get('timeInterval').get('duration')),
-            description = validated_data.get('description'),
-            billable = validated_data['billable'] ,
-            project = Project.objects.get(id=validated_data.get('project').get('id')),
-            hourlyRate = Rate,
-            start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
-            end = timeZoneConvert(validated_data.get('timeInterval').get('end')),
-            workspaceId = Workspace.objects.get(id=validated_data.get('workspaceId')) ,
-        )
-        return entry
-    
+            logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+            raise ValidationError(str(e))
     def update(self, instance: Entry, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Entry Called')
@@ -277,9 +282,11 @@ class EntrySerializer(serializers.Serializer):
             instance.description = validated_data.get('description') or instance.description
             instance.billable = validated_data['billable'] if validated_data['billable'] != None else instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
-            if validated_data.get('hourlyRate') is not None:     
-                instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
-            else: instance.hourlyRate =  -1
+            if validated_data.get('hourlyRate') is None and validated_data.get('billable') == True:  
+                logger.error('Silent Failure - Updating billable entry with Null rate is not allowed.')   
+                raise ValidationError('Billable entry is missing Rate')
+            instance.hourlyRate = validated_data.get('hourlyRate', {'amount': 0.0}).get('amount') 
+
             instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
             instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
             # instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
