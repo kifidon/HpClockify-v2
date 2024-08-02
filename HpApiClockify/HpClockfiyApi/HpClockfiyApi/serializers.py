@@ -241,6 +241,7 @@ class EntrySerializer(serializers.Serializer):
                 logger.critical('No Rate on billable Entry')
                 raise ValidationError()
             Rate = validated_data.get('hourlyRate').get('amount')
+        else: Rate = 0
         try: 
             timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
         except Exception as e:
