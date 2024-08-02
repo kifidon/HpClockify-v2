@@ -293,7 +293,9 @@ async def updateTimesheets(request:ASGIRequest):
     logger.info(f'{request.method}: updateTimesheet')
     try: 
         inputData = loads(request.body)
+        logger.info('Waiting for Update Timesheet Semahore')
         async with updateTimesheetSemaphore:
+            logger.info('Aquired Update Timesheet Semahore')
             def updateApproval(): # create thread 
                 # with transaction.atomic(): # impliment this in the future
                 try: 
@@ -336,12 +338,14 @@ async def updateTimesheets(request:ASGIRequest):
             updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
             response = await updateAsync()
             asyncio.create_task(createTask()) # allows for Fire and Forget call of tasks  :
+        
     except Exception as e:
         # transaction.rollback()
         response = JsonResponse(data= {'Message': f'{str(e)}', 'Traceback': e.__traceback__.tb_lineno}, status= status.HTTP_400_BAD_REQUEST)
         logger.error(f'Caught Exception ({e.__traceback__.tb_lineno}): {str(e)}')
         
     finally:
+        logger.info('Semaphore Released')
         await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
         return response
 
