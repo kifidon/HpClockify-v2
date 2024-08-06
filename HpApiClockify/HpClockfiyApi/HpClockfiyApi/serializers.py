@@ -4,7 +4,7 @@ from .models import *
 from rest_framework.exceptions import ValidationError
 from .clockify_util.hpUtil import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
 from json import dumps
-from datetime import date
+from datetime import date, datetime
 
 class EmployeeUserSerializer(serializers.ModelSerializer):
     '''
@@ -182,8 +182,8 @@ class TimesheetSerializer(serializers.Serializer):
            id = validated_data['id'],
            workspace = Workspace.objects.get(id=validated_data['workspaceId']),
            emp = Employeeuser.objects.get(id=validated_data.get('owner').get('userId')),
-           start_time = timeZoneConvert(validated_data.get('dateRange').get('start')),
-           end_time = timeZoneConvert(validated_data.get('dateRange').get('end')),
+           start_time = datetime.strptime(validated_data.get('dateRange').get('start'), '%Y-%m-%dT%H:%M:%SZ').date(),
+           end_time = datetime.strptime(validated_data.get('dateRange').get('end'),'%Y-%m-%dT%H:%M:%SZ').date(),
            status = validated_data.get('status').get('state')
         )
         return timesheet
@@ -194,8 +194,8 @@ class TimesheetSerializer(serializers.Serializer):
             # print("\n", validated_data, '\n', vars(instance) )
             instance.workspace = Workspace.objects.get(id=validated_data['workspaceId']) or instance.workspace
             instance.emp = Employeeuser.objects.get(id = validated_data.get('owner').get('userId')) or instance.emp
-            instance.start_time = timeZoneConvert(validated_data.get('dateRange').get('start')) or instance.start_time
-            instance.end_time = timeZoneConvert(validated_data.get('dateRange').get('end'))or instance.end_time
+            instance.start_time = datetime.strptime(validated_data.get('dateRange').get('start'), '%Y-%m-%dT%H:%M:%SZ').date() or instance.start_time
+            instance.end_time = datetime.strptime(validated_data.get('dateRange').get('end'),'%Y-%m-%dT%H:%M:%SZ').date()  or instance.end_time
             instance.status = validated_data.get('status').get('state') or instance.status
             instance.save(force_update=True)
         except Exception as e:
