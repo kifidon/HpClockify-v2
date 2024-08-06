@@ -14,6 +14,7 @@ import hashlib
 import random
 
 retrySem = asyncio.Semaphore(1)
+logger = setup_background_logger()
 
 async def pauseOnDeadlock(caller, recordID):
     logger = setup_background_logger()
@@ -119,7 +120,7 @@ def taskResult(response: JsonResponse, inputData, caller: str):
         message = response.content.decode() or None,
         data = inputData,
         caller = caller,
-        time = timeZoneConvert(get_current_time(), '%Y-%m-%d %H:%M:%S')
+        time = get_current_time()
     )
 
 
@@ -287,13 +288,17 @@ def getAbbreviation(month = None, year = None, reverse = False ):
 def get_current_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+
 def timeZoneConvert(dateTime, format='%Y-%m-%dT%H:%M:%SZ'):
     utcTimezone = pytz.utc
     localTimeZone = pytz.timezone('America/Denver')
     if isinstance(dateTime, str):
         dateTime = datetime.strptime(dateTime, format)
     output = utcTimezone.localize(dateTime).astimezone(localTimeZone)
-    return  output.replace(tzinfo=None)
+    output =  output.replace(tzinfo=None)
+    
+    logger.debug(f'TimeZone Convert - {output.strftime('%Y-%m-%d T %H:%M')}')
+    return output
 
 def timeDuration(duration_str):
     """
