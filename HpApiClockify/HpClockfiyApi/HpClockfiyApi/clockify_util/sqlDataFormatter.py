@@ -1393,8 +1393,8 @@ def lemGenerator( projectCode: str, lemId: str):
                         worksheet.write(row,column, rowData[i], textFormat)
                         column += 1
                         continue
-                right = column
-                row += 1
+            right = column
+            row += 1
             
             worksheet.merge_range(0, 0, 1, right, f'{projectCode} {lemInfo[0]}', titleFormat)
 
