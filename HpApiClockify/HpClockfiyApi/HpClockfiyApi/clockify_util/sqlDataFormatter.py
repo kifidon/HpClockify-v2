@@ -1393,6 +1393,7 @@ def lemGenerator( projectCode: str, lemId: str):
                         worksheet.write(row,column, rowData[i], textFormat)
                         column += 1
                         continue
+                row += 1
             right = column
             row += 1
             
