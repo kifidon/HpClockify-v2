@@ -862,6 +862,10 @@ def Payroll(start = None, end = None):
             # Text Data Format 
             textFormat = workbook.add_format()
             textFormat.set_border(1)
+            # Highlight  Data Format 
+            highlightFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+            highlightFormat.set_border(1)
+            highlightFormat.set_bg_color('#FFCCCB')
             # date Data Format 
             dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
             dateFormat.set_border(1)
@@ -916,7 +920,9 @@ def Payroll(start = None, end = None):
                         worksheet.write(row,6,totalsData[i][5], totalFormat)
                         worksheet.write(row,7,totalsData[i][6], totalFormat)
                         worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-                        worksheet.write(row,10,totalsData[i][8], totalFormat)
+                        if float(totalsData[i][8]) > 80: 
+                            worksheet.write(row,10,totalsData[i][8], highlightFormat)
+                        else: worksheet.write(row,10,totalsData[i][8], totalFormat)
                         worksheet.write(row,11,totalsData[i][9], totalFormat)
                         i += 1
                         row+=1

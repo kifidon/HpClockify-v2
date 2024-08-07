@@ -1283,7 +1283,7 @@ def postThreadEquipEntry(inputData: dict):
                 logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
             raise ValidationError(threadSerializer.initial_data)
     except Exception as e: 
-        logger.debug(f"Initial Data: {dumps(threadSerializer.initial_data, indent = 4)}")
+        logger.debug(f"Initial Data: {dumps(inputData, indent = 4)}")
         logger.error(f"{type(e)} ({e.__traceback__.tb_lineno}) - {str(e)} ")
         raise e
         
