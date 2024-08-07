@@ -200,13 +200,13 @@ class BackGroundTaskResult(models.Model):
 
 class LemSheet(models.Model):
     id = models.CharField(max_length = 50, primary_key=True) #  date, and project
-    clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     lem_sheet_date = models.DateField(blank=False, null=False)
     lemNumber = models.CharField(max_length = 10, blank = False, null = False)
     description = models.TextField(blank=True, null=True )
     notes = models.TextField(blank = True, null= True)
     projectId = models.ForeignKey(Project, on_delete=models.CASCADE, db_column= 'projectId')
     projectManagerId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='projectManagerId')
+    clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     class Meta:
         managed = False
@@ -218,6 +218,9 @@ class LemSheet(models.Model):
 class Role(models.Model):
     id = models.CharField(max_length = 50, primary_key= True) #hashed by name
     name = models.CharField(max_length = 50, blank= False, null = False)
+    clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    
     class Meta: 
         managed = False
         db_table = 'Role'
@@ -225,6 +228,8 @@ class Role(models.Model):
 class Equipment(models.Model):
     id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     name = models.CharField(max_length=50, null=False, blank= False)
+    clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
+    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')    
     class Meta: 
         managed = False
         db_table = 'Equipment'
