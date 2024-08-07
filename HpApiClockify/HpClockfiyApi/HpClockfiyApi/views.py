@@ -233,9 +233,18 @@ def bankedHrs(request: ASGIRequest):
 @api_view(['GET'])
 def billableNonBillable(reqiest:ASGIRequest, start_date = None, end_date = None):
     logger = setup_server_logger()
-    logger.info(f'Weekly Payroll Report Called')
+    logger.info(f'Billable vs. Non billable Report Called')
     folder_path = NonBillableReport(start_date, end_date )
     return download_text_file(folder_path)
+###########################################################################################################################################################################################################
+
+@api_view(['GET'])
+def GenerateLemView(reqiest:ASGIRequest, projectCode = None, lemId = None):
+    logger = setup_server_logger()
+    logger.info(f'Lem Generate for {projectCode} Report Called: {lemId}')
+    folder_path = GenerateLem(projectCode, lemId )
+    return download_text_file(folder_path)
+
 ###########################################################################################################################################################################################################
 
 def aunthenticateRequst(request: ASGIRequest, secret: str): 

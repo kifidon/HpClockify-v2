@@ -33,6 +33,8 @@ urlpatterns = [
     path('payroll/<str:start_date>/<str:end_date>/', views.weeklyPayrollReport),
     path('timeStatus', views.TimeStatusEvent),
     path('timeStatus/<str:start_date>/<str:end_date>/', views.TimeStatusEvent),
+    
+    path('lemsheet/<str:projectCode>/<str:lemId>/', views.GenerateLemView),
 
     #depreciated
     path('billableReport', views.monthlyBillableReport),

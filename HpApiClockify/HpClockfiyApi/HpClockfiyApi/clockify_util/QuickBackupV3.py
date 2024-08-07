@@ -185,6 +185,12 @@ def TimeStatusCaller(start_date = None, end_date = None):
     logger.info(f" {file_path}")
     return file_path
 
+def GenerateLem(projectCode,lemId):
+    file_path = lemGenerator(projectCode, lemId)
+    logger.info(f" {file_path}")
+    return file_path
+    
+
 async def main(): # Move the sql connection to the thread to increase performance by running async 
     await asyncio.gather(
     (ClientEvent()),

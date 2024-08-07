@@ -1115,6 +1115,306 @@ def TimeStatus(start = None, end = None):
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
 
+def lemGenerator( projectCode: str, lemId: str):
+    logger = setup_background_logger()
+    try:
+        cursor, conn = sqlConnect()
+
+        #get Summary Data
+        query = f''' 
+            
+            -- For generating lem spreadsheet
+            Declare @lemId Nvarchar(MAX) = '{lemId}'
+            select Concat(lw.role, ' - Work'), Sum(lw.[work]), lw.workRate, SUM(lw.work * lw.workRate)  From lemWorkerEntries lw
+            where lw.id = @lemId
+            group by lw.role, lw.workRate
+            having Sum(lw.work) != 0
+            UNION
+            select Concat(lw.role, ' - Travel'), SUM(lw.travel), lw.travelRate, SUM(lw.travel * lw.travelRate)  From lemWorkerEntries lw
+            where lw.id = @lemId
+            group by lw.role, lw.travelRate
+            having Sum(lw.travel) != 0
+            Union
+            select Concat(lw.role, ' - Calc'), Sum(lw.Calc) , lw.[Calc Rate], SUM(lw.calc * lw.[Calc Rate])  From lemWorkerEntries lw
+            where lw.id = @lemId
+            group by lw.role, lw.[Calc Rate]
+            having Sum(lw.calc) != 0
+        '''
+        logger.debug(query)
+        cursor.execute(query)
+        dataSummary = cursor.fetchall()
+        #get lem info 
+        query = f'''
+             
+            Declare @lemId Nvarchar(MAX) = '{lemId}'
+            select ls.lemNumber, c.name, ls.lem_sheet_date, eu.name,  ls.notes, ls.[description] From LemSheet ls
+            inner join Client c on c.id = ls.clientId
+            inner join EmployeeUser eu on eu.id = ls.projectManagerId
+            where ls.id =  @lemId
+        '''
+        logger.debug(query)
+        cursor.execute(query)
+        lemInfo = cursor.fetchone()
+
+        #lem worker Entries
+        query = f'''
+             
+            Declare @lemId Nvarchar(MAX) = '{lemId}'
+            Select 
+                lw.emp,
+                lw.role,
+                lw.work,
+                lw.WorkTotal,
+                lw.travel,
+                lw.TravelTotal, 
+                lw.Calc,
+                lw.CalcTotal,
+                lw.Meals,
+                lw.Hotel
+            from lemWorkerEntries lw
+            where lw.id = @lemId
+        '''
+        logger.debug(query)
+        cursor.execute(query)
+        workerEntries = cursor.fetchall()
+        #lem Equipment Entries
+        query = f'''
+            
+            Declare @lemId Nvarchar(MAX) = '{lemId}'
+            Select 
+                le.name,
+                le.qty,
+                le.Rate,
+                le.cost
+            from lemEquipEntries le
+            where le.id = @lemId
+        '''
+        logger.debug(query)
+        cursor.execute(query)
+        equipmentEntries = cursor.fetchall()
+        
+        #format Null values
+        dataSummary = [['Missing Rate' if val is None else val for val in row] for row in dataSummary]
+        lemInfo = ['----' if val is None else val for val in lemInfo] 
+        workerEntries = [['' if val is None else val for val in row] for row in workerEntries]
+        equipmentEntries = [['' if val is None else val for val in row] for row in equipmentEntries]
+
+        # Generate Folder for spreadsheets
+        current_dir = settings.BASE_DIR
+        lemDir = f"LemSheets"
+        projDir = projectCode
+        folder_name = lemInfo[0]
+
+        folder_path = os.path.join(current_dir, lemDir, projDir, folder_name)
+        logger.debug(f'Created Folder at {folder_path}')
+        if not os.path.exists(folder_path):
+                os.makedirs(folder_path )
+        file_path = os.path.join(folder_path, f"{lemDir}-{projDir}-{folder_name}.xlsx")
+        logger.debug(f'File at {file_path}')
+
+        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+            #Generate file and initilize writers and formats 
+            workbook = writer.book
+            worksheet = workbook.add_worksheet(f"{projectCode} - {lemInfo[0]}")
+            writer.sheets[f'{projectCode} - {lemInfo[0]}'] = worksheet 
+            
+            row = 0 #initilize row pointer 
+
+            #formats
+            #title 
+            titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
+            titleFormat.set_font_size(20)
+            titleFormat.set_bg_color('#D9D9D9')
+            #file Heaaders
+            headerFormat = workbook.add_format({'bold': True, "italic": True, 'align': 'right'})
+            #columnNameFormat 
+            columnNameFormat = workbook.add_format({'bold': True, 'align': 'center'})
+            columnNameFormat.set_border(1)
+            columnNameFormat.set_bg_color('#d9d9d9')
+            # Text Data Format 
+            textFormat = workbook.add_format({ 'align': 'center'})
+            textFormat.set_border(1)
+            #numFormat
+            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
+            numFormat.set_border(1)
+            dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd', 'align':'left'})
+            
+
+            logger.info('Writting Data....')
+            
+            row += 2
+            headersLeft = {
+                'Client:': lemInfo[1],
+                'Date:': lemInfo[2],
+                'PM:': lemInfo[3],
+            }
+            headersRight = {
+                'Timesheet No. :': lemInfo[0],
+                'Task Description:': lemInfo[5],
+                'Notes': lemInfo[4]
+            }
+            top = row
+            for key, value in headersLeft.items():
+                if key != 'Date:':
+                    worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
+                    worksheet.merge_range(row,2,row+1,4, value)
+                else: 
+                    worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
+                    worksheet.merge_range(row,2,row+1, 4, value, dateFormat)
+                row += 2
+            row = top 
+
+            for key, value in headersRight.items():
+                worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
+                worksheet.merge_range(row,8,row+1, 10, value)
+                row += 2
+            row += 1
+
+            workerEntriesColumns = [
+                'Emp Name',
+                'Role',
+                'Work Hrs',
+                'Work Total',
+                'Travel Hrs',
+                'Travel Total',
+                'Calc Hrs',
+                'Calc Total',
+                'Meals',
+                'Hotel'
+            ]
+
+            top = row
+            column = 0
+            for i in range(0,len(workerEntriesColumns)):
+                if i in [0,1]:
+                    worksheet.merge_range(row, column, row, column+1,workerEntriesColumns[i],columnNameFormat)
+                    column +=2
+                    continue
+                worksheet.write(row,column, workerEntriesColumns[i], columnNameFormat)
+                column += 1
+            row+=1
+
+            for rowData in workerEntries:
+                column = 0
+                for i in range(0,len(rowData)):
+                    if i<= 1:
+                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
+                        column += 2
+                        continue
+                    elif i in [3,5,7,8,9]:
+                        worksheet.write(row,column, rowData[i], numFormat )
+                        column += 1
+                        continue
+                    else:
+                        worksheet.write(row,column, rowData[i], textFormat)
+                        column += 1
+                        continue
+                row += 1
+
+            # row = top
+            # column += 1 #write next table to the right of the second table
+            # left = column 
+            # write next table under second table 
+            row += 1
+            left = 0
+            column = left
+
+            summaryColumns = [
+                'Item', 
+                'QTY (Hrs)',
+                'Rate',
+                'Cost'
+            ]
+            top = row
+            for i in range(0,len(summaryColumns)):
+                if i < 1:
+                    worksheet.merge_range(row, column, row, column+1,summaryColumns[i],columnNameFormat)
+                    column +=2
+                    continue
+                worksheet.write(row,column, summaryColumns[i], columnNameFormat)
+                column += 1
+            row += 1
+
+            for rowData in dataSummary:
+                column = left
+                for i in range(0,len(rowData)):
+                    if i == 0:
+                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
+                        column += 2
+                        continue
+                    elif i in [2,3]:
+                        worksheet.write(row,column, rowData[i], numFormat )
+                        column += 1
+                        continue
+                    else:
+                        worksheet.write(row,column, rowData[i], textFormat)
+                        column += 1
+                        continue
+                row += 1
+            
+            row = top
+            column += 1 #write next table to the right of the first table
+            left = column 
+            logger.debug(f'{row}, {column}')
+            #write next table under first table 
+            # row += 1
+            # left = 0
+            # column = left
+            
+            equipmentEntriesColumns = [
+                'Equipment',
+                'QTY',
+                'Rate',
+                'Cost'
+            ]
+            
+            for i in range(0,len(equipmentEntriesColumns)):
+                if i < 1:
+                    worksheet.merge_range(row, column, row, column+1,equipmentEntriesColumns[i],columnNameFormat)
+                    column +=2
+                    continue
+                worksheet.write(row,column, equipmentEntriesColumns[i], columnNameFormat)
+                column += 1
+            row += 1
+
+
+            for rowData in equipmentEntries:
+                column = left
+                for i in range(0,len(rowData)):
+                    if i == 0:
+                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
+                        column += 2
+                        continue
+                    elif i in [2,3]:
+                        worksheet.write(row,column, rowData[i], numFormat )
+                        column += 1
+                        continue
+                    else:
+                        worksheet.write(row,column, rowData[i], textFormat)
+                        column += 1
+                        continue
+                right = column
+                row += 1
+            
+            worksheet.merge_range(0, 0, 1, right, f'{projectCode} {lemInfo[0]}', titleFormat)
+
+
+            writer.close()  
+        return folder_path
+    except Exception as e: 
+        logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+        return None
+
+
+
+
+
+
+
+
+
+
+
 def main():
     BillableReportGenerate('07','24')
     # MonthylyProjReport('2024-02-25', '2024-03-24')
