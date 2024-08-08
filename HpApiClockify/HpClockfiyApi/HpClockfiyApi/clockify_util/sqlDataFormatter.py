@@ -1214,7 +1214,7 @@ def lemGenerator( projectCode: str, lemId: str):
         projDir = projectCode
         folder_name = lemInfo[0]
 
-        folder_path = os.path.join(current_dir, lemDir, projDir, folder_name)
+        folder_path = os.path.join(current_dir, reports, lemDir, projDir, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
