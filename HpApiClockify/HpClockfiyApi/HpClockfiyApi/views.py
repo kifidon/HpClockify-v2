@@ -1192,16 +1192,25 @@ async def lemSheet(request:ASGIRequest):
         logger.info(request.method)
         logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
-            
-
             post = sync_to_async(postThreadLemSheet, thread_sensitive= True)
             try:
                 result = await post(inputData)
                 if result:
                     return JsonResponse(data=inputData['id'], status= status.HTTP_201_CREATED, safe=False)
-                else: return JsonResponse(data=inputData, status =status.HTTP_400_BAD_REQUEST)
+                else: return JsonResponse(data='There was a problem creating your LEM. A similar record may already exist. Review selection and try again. To update lem visit the View Lem Screen. If problem continues contact Admin', status =status.HTTP_400_BAD_REQUEST, safe = False)
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
+        elif request.method == 'DELETE':
+            try: 
+                lemsheet = LemSheet.objects.get(id = inputData.get('id'))
+                lemsheet.delete()
+                logger.info('Delted Lemsheet record succsesfully')
+                response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
+                return response
+            except LemSheet.DoesNotExist as e:
+                logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
+                response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
+                return response
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
     except Exception as e:
