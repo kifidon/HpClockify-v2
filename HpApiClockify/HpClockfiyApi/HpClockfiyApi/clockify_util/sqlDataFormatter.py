@@ -1235,7 +1235,8 @@ def lemGenerator( projectCode: str, lemId: str):
             titleFormat.set_font_size(20)
             titleFormat.set_bg_color('#D9D9D9')
             #file Heaaders
-            headerFormat = workbook.add_format({'bold': True, "italic": True, 'align': 'right'})
+            headerFormat = workbook.add_format({'bold': True, "italic": True, 'align': 'right', 'valign':'top'})
+            headerValueFormat = workbook.add_format({'italic': True,'align': 'left', 'text_wrap': True, 'valign':'top'})
             #columnNameFormat 
             columnNameFormat = workbook.add_format({'bold': True, 'align': 'center'})
             columnNameFormat.set_border(1)
@@ -1246,54 +1247,74 @@ def lemGenerator( projectCode: str, lemId: str):
             #numFormat
             numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
             numFormat.set_border(1)
-            dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd', 'align':'left'})
+            dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd', 'align':'left', 'valign':'top'})
+            
+            descripTitleFormat = workbook.add_format({'bold': True, 'align':'left'})
+            descripTitleFormat.set_font_size(15)
+            descripTitleFormat.set_border(1)
+            descripTitleFormat.set_bg_color('#D9D9D9')
+
+            descripFormat = workbook.add_format({'italic': True,'align': 'left', 'text_wrap': True, 'valign': 'top'})
+            descripFormat.set_border(1)
+            descripFormat.set_font_size(10)
             
 
             logger.info('Writting Data....')
-            
+            logger.debug(row)
             row += 2
             headersLeft = {
                 'Client:': lemInfo[1],
+                'Client Rep': r'"Not Implineted - No Data in the system"',
                 'Date:': lemInfo[2],
                 'PM:': lemInfo[3],
             }
             headersRight = {
                 'Timesheet No. :': lemInfo[0],
-                'Task Description:': lemInfo[5],
-                'Notes': lemInfo[4]
+                'Task Code:': projectCode,
+                'Task Description:': lemInfo[4],
             }
             top = row
             for key, value in headersLeft.items():
                 if key != 'Date:':
                     worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
-                    worksheet.merge_range(row,2,row+1,4, value)
+                    worksheet.merge_range(row,2,row+1,4, value, headerValueFormat)
                 else: 
                     worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
                     worksheet.merge_range(row,2,row+1, 4, value, dateFormat)
                 row += 2
+            
+            bottom = row
             row = top 
+            logger.debug(row)
 
             for key, value in headersRight.items():
-                worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
-                worksheet.merge_range(row,8,row+1, 10, value)
-                row += 2
+                if key != "Task Description:":
+                    worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
+                    worksheet.merge_range(row,8,row+1, 10, value, headerValueFormat)
+                    row += 2
+                    continue
+                else: 
+                    worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
+                    worksheet.merge_range(row,8,row+3, 10, value,headerValueFormat)
+                    row += 4
+                    continue
+            logger.debug(row)
+            row = bottom 
             row += 1
+            logger.debug(row)
 
             workerEntriesColumns = [
                 'Emp Name',
                 'Role',
                 'Work Hrs',
-                'Work Total',
                 'Travel Hrs',
-                'Travel Total',
                 'Calc Hrs',
-                'Calc Total',
                 'Meals',
                 'Hotel'
             ]
 
             top = row
-            column = 0
+            column = 1
             for i in range(0,len(workerEntriesColumns)):
                 if i in [0,1]:
                     worksheet.merge_range(row, column, row, column+1,workerEntriesColumns[i],columnNameFormat)
@@ -1302,25 +1323,34 @@ def lemGenerator( projectCode: str, lemId: str):
                 worksheet.write(row,column, workerEntriesColumns[i], columnNameFormat)
                 column += 1
             row+=1
+            logger.debug(row)
 
             for rowData in workerEntries:
-                column = 0
+                column = 1
                 for i in range(0,len(rowData)):
                     if i<= 1:
                         worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
                         column += 2
                         continue
-                    elif i in [3,5,7,8,9]:
-                        worksheet.write(row,column, rowData[i], numFormat )
-                        column += 1
+                    elif i in [3,5,7]: #not includesd in this table 
+                        # worksheet.write(row,column, rowData[i], numFormat )
+                        # column += 1
                         continue
                     else:
                         worksheet.write(row,column, rowData[i], textFormat)
                         column += 1
                         continue
                 row += 1
+                logger.debug(row)
 
-            # row = top
+
+            row += 1
+            top = row
+            worksheet.merge_range(row,0,row,4, 'Description of Work Performed', descripTitleFormat)
+            row += 1
+            worksheet.merge_range(row,0, row+6, 4, lemInfo[5] , descripFormat)
+            row += 7
+
             # column += 1 #write next table to the right of the second table
             # left = column 
             # write next table under second table 
@@ -1334,7 +1364,7 @@ def lemGenerator( projectCode: str, lemId: str):
                 'Rate',
                 'Cost'
             ]
-            top = row
+            
             for i in range(0,len(summaryColumns)):
                 if i < 1:
                     worksheet.merge_range(row, column, row, column+1,summaryColumns[i],columnNameFormat)
@@ -1343,7 +1373,7 @@ def lemGenerator( projectCode: str, lemId: str):
                 worksheet.write(row,column, summaryColumns[i], columnNameFormat)
                 column += 1
             row += 1
-
+            labourTotal = 0
             for rowData in dataSummary:
                 column = left
                 for i in range(0,len(rowData)):
@@ -1354,6 +1384,8 @@ def lemGenerator( projectCode: str, lemId: str):
                     elif i in [2,3]:
                         worksheet.write(row,column, rowData[i], numFormat )
                         column += 1
+                        if i ==3:
+                            labourTotal += rowData[i]
                         continue
                     else:
                         worksheet.write(row,column, rowData[i], textFormat)
@@ -1362,7 +1394,7 @@ def lemGenerator( projectCode: str, lemId: str):
                 row += 1
             
             row = top
-            column += 1 #write next table to the right of the first table
+            column += 1 #write next table to the right of the description  table
             left = column 
             logger.debug(f'{row}, {column}')
             #write next table under first table 
@@ -1376,7 +1408,7 @@ def lemGenerator( projectCode: str, lemId: str):
                 'Rate',
                 'Cost'
             ]
-            
+            equipTotal =0
             for i in range(0,len(equipmentEntriesColumns)):
                 if i < 1:
                     worksheet.merge_range(row, column, row, column+1,equipmentEntriesColumns[i],columnNameFormat)
@@ -1397,15 +1429,38 @@ def lemGenerator( projectCode: str, lemId: str):
                     elif i in [2,3]:
                         worksheet.write(row,column, rowData[i], numFormat )
                         column += 1
+                        if i ==3:
+                            equipTotal += rowData[i]
                         continue
                     else:
                         worksheet.write(row,column, rowData[i], textFormat)
                         column += 1
                         continue
                 row += 1
-            right = column
+            right = column -1
             row += 1
             
+            totalNumFormat = workbook.add_format({'bold': True, 'num_format': 7, 'align': 'center'})
+            grandTotalNumFormat = workbook.add_format({'bold': True, 'num_format': 7 ,'align': 'center'})
+            grandTotalNumFormat.set_bg_color('#FFFF99')
+
+            worksheet.merge_range(row, left,row, left+2, 'Labour Total', headerFormat)
+            worksheet.merge_range(row, right-1,row, right, labourTotal, totalNumFormat)
+            row+= 1
+            worksheet.merge_range(row, left,row, left+2, 'Equip Total', headerFormat)
+            worksheet.merge_range(row, right-1,row, right, equipTotal, totalNumFormat)
+            row+=1
+
+            grandTotalFormat = workbook.add_format({'bold': True, 'italic': True, 'align':'right'})
+            grandTotalFormat.set_bg_color('#FFFF99')
+            grandTotalFormat.set_num_format('$#,##0.00')
+
+            
+
+            worksheet.merge_range(row, left, row, left+2, 'Grand Total', grandTotalFormat)
+            worksheet.merge_range(row, right-1, row, right, labourTotal + equipTotal, grandTotalNumFormat)
+
+
             worksheet.merge_range(0, 0, 1, right, f'{projectCode} {lemInfo[0]}', titleFormat)
 
 
