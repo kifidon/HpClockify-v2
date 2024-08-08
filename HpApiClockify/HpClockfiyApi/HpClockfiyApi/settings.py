@@ -8,7 +8,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOG_LEVEL = 'INFO' ## Flag
+LOG_LEVEL = 'DEBUG' ## Flag
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -34,6 +34,12 @@ LOGGING = {
             'filename': os.path.join(LOGS_DIR, 'BackgroundTasksLog.log'),
             'formatter': 'standard',  # Use the 'standard' formatter
         },
+        'sqlFile': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'SqlLog.log'),
+            'formatter': 'standard',  # Use the 'standard' formatter
+        },
     },
     'loggers': {
         'server': {
@@ -43,6 +49,11 @@ LOGGING = {
         },
         'background_tasks': {  # Create a logger for background tasks
             'handlers': ['background_file'],  # Use the 'background_file' handler
+            'level': LOG_LEVEL,  # Set the logging level for background tasks
+            'propagate': True,
+        },
+        'sqlLogger': {  # Create a logger for background tasks
+            'handlers': ['sqlFile'],  # Use the 'background_file' handler
             'level': LOG_LEVEL,  # Set the logging level for background tasks
             'propagate': True,
         },

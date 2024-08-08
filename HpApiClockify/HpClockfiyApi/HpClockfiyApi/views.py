@@ -35,7 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 from .clockify_util.QuickBackupV3 import *
 from .clockify_util import SqlClockPull
-from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock
+from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock, log_sql_queries
 from . Loggers import setup_server_logger
 from . import settings
 from rest_framework.exceptions import ErrorDetail
@@ -46,7 +46,7 @@ import httpx
 import base64
 
 loggerLevel = 'DEBUG'
-logger = setup_server_logger(loggerLevel)
+logger = setup_server_logger()
 saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
 ###########################################################################################################################################################################################################
@@ -210,7 +210,26 @@ def viewTaskLog(request):
         return HttpResponse(log_contents, content_type='application/json')
     else:
         return HttpResponse('logger file not found', status=404)
-    
+
+def printSql(request):
+    log_sql_queries()
+    log_file_path = os.path.join(settings.LOGS_DIR, 'SqlLog.log')  # Update with the path to your logger file
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as file:
+            # Read all lines from the file
+            lines = file.readlines()
+            # Extract the last 1000 lines
+            last_1000_lines = lines[-10000:]
+            # Reverse the order of the lines
+            reversed_lines = reversed(last_1000_lines)
+            # Join the lines into a single string
+            log_contents = ''.join(reversed_lines)
+        return HttpResponse(log_contents, content_type='application/json')
+    else:
+        return HttpResponse('logger file not found', status=404)
+
+
+
 @api_view(['GET', 'POST'])
 def bankedHrs(request: ASGIRequest):
     '''
@@ -1184,17 +1203,6 @@ def postThreadLemSheet(inputData):
         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
         raise e
 
-def deleteThreadLemSheet(inputData):
-    try: 
-        lemsheet = LemSheet.objects.get(pk = inputData.get('id'))
-        lemsheet.delete()
-        logger.info('Delted Lemsheet record succsesfully')
-        response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
-        return response
-    except LemSheet.DoesNotExist as e:
-        logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
-        response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
-        return response
 
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
@@ -1213,8 +1221,21 @@ async def lemSheet(request:ASGIRequest):
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
         elif request.method == 'DELETE':
-            delete = sync_to_async(deleteThreadLemSheet, thread_sensitive= True)
-            return await delete(inputData)
+            try: 
+                lemsheet = await LemSheet.objects.aget(pk = inputData.get('id'))
+                logger.debug(lemsheet)
+                await lemsheet.adelete()
+                logger.info('Deleted Lemsheet record succsesfully')
+                response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
+                return response
+            except LemSheet.DoesNotExist as e:
+                logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
+                logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+                response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
+                return response
+            except Exception as e: 
+                logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+                raise 
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
     except Exception as e:

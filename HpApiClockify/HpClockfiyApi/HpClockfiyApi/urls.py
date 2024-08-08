@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.viewServerLog),
     path('task', views.viewTaskLog),
+    path('sql', views.printSql),
 
     path('quickBackup', views.quickBackup),
     path('billing', views.billableReport),

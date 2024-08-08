@@ -254,12 +254,11 @@ class LemEntry(models.Model):
     calc = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     meals = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     hotel = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
-    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     class Meta:
         managed = False
         db_table = 'LemEntry'
         constraints = [
-            models.UniqueConstraint(fields=['workerId', 'lemId', 'workspaceId'], name='unique_worker_entry')
+            models.UniqueConstraint(fields=['workerId', 'lemId'], name='unique_worker_entry')
         ]
 
 class EquipEntry(models.Model):
@@ -268,7 +267,6 @@ class EquipEntry(models.Model):
     equipId = models.ForeignKey(Equipment, on_delete=models.DO_NOTHING, db_column='equipId')
     isUnitRate = models.BooleanField()
     qty = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, default=0.00)
-    workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     class Meta:
         managed = False
         db_table = "EquipEntry"

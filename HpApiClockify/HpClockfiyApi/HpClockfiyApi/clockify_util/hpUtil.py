@@ -1,4 +1,4 @@
-from .. Loggers import setup_background_logger
+from .. Loggers import setup_background_logger, setup_sql_logger
 import asyncio
 from json import dumps, dump, loads, JSONDecodeError
 import pytz
@@ -12,6 +12,20 @@ import os
 import shutil
 import hashlib
 import random
+from django.db import connection
+
+# Execute the query and log it
+def log_sql_queries():
+    logger = setup_sql_logger()
+    logger.info('Logging sql')
+    queries = connection
+    if len(queries) < 1:
+        logger.info('Currently no querries')
+    for query in queries:
+        logger.info(query['sql'])
+
+
+
 
 retrySem = asyncio.Semaphore(1)
 logger = setup_background_logger()
