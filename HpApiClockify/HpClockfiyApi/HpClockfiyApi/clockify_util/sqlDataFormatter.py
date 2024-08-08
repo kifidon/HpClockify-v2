@@ -641,8 +641,9 @@ def NonBillableReportGen(start = None, end = None):
         folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
+            logger.info('Making Dir')
+            os.makedirs(folder_path )
+        file_path = os.path.join(folder_path, f"data.xlsx")
 
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
             #Generate file and initilize writers and formats 
@@ -721,8 +722,9 @@ def NonBillableReportGen(start = None, end = None):
             nonBillingAmount = 0
             for rowData in data:
                 current = rowData[0]
+                
                 if (current is not None or previous is not None) and current != previous:
-                    if billingAmount != 0 and nonBillingAmount != 0:
+                    if billingAmount != 0 or nonBillingAmount != 0:
                         worksheet.merge_range(row,0,row,3, '', textFormat)
                         worksheet.write(row,4, '', textFormat)
                         worksheet.merge_range(row,5,row,7, 'TOTAL', rowTotalFormat)
@@ -730,6 +732,8 @@ def NonBillableReportGen(start = None, end = None):
                         worksheet.write(row,9,totalNonBillable,textFormat)
                         worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
+                        totalBillable = 0
+                        totalNonBillable = 0
                     if subTotal!= 0 :
                         worksheet.merge_range(row,0,row,8, 'GRAND TOTAL', subTotalFormat)
                         worksheet.write(row,9,subTotal,subTotalFormat)
@@ -841,7 +845,7 @@ def Payroll(start = None, end = None):
         folder_path = os.path.join(current_dir,reports, payrollDir,  folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
+            os.makedirs(folder_path )
         file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
 
         
