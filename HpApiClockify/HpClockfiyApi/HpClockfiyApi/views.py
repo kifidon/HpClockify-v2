@@ -1186,7 +1186,7 @@ def postThreadLemSheet(inputData):
 
 def deleteThreadLemSheet(inputData):
     try: 
-        lemsheet = LemSheet.objects.get(id = inputData.get('id'))
+        lemsheet = LemSheet.objects.get(pk = inputData.get('id'))
         lemsheet.delete()
         logger.info('Delted Lemsheet record succsesfully')
         response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
