@@ -342,8 +342,10 @@ def BillableReportGenerate(month = None, year = None):
 
         # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
+        reports = 'Reports'
+        directory = 'Billing'
         folder_name = f"HP-IND-{year}-{month}"
-        folder_path = os.path.join(current_dir, folder_name)
+        folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
 
         for pId in pIds:
@@ -633,8 +635,10 @@ def NonBillableReportGen(start = None, end = None):
     
          # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
+        reports = 'Reports'
+        directory = 'BillableVsNonBillable'
         folder_name = f"Weekly Report- Billable vs Non Billable - {start} - {end}"
-        folder_path = os.path.join(current_dir, folder_name)
+        folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
@@ -831,8 +835,10 @@ def Payroll(start = None, end = None):
 
          # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
-        folder_name = f"Weekly Report-payroll-{start}-{end}"
-        folder_path = os.path.join(current_dir, folder_name)
+        reports = 'Reports'
+        payrollDir = 'Payroll'
+        folder_name = f"Weekly Report-Payroll-{start}-{end}"
+        folder_path = os.path.join(current_dir,reports, payrollDir,  folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
@@ -1016,8 +1022,10 @@ def TimeStatus(start = None, end = None):
         
             # Generate Folder for spreadsheets
             current_dir = settings.BASE_DIR
+            reports = 'Reports'
+            timeStatusDir = 'TimeStatus'
             folder_name = f"Weekly Report-Weekly Time Status-{startRange}-{endRange}"
-            folder_path = os.path.join(current_dir, folder_name)
+            folder_path = os.path.join(current_dir,reports, timeStatusDir,  folder_name)
             logger.debug(f'Created Folder at {folder_path}')
             if not os.path.exists(folder_path):
                     os.makedirs(folder_path )
@@ -1201,6 +1209,7 @@ def lemGenerator( projectCode: str, lemId: str):
 
         # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
+        reports = 'Reports'
         lemDir = f"LemSheets"
         projDir = projectCode
         folder_name = lemInfo[0]
