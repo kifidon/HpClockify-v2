@@ -1184,6 +1184,18 @@ def postThreadLemSheet(inputData):
         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
         raise e
 
+def deleteThreadLemSheet(inputData):
+    try: 
+        lemsheet = LemSheet.objects.get(id = inputData.get('id'))
+        lemsheet.delete()
+        logger.info('Delted Lemsheet record succsesfully')
+        response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
+        return response
+    except LemSheet.DoesNotExist as e:
+        logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
+        response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
+        return response
+
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
     logger = setup_server_logger()
@@ -1201,16 +1213,8 @@ async def lemSheet(request:ASGIRequest):
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
         elif request.method == 'DELETE':
-            try: 
-                lemsheet = LemSheet.objects.get(id = inputData.get('id'))
-                lemsheet.delete()
-                logger.info('Delted Lemsheet record succsesfully')
-                response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
-                return response
-            except LemSheet.DoesNotExist as e:
-                logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
-                response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
-                return response
+            delete = sync_to_async(deleteThreadLemSheet, thread_sensitive= True)
+            return await delete(inputData)
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
     except Exception as e:
