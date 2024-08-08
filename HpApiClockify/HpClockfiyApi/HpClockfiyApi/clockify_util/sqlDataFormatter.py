@@ -641,8 +641,9 @@ def NonBillableReportGen(start = None, end = None):
         folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
+            logger.info('Making Dir')
+            os.makedirs(folder_path )
+        file_path = os.path.join(folder_path, f"data.xlsx")
 
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
             #Generate file and initilize writers and formats 
@@ -844,7 +845,7 @@ def Payroll(start = None, end = None):
         folder_path = os.path.join(current_dir,reports, payrollDir,  folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
+            os.makedirs(folder_path )
         file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
 
         
