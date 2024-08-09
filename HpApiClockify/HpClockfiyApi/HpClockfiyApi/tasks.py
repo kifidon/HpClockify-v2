@@ -99,7 +99,7 @@ async def retryExpenses(request: ASGIRequest):
                     raise e
             
             tasks = []
-            pushCategoriesAsync = sync_to_async(pushCategories, thread_sensitive=True)
+            pushCategoriesAsync = sync_to_async(pushCategories, thread_sensitive=False)
 
             for i in range(0,len(categories['categories'])): # updates/inserts all Expense categories async  
                 tasks.append(
@@ -297,7 +297,7 @@ async def approvedEntries(request: ASGIRequest):
                     
                     break
             
-                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=True)
+                updateAsync = sync_to_async(syncUpdateEntries, thread_sensitive=False)
                 '''May cause SQL server deadlock on resources'''
                 for i in range(0,len(allEntries)): # updates all entries sync 
                     await updateAsync(allEntries[i], workspaceId, timeId, inputData)
@@ -426,7 +426,7 @@ async def lemEntrytTask(request: ASGIRequest):
         logger.debug(inputData)
         logger.debug(type(inputData) )
         if request.method == 'POST':
-            post = sync_to_async(postThreadLemEntryTask, thread_sensitive=True)
+            post = sync_to_async(postThreadLemEntryTask, thread_sensitive=False)
             await post(inputData)
             return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
         else: #do this later if needed

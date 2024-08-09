@@ -363,7 +363,7 @@ async def updateTimesheets(request:ASGIRequest):
                 await callBackgroungEntry()
                 # await callBackgroungExpense()
                 
-            updateAsync = sync_to_async(updateApproval, thread_sensitive=True)
+            updateAsync = sync_to_async(updateApproval, thread_sensitive=False)
             response = await updateAsync()
             asyncio.create_task(createTask()) # allows for Fire and Forget call of tasks  :
         
@@ -1203,7 +1203,6 @@ def postThreadLemSheet(inputData):
         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
         raise e
 
-
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
     logger = setup_server_logger()
@@ -1212,7 +1211,7 @@ async def lemSheet(request:ASGIRequest):
         logger.info(request.method)
         logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
-            post = sync_to_async(postThreadLemSheet, thread_sensitive= True)
+            post = sync_to_async(postThreadLemSheet, thread_sensitive=False)
             try:
                 result = await post(inputData)
                 if result:
@@ -1220,22 +1219,21 @@ async def lemSheet(request:ASGIRequest):
                 else: return JsonResponse(data='There was a problem creating your LEM. A similar record may already exist. Review selection and try again. To update lem visit the View Lem Screen. If problem continues contact Admin', status =status.HTTP_400_BAD_REQUEST, safe = False)
             except utils.IntegrityError as c:
                 return JsonResponse(data=str(c), status= status.HTTP_409_CONFLICT, safe=False)
-        elif request.method == 'DELETE':
+        elif request.method == 'DELETE': #Update status gflag 
             try: 
                 lemsheet = await LemSheet.objects.aget(pk = inputData.get('id'))
                 logger.debug(lemsheet)
-                await lemsheet.adelete()
-                logger.info('Deleted Lemsheet record succsesfully')
-                response = JsonResponse(data= 'Deleted record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
+                lemsheet.archived = True
+                await lemsheet.asave(force_update=True)
+                logger.info('Archived Lemsheet record succsesfully')
+                response = JsonResponse(data= 'Archived record succsesfully', status= status.HTTP_204_NO_CONTENT, safe=False)
                 return response
             except LemSheet.DoesNotExist as e:
                 logger.warning(f'Record to delete with id {inputData.get('id')} was not found. Canceling Opperation ')
                 logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
                 response = JsonResponse(data='Cannot delete record because it was not found in database. Contact Admin to resolve issue', status=status.HTTP_404_NOT_FOUND, safe= False)
                 return response
-            except Exception as e: 
-                logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
-                raise 
+            
         else: #do this later if needed
             return JsonResponse(data='Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)  
     except Exception as e:
@@ -1285,7 +1283,7 @@ async def LemWorkerEntry(request:ASGIRequest):
         logger.info(request.method)
         if request.method == 'POST':
             
-            post = sync_to_async(postThreadLemWorker, thread_sensitive= True)
+            post = sync_to_async(postThreadLemWorker, thread_sensitive=False)
 
             await post(inputData)
 
@@ -1340,7 +1338,7 @@ async def equipmentEntries(request: ASGIRequest):
         logger.info(request.method)
 
         if request.method == 'POST':
-            post = sync_to_async(postThreadEquipEntry, thread_sensitive= True)
+            post = sync_to_async(postThreadEquipEntry, thread_sensitive=False)
             result = await post(inputData)
             if result:
                 return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
@@ -1509,7 +1507,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1546,7 +1544,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1584,7 +1582,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1622,7 +1620,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1659,7 +1657,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1697,7 +1695,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
@@ -1735,7 +1733,7 @@ Future Proof
                     except Exception as e: 
                         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
                         raise e
-                post = sync_to_async(postThread, thread_sensitive= True)
+                post = sync_to_async(postThread, thread_sensitive=False)
 
                 result = await post(inputData)
                 if result:
