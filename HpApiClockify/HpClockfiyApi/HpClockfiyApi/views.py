@@ -1289,10 +1289,11 @@ async def LemWorkerEntry(request:ASGIRequest):
 
             url =  'http://localhost:5000/HpClockifyApi/task/lemEntry'
             async with httpx.AsyncClient(timeout=300) as client:
-                await client.post(url=url, data=inputData)
-
-            return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
-            
+                response = await client.post(url=url, data=inputData)
+            if response.status_code <=299:
+                return JsonResponse(data=inputData, status= status.HTTP_201_CREATED)
+            else:
+                return JsonResponse(data='Failed To insert Entry. Review Selections and try again or contact Admin if problem persists', status= status.HTTP_400_BAD_REQUEST, safe=False)
         else: #do this later if needed
             return JsonResponse(data='Feture Not Extended', status = status.HTTP_510_NOT_EXTENDED, safe=False)
     except ValidationError as v:

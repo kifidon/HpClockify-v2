@@ -209,6 +209,7 @@ class LemSheet(models.Model):
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     archived = models.BooleanField(blank=True, default=False)
+    clientRep = models.CharField(blank=True, null=True, max_length=50, default= "----")
     class Meta:
         managed = False
         db_table = 'LemSheet'
@@ -237,7 +238,7 @@ class Equipment(models.Model):
         
 class LemWorker(models.Model):
     _id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
-    empId = models.ForeignKey(Employeeuser, on_delete= models.CASCADE, db_column='empId') # 
+    empId = models.CharField(max_length=50, null=False, blank= False,db_column=  'name') # 
     roleId = models.ForeignKey(Role, on_delete=models.DO_NOTHING, db_column='roleId')
     class Meta: 
         managed = False
@@ -280,6 +281,7 @@ class WorkerRateSheet(models.Model):
     travelRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     calcRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    projectId = models.ForeignKey(Project, on_delete=models.CASCADE, db_column= 'projectId')
     class Meta:
         managed = False
         db_table = 'WorkerRateSheet'
@@ -294,6 +296,7 @@ class EqpRateSheet(models.Model):
     unitRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     dayRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
+    projectId = models.ForeignKey(Project, on_delete=models.CASCADE, db_column= 'projectId')
     class Meta:
         managed = False
         db_table = 'EqpRateSheet'
