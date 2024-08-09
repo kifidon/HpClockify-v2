@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 from .. import settings 
 import logging
 from ..Loggers import setup_background_logger
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import win32com.client as win32
 
 def MonthylyProjReport(month = None, year = None):
     if month is None or year is None:
@@ -1222,7 +1225,7 @@ def lemGenerator( projectCode: str, lemId: str):
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f"{lemDir}-{projDir}-{folder_name}.xlsx")
+        file_path = os.path.join(folder_path, f" {lemDir}-{projDir} - {folder_name}.xlsx")
         logger.debug(f'File at {file_path}')
 
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
@@ -1468,9 +1471,31 @@ def lemGenerator( projectCode: str, lemId: str):
             worksheet.merge_range(0, 0, 1, right, f'{projectCode} {lemInfo[0]}', titleFormat)
 
 
-            writer.close()  
+
+        
+
+        excel = win32.Dispatch('Excel.Application')
+        excel.Visible = False
+
+        wb = excel.Workbooks.Open(file_path)
+        # logger.debug(len(wb))
+        ws = wb.Worksheets[0]
+
+        ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
+        ws.PageSetup.FitToPagesWide = 1
+        ws.PageSetup.FitToPagesTall = 1
+
+        ws.ExportAsFixedFormat(0,  f'{file_path} .pdf')
+
+        writer.close() 
+        wb.Close()
+        excel.Quit()
+
         return folder_path
     except Exception as e: 
+        wb.Close()
+        excel.Quit()
+
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
         return None
 
