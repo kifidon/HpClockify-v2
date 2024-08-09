@@ -208,7 +208,7 @@ class LemSheet(models.Model):
     projectManagerId = models.ForeignKey(Employeeuser, models.DO_NOTHING, db_column='projectManagerId')
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
-    archived = models.BooleanField(max_length=1, blank= True, null=True)
+    archived = models.BooleanField(blank=True, default=False)
     class Meta:
         managed = False
         db_table = 'LemSheet'
