@@ -561,7 +561,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     }
     '''
     title = serializers.SerializerMethodField(required = False)
-    code = serializers.SerializerMethodField(max_length=50, blank=True, null=True)
+    code = serializers.SerializerMethodField(required = False)
 
     def get_code(self, obj):
         return obj[:8]
