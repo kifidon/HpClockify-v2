@@ -280,6 +280,8 @@ class WorkerRateSheet(models.Model):
     workRate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     travelRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     calcRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    mealRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
+    hotelRate =  models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True, default=0.00)
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
     projectId = models.ForeignKey(Project, on_delete=models.CASCADE, db_column= 'projectId')
     class Meta:
