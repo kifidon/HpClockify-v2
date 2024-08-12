@@ -1424,8 +1424,12 @@ def lemGenerator( projectCode: str, lemId: str):
                     elif i in [2,3]:
                         worksheet.write(row,column, rowData[i], numFormat )
                         column += 1
-                        if i ==3:
-                            labourTotal += rowData[i]
+                        if i ==3 and type(rowData[i]):
+                            try:
+                                labourTotal += float(rowData[i])
+                            except (ValueError, TypeError) as e:
+                                logger.warning(f'Row Data type is {type(rowData[i])}')
+
                         continue
                     else:
                         worksheet.write(row,column, rowData[i], textFormat)
@@ -1470,7 +1474,11 @@ def lemGenerator( projectCode: str, lemId: str):
                         worksheet.write(row,column, rowData[i], numFormat )
                         column += 1
                         if i ==3:
-                            equipTotal += rowData[i]
+                            try:    
+                                equipTotal += rowData[i]
+                            except (ValueError, TypeError) as e:
+                                logger.warning(f'Row Data type is {type(rowData[i])}')
+
                         continue
                     else:
                         worksheet.write(row,column, rowData[i], textFormat)
