@@ -1232,7 +1232,7 @@ def lemGenerator( projectCode: str, lemId: str):
                 le.name,
                 le.qty,
                 le.Rate,
-                le.cost,
+                le.cost
 
             from lemEquipEntries le
             where le.id = @lemId
