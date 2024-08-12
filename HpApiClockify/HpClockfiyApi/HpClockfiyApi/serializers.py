@@ -496,82 +496,82 @@ class FileExpenseSerializer(serializers.ModelSerializer):
         model = FilesForExpense
         fields = "__all__"
 
-class ProjectSerializer(serializers.ModelSerializer):
-    '''
-        {
-        "id": "66b3acf08becbd615f4e40dc",
-        "name": "LIL-003 - Lil'wat Business Group Office & Shop",
-        "hourlyRate": {
-            "amount": 0
-        },
-        "costRate": null,
-        "clientId": "65e8b35c5590595c3ffd1e65",
-        "workspaceId": "65c249bfedeea53ae19d7dad",
-        "billable": true,
-        "memberships": [
-            {
-                "userId": "664ce0a17abd9f73f7926cb6",
-                "hourlyRate": null,
-                "costRate": null,
-                "targetId": "66b3acf08becbd615f4e40dc",
-                "membershipType": "PROJECT",
-                "membershipStatus": "ACTIVE"
-            }
-        ],
-        "color": "#FF5722",
-        "estimate": {
-            "estimate": "PT0S",
-            "type": "AUTO"
-        },
-        "archived": false,
-        "duration": "PT0S",
-        "clientName": "LIL",
-        "note": "",
-        "timeEstimate": {
-            "estimate": "PT0S",
-            "type": "AUTO",
-            "resetOption": null,
-            "active": false,
-            "includeNonBillable": true
-        },
-        "budgetEstimate": null,
-        "estimateReset": null,
-        "currency": null,
-        "template": false,
-        "public": true,
-        "tasks": [],
-        "client": {
-            "name": "LIL",
-            "email": null,
-            "address": "",
-            "workspaceId": "65c249bfedeea53ae19d7dad",
-            "archived": false,
-            "note": "",
-            "currencyId": {
-                "timestamp": 1707858011,
-                "counter": 1777596,
-                "machineIdentifier": 2048178,
-                "processIdentifier": 28965,
-                "timeSecond": 1707858011,
-                "time": 1707858011000,
-                "date": 1707858011000
-            },
-            "id": "65e8b35c5590595c3ffd1e65"
-        }
-    }
-    '''
-    title = serializers.SerializerMethodField(required = False)
-    code = serializers.SerializerMethodField(max_length=50, blank=True, null=True)
+# class ProjectSerializer(serializers.ModelSerializer):
+#     '''
+#         {
+#         "id": "66b3acf08becbd615f4e40dc",
+#         "name": "LIL-003 - Lil'wat Business Group Office & Shop",
+#         "hourlyRate": {
+#             "amount": 0
+#         },
+#         "costRate": null,
+#         "clientId": "65e8b35c5590595c3ffd1e65",
+#         "workspaceId": "65c249bfedeea53ae19d7dad",
+#         "billable": true,
+#         "memberships": [
+#             {
+#                 "userId": "664ce0a17abd9f73f7926cb6",
+#                 "hourlyRate": null,
+#                 "costRate": null,
+#                 "targetId": "66b3acf08becbd615f4e40dc",
+#                 "membershipType": "PROJECT",
+#                 "membershipStatus": "ACTIVE"
+#             }
+#         ],
+#         "color": "#FF5722",
+#         "estimate": {
+#             "estimate": "PT0S",
+#             "type": "AUTO"
+#         },
+#         "archived": false,
+#         "duration": "PT0S",
+#         "clientName": "LIL",
+#         "note": "",
+#         "timeEstimate": {
+#             "estimate": "PT0S",
+#             "type": "AUTO",
+#             "resetOption": null,
+#             "active": false,
+#             "includeNonBillable": true
+#         },
+#         "budgetEstimate": null,
+#         "estimateReset": null,
+#         "currency": null,
+#         "template": false,
+#         "public": true,
+#         "tasks": [],
+#         "client": {
+#             "name": "LIL",
+#             "email": null,
+#             "address": "",
+#             "workspaceId": "65c249bfedeea53ae19d7dad",
+#             "archived": false,
+#             "note": "",
+#             "currencyId": {
+#                 "timestamp": 1707858011,
+#                 "counter": 1777596,
+#                 "machineIdentifier": 2048178,
+#                 "processIdentifier": 28965,
+#                 "timeSecond": 1707858011,
+#                 "time": 1707858011000,
+#                 "date": 1707858011000
+#             },
+#             "id": "65e8b35c5590595c3ffd1e65"
+#         }
+#     }
+#     '''
+#     title = serializers.SerializerMethodField(required = False)
+#     code = serializers.SerializerMethodField(max_length=50, blank=True, null=True)
 
-    def get_code(self, obj):
-        return obj[:8]
+#     def get_code(self, obj):
+#         return obj[:8]
     
-    def get_title(self, obj):
-        return obj[11:]
+#     def get_title(self, obj):
+#         return obj[11:]
     
-    class Meta:
-        model = Project
-        fields = '__all__'  
+#     class Meta:
+#         model = Project
+#         fields = '__all__'  
 
 #########################################################################################################################################################################################################
 class LemSheetSerializer(serializers.ModelSerializer):
