@@ -444,7 +444,7 @@ def newTimeSheets(request: ASGIRequest):
 
 #depreciated 
 @csrf_exempt
-async def quickBackup(request: ASGIRequest):
+async def quickBackup(request: ASGIRequest, event = None):
     '''
     Function Description: 
         Calls every Clockify pull and Push Event syncrhonsously. takes Approx 10 min.
@@ -458,12 +458,13 @@ async def quickBackup(request: ASGIRequest):
     Returns: 
         response(Response)
     '''
-    try: 
-        result = await main() # General String for return output
-    except Exception as e:
-        logger.info(f'Quickbackup: {str(e)}')
-    finally: 
+    try:
+        result = await eventSelect(event)
         response = JsonResponse(data = result, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        logger.error(f'Quickbackup: {str(e)}')
+        response = JsonResponse(data = str(e), status=status.HTTP_207_MULTI_STATUS, safe=False)
+    finally: 
         return response
 
 #depreciated

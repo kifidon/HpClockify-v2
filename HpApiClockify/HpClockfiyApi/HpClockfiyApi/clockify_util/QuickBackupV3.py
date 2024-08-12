@@ -9,7 +9,8 @@ from asgiref.sync import sync_to_async
 from .. Loggers import setup_server_logger
 logger = setup_server_logger('DEBUG')
 
-def UserEvent(wkSpaceName = 'Hill Plain'):
+async def UserEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('User Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -20,13 +21,13 @@ def UserEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushUsers(wid, conn, cursor))
+    logger.info( ClockifyPushV3.pushUsers(wid, conn, cursor))
 
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
 async def ClientEvent(wkSpaceName = 'Hill Plain'):
-    logger.info('Called')
+    logger.info('Client Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -37,13 +38,14 @@ async def ClientEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    clients = sync_to_async(ClockifyPushV3.pushClients, thread_sensitive=True)
-    logger.info( await clients(wid, conn, cursor))
+    result = ClockifyPushV3.pushClients(wkSpaceName)
+    
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
-    return 1
+    return result
 
 async def ProjectEvent(wkSpaceName = 'Hill Plain'):
-    logger.info('Called')
+    logger.info('Project Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -55,12 +57,13 @@ async def ProjectEvent(wkSpaceName = 'Hill Plain'):
         logger.error('cannot connect to server')
         return 0
     projects = sync_to_async(ClockifyPushV3.pushProjects, thread_sensitive=True)
-    logger.info(await projects(wid, conn, cursor))
+    result = await projects(wid, conn, cursor)
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
-    return 1
+    return result
 
 async def PolicyEvent(wkSpaceName = 'Hill Plain'):
-    logger.info('Called')
+    logger.info('Policy Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -72,11 +75,13 @@ async def PolicyEvent(wkSpaceName = 'Hill Plain'):
         logger.error('cannot connect to server')
         return 0
     policies = sync_to_async(ClockifyPushV3.pushPolicies, thread_sensitive= True)
-    logger.info(await policies(wid, conn, cursor))
+    result = await policies(wid, conn, cursor)
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
-    return 1
+    return result
 
-def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
+async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
+    logger.info('Timesheet Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -87,10 +92,12 @@ def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(f"({status}) {ClockifyPushV3.pushApprovedTime(wid, conn, cursor, status)}")
+    result =  ClockifyPushV3.pushApprovedTime(wid, conn, cursor, status)
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
 
-def TimeOffEvent(wkSpaceName = 'Hill Plain'):
+async def TimeOffEvent(wkSpaceName = 'Hill Plain'):
+    logger.info('Timeoff Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -101,12 +108,13 @@ def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    logger.info(ClockifyPushV3.pushTimeOff(wid, conn, cursor))
+    result = ClockifyPushV3.pushTimeOff(wid, conn, cursor)
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
-    return 1
+    return result
 
 async def HolidayEvent(wkSpaceName = 'Hill Plain'):
-    logger.info('Called')
+    logger.info('Holiday Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
     attempts = 0
@@ -118,7 +126,8 @@ async def HolidayEvent(wkSpaceName = 'Hill Plain'):
         logger.error('cannot connect to server')
         return 0
     holidays = sync_to_async(ClockifyPushV3.pushHolidays, thread_sensitive=True)
-    logger.info(await holidays(wid, conn, cursor))
+    result = await holidays(wid, conn, cursor)
+    logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
@@ -138,6 +147,40 @@ async def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     logger.info(await usergroups(wid, conn, cursor))
     cleanUp(conn=conn, cursor=cursor)
     return 1
+
+async def main(): # Move the sql connection to the thread to increase performance by running async 
+    await asyncio.gather(
+    (ClientEvent()),
+    (ProjectEvent()),
+    (PolicyEvent()),
+    (HolidayEvent()),
+    # (UserGroupEvent()),
+    (TimeOffEvent())
+    )
+    return 'Opperation Complete. View Logging For errors'
+
+async def eventSelect(event = None):
+    try:
+        events = {
+            'user': UserEvent(wkSpaceName = 'Hill Plain'),
+            'client': ClientEvent(wkSpaceName = 'Hill Plain'),
+            'project': ProjectEvent(wkSpaceName = 'Hill Plain'),
+            'policy': PolicyEvent(wkSpaceName = 'Hill Plain'),
+            'timesheet': TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'),
+            'timeoff': TimeOffEvent(wkSpaceName = 'Hill Plain'),
+            'holiday': HolidayEvent(wkSpaceName = 'Hill Plain'),
+            'userGroup': UserGroupEvent(wkSpaceName = 'Hill Plain'),
+        }
+        results = await asyncio.gather(events.get(event, main()), return_exceptions= True)
+        exceptions = []  
+        return results
+    except Exception as e:
+        logger.error(({e.__traceback__.tb_lineno}) - {str(e)})
+        raise e
+        
+######################################################################################################################################################################
+
+
 def CreateTextFile():
     timezone = pytz.timezone('America/Denver')
     currentDateTimeObject = datetime.datetime.now(timezone)
@@ -191,16 +234,6 @@ def GenerateLem(projectCode,lemId):
     return file_path
     
 
-async def main(): # Move the sql connection to the thread to increase performance by running async 
-    await asyncio.gather(
-    (ClientEvent()),
-    (ProjectEvent()),
-    (PolicyEvent()),
-    (HolidayEvent()),
-    (UserGroupEvent()),
-    (TimeOffEvent())
-    )
-    return 'Opperation Complete. View Logging For errors'
 
 if __name__ == "__main__":
     main()

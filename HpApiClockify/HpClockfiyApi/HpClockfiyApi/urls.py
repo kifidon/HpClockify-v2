@@ -26,6 +26,7 @@ urlpatterns = [
     path('sql', views.printSql),
 
     path('quickBackup', views.quickBackup),
+    path('quickBackup/<str:event>', views.quickBackup),
     path('billing', views.billableReport),
     path('billing/<str:month>/<str:year>/', views.billableReport),
     path('billingSummary', views.billableNonBillable),

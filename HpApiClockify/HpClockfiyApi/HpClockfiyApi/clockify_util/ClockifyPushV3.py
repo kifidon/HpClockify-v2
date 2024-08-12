@@ -278,7 +278,8 @@ def pushProjects(wkSpaceID, conn, cursor):
     count = 0
     key = getApiKey()
     projects = getProjects(wkSpaceID, key)
-    deleted = deleteProjects(conn, cursor, wkSpaceID)
+    deleted = 0
+    # deleted = deleteProjects(conn, cursor, wkSpaceID)
     try:
         while len(projects) >=1 and page != 10:
             gExists += exists; exists = 0
@@ -1307,7 +1308,6 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
         - pushUsers(wkSpaceID, conn, cursor): Pushes users to the database.
     """
     logger.info(pushHolidays(wkSpaceID, conn, cursor))
-    
     page = 1
     gCount = 0
     gUpdate = 0
@@ -1318,10 +1318,8 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
     newRequests = [] # for deletions (ID's)
     timeOff = getTimeOff(wkSpaceID, page, startRange, endRange)
     try:
-        while len(timeOff['requests']) != 0 and page < 4:
-            gCount += count;  count = 0 
-            gUpdate += update; update = 0
-            gExists += exists ; exists = 0
+        while len(timeOff['requests']) != 0 and page <= 3:
+            
             logger.info(f"Inserting From Page: {page} of Time Off Requests ({len(timeOff['requests'])} records)")
             for requests in timeOff["requests"]:
                 userID = requests["userId"]
@@ -1416,6 +1414,12 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                         else: # unknown error 
                             raise # Unkown integrity error on insert 
             page += 1
+            gCount += count 
+            gUpdate += update
+            gExists += exists 
+            count = 0 
+            update = 0
+            exists = 0
             timeOff = getTimeOff(wkSpaceID, page, startRange, endRange) 
     except Exception as exc :
         conn.rollback()  # Roll back changes if an exception occurs
@@ -1424,8 +1428,9 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
     else:
         conn.commit() # saving inserts 
         deleted = 0
-        deleteTimeOff(wkSpaceID, conn, cursor, newRequests)
-        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                    
+        # deleteTimeOff(wkSpaceID, conn, cursor, newRequests)
+        logger.info("Committing changes...")  # Commit changes if no exceptions occurred
+                           
         return(f"Operation Completed: TimeOffRequest table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated. {deleted} deleted\n")
 ''' 
 def pushAttendance(wkSpaceID, conn, cursor, startDate="2024-02-11T00:00:00Z", endDate="2024-02-17T23:59:59.999Z", page =1):
