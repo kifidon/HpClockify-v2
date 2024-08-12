@@ -1166,16 +1166,26 @@ def lemGenerator( projectCode: str, lemId: str):
             where lw.id = @lemId
             group by lw.role, lw.workRate
             having Sum(lw.work) != 0
-            UNION
+             UNION
             select Concat(lw.role, ' - Travel'), SUM(lw.travel), lw.travelRate, SUM(lw.travel * lw.travelRate)  From lemWorkerEntries lw
             where lw.id = @lemId
             group by lw.role, lw.travelRate
             having Sum(lw.travel) != 0
-            Union
+             Union
             select Concat(lw.role, ' - Calc'), Sum(lw.Calc) , lw.[Calc Rate], SUM(lw.calc * lw.[Calc Rate])  From lemWorkerEntries lw
             where lw.id = @lemId
             group by lw.role, lw.[Calc Rate]
             having Sum(lw.calc) != 0
+             Union
+            select Concat(lw.role, ' - Meal'), Sum(lw.Meals) , lw.mealRate, SUM(lw.mealTotal)  From lemWorkerEntries lw
+            where lw.id = @lemId
+            group by lw.role, lw.mealRate
+            having Sum(lw.Meals) != 0
+             Union
+            select Concat(lw.role, ' - Hotel'), Sum(lw.Hotel) , lw.hotelRate, SUM(lw.hotelTotal)  From lemWorkerEntries lw
+            where lw.id = @lemId
+            group by lw.role, lw.hotelRate
+            having Sum(lw.Hotel) != 0
         '''
         logger.debug(query)
         cursor.execute(query)
