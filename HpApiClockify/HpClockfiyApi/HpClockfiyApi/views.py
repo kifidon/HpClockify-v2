@@ -665,7 +665,7 @@ async def getProjects(request: ASGIRequest):
                 response = Response(serializer.data, status= status.HTTP_200_OK)
             '''
             response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-            taskResult(response, dumps(loads(request.body)), 'Project Function')
+            saveTaskResult(response, dumps(loads(request.body)), 'Project Function')
             return response  
         
         if request.method != 'POST': 

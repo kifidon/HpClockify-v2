@@ -1318,7 +1318,7 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
     newRequests = [] # for deletions (ID's)
     timeOff = getTimeOff(wkSpaceID, page, startRange, endRange)
     try:
-        while len(timeOff['requests']) != 0 and page < 10:
+        while len(timeOff['requests']) != 0 and page < 4:
             gCount += count;  count = 0 
             gUpdate += update; update = 0
             gExists += exists ; exists = 0
