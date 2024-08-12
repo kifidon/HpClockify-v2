@@ -634,8 +634,8 @@ def getWorkspaces(request: ASGIRequest, format = None):
     #     Response(data = None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
    ''' 
 
-@api_view(['GET', 'POST',])
-def getProjects(request: ASGIRequest):
+@csrf_exempt
+async def getProjects(request: ASGIRequest):
     '''
     Function Description: 
         Synchronous call for the server to pull all projects and apply CRUD for all records. 
@@ -654,26 +654,43 @@ def getProjects(request: ASGIRequest):
     '''
     secret = 'obEJDmaQEgIrhBhLVpUO4pXO6aXgWEK3'
     logger.info(f'POST: getProjects')
-    if aunthenticateRequst(request, secret):  
-        '''
-        elif request.method == 'GET':
-            projects = Project.objects.all()
-            serializer = ProjectSerializer(projects, many=True)
-            response = Response(serializer.data, status= status.HTTP_200_OK)
-        '''
-        if request.method == 'POST' or request.method=='GET': 
-            stat = ProjectEvent()
-            logger.info(f'Project Event ')
-            if stat:
-                return Response(data= 'Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_200_OK)
-            else: return Response(data='Check logs @: https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_400_BAD_REQUEST)
-        else:
+    inputData = loads(request.body)
+    logger.debug(reverseForOutput(inputData))
+    try: 
+        if not aunthenticateRequst(request, secret):  
+            '''
+            elif request.method == 'GET':
+                projects = Project.objects.all()
+                serializer = ProjectSerializer(projects, many=True)
+                response = Response(serializer.data, status= status.HTTP_200_OK)
+            '''
+            response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
+            taskResult(response, dumps(loads(request.body)), 'Project Function')
+            return response  
+        
+        if request.method != 'POST': 
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
-    else:
-        response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'Project Function')
-        return response  
+        try:
+            project = await Project.objects.aget(pk = inputData.get('id', ''))
+            serializer = ProjectSerializer(instance=project, data=inputData)
+            logger.info(f'Insert path taken for Project instance')
+        except Project.DoesNotExist:
+            serializer = ProjectSerializer(data=inputData)
+            logger.info(f'Update path taken for Project instance')
+        avalid = await sync_to_async(serializer.is_valid)()
+        if avalid:
+            await sync_to_async (serializer.save)()
+            return JsonResponse(inputData, status=status.HTTP_200_OK)
+        else: 
+            logger.warning(f'Serializer could not be saved: {serializer.errors}')
+            for key, value in serializer.errors.items():
+                logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                return JsonResponse(data= f'Failed to add project {key}: {value}', status=status.HTTP_400_BAD_REQUEST, safe = False)
+    except Exception as e:
+        logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+        return JsonResponse(data=f'{str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe=False)
+            
 
 @csrf_exempt
 async def getTimeOffRequests(request: ASGIRequest):
