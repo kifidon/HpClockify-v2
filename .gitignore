@@ -22,3 +22,5 @@ __pycache__/
 .github/
 .gitattributes
 HpApiClockify/HpClockfiyApi/HpClockfiyApi/migrations/
+HpApiClockify/HpClockfiyApi/Reports
+HpApiClockify/HpClockfiyApi/HpClockfiyApi/settings.py
