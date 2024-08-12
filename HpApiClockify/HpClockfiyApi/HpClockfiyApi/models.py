@@ -76,8 +76,8 @@ class Project(models.Model):
     name = models.TextField(blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     code = models.CharField(max_length=50, blank=True, null=True)
-    client = models.ForeignKey(Client, models.DO_NOTHING, to_field='id', db_column='client_id')
-    workspace = models.ForeignKey('Workspace', models.DO_NOTHING, to_field='id',db_column='workspace_id')
+    clientId = models.ForeignKey(Client, models.DO_NOTHING, to_field='id', db_column='client_id')
+    workspaceId = models.ForeignKey('Workspace', models.DO_NOTHING, to_field='id',db_column='workspace_id')
 
     class Meta:
         managed = False
