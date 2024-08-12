@@ -6,7 +6,6 @@ from django.core.handlers.asgi import ASGIRequest
 from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils 
-
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from asgiref.sync import sync_to_async

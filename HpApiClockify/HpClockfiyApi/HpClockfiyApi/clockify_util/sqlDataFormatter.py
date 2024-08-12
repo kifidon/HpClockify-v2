@@ -14,6 +14,23 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import win32com.client as win32
 
+def convertXlsxPdf(folder_path, file_path):
+    excel = win32.Dispatch('Excel.Application')
+    excel.Visible = False
+    pdfFile = os.path.join(folder_path, f"{file_path}.pdf")
+    wb = excel.Workbooks.Open(file_path)
+    # logger.debug(len(wb))
+    ws = wb.Worksheets[0]
+
+    ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
+    ws.PageSetup.FitToPagesWide = 1
+    ws.PageSetup.FitToPagesTall = 1
+
+    ws.ExportAsFixedFormat(0,  f'{pdfFile}')
+
+    wb.Close()
+    excel.Quit()
+
 def MonthylyProjReport(month = None, year = None):
     if month is None or year is None:
         month, year = getMonthYear()
@@ -592,7 +609,7 @@ def BillableReportGenerate(month = None, year = None):
                 
                 
                 writer.close()
-
+        convertXlsxPdf(folder_path, file_path)
         return folder_path        
 
     except Exception as e: 
@@ -783,6 +800,7 @@ def NonBillableReportGen(start = None, end = None):
             worksheet.write(row,8,(totalBillable+ totalNonBillable),columnNameFormat)
             writer.close()
 
+        convertXlsxPdf(folder_path, file_path)
         return folder_path
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
@@ -966,6 +984,8 @@ def Payroll(start = None, end = None):
             
 
             writer.close()
+        convertXlsxPdf(folder_path, file_path)
+
         return folder_path
             
 
@@ -1126,6 +1146,8 @@ def TimeStatus(start = None, end = None):
                 writer.close()
             start = (datetime.strptime(start, '%Y-%m-%d') + timedelta(days=7)).strftime('%Y-%m-%d')
             end = (datetime.strptime(end, '%Y-%m-%d') + timedelta(days=7)).strftime('%Y-%m-%d')
+            convertXlsxPdf(folder_path, file_path)
+
         return folder_path
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
@@ -1470,31 +1492,11 @@ def lemGenerator( projectCode: str, lemId: str):
 
             worksheet.merge_range(0, 0, 1, right, f'{projectCode} {lemInfo[0]}', titleFormat)
 
-
-
-        
-
-        excel = win32.Dispatch('Excel.Application')
-        excel.Visible = False
-
-        wb = excel.Workbooks.Open(file_path)
-        # logger.debug(len(wb))
-        ws = wb.Worksheets[0]
-
-        ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
-        ws.PageSetup.FitToPagesWide = 1
-        ws.PageSetup.FitToPagesTall = 1
-
-        ws.ExportAsFixedFormat(0,  f'{file_path} .pdf')
-
         writer.close() 
-        wb.Close()
-        excel.Quit()
+        convertXlsxPdf(folder_path, file_path)
 
         return folder_path
     except Exception as e: 
-        wb.Close()
-        excel.Quit()
 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
         return None
