@@ -1194,7 +1194,7 @@ def lemGenerator( projectCode: str, lemId: str):
         query = f'''
              
             Declare @lemId Nvarchar(MAX) = '{lemId}'
-            select ls.lemNumber, c.name, ls.lem_sheet_date, eu.name,  ls.notes, ls.[description] From LemSheet ls
+            select ls.lemNumber, c.name, ls.lem_sheet_date, eu.name,  ls.notes, ls.[description], ls.clientRep From LemSheet ls
             inner join Client c on c.id = ls.clientId
             inner join EmployeeUser eu on eu.id = ls.projectManagerId
             where ls.id =  @lemId
@@ -1232,7 +1232,8 @@ def lemGenerator( projectCode: str, lemId: str):
                 le.name,
                 le.qty,
                 le.Rate,
-                le.cost
+                le.cost,
+
             from lemEquipEntries le
             where le.id = @lemId
         '''
@@ -1303,7 +1304,7 @@ def lemGenerator( projectCode: str, lemId: str):
             row += 2
             headersLeft = {
                 'Client:': lemInfo[1],
-                'Client Rep': r'"Not Implineted - No Data in the system"',
+                'Client Rep': lemInfo[6],
                 'Date:': lemInfo[2],
                 'PM:': lemInfo[3],
             }
