@@ -90,10 +90,10 @@ def monthlyBillableReportEquipment(request, month = None, year= None):
     folder_path = monthlyBillableEqp(month, year )
     return download_text_file(folder_path)
 
-def billableReport(request, month= None, year = None):
+async def billableReport(request, month= None, year = None):
     logger = setup_server_logger(loggerLevel)
     logger.info(f'BillableReport Called for {month}-{year}')
-    folder_path = billingReport(month, year )
+    folder_path = await billingReport(month, year )
     return download_text_file(folder_path)
 
 @api_view(['GET'])

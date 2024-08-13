@@ -192,8 +192,8 @@ def CreateTextFile():
     file.close()
     logger.info(filePath, end="")
 
-def billingReport(month= None, year = None):
-    file_path = (BillableReportGenerate(month, year ))
+async def billingReport(month= None, year = None):
+    file_path = await BillableReportGenerate(month, year )
     logger.info(f" {file_path}")
     return file_path 
 

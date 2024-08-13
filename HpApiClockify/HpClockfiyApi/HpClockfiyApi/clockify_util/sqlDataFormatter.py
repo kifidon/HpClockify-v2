@@ -13,23 +13,32 @@ from ..Loggers import setup_background_logger
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import win32com.client as win32
+import asyncio
+from asgiref.sync import sync_to_async
 
+logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path):
-    excel = win32.Dispatch('Excel.Application')
-    excel.Visible = False
-    pdfFile = os.path.join(folder_path, f"{file_path}.pdf")
-    wb = excel.Workbooks.Open(file_path)
-    # logger.debug(len(wb))
-    ws = wb.Worksheets[0]
+    try:
+        logger.info('Generating PDF from XL file')
+        excel = win32.Dispatch('Excel.Application')
+        excel.Visible = False
+        pdfFile = os.path.join(folder_path, f"{file_path}.pdf")
+        wb = excel.Workbooks.Open(file_path)
+        # logger.debug(len(wb))
+        ws = wb.Worksheets[0]
 
-    ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
-    ws.PageSetup.FitToPagesWide = 1
-    ws.PageSetup.FitToPagesTall = 1
+        ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
+        ws.PageSetup.FitToPagesWide = 1
+        ws.PageSetup.FitToPagesTall = 1
 
-    ws.ExportAsFixedFormat(0,  f'{pdfFile}')
+        ws.ExportAsFixedFormat(0,  f'{pdfFile}')
 
-    wb.Close()
-    excel.Quit()
+        wb.Close()
+        excel.Quit()
+        logger.info('Opperation Succesful')
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+        pass 
 
 def MonthylyProjReport(month = None, year = None):
     if month is None or year is None:
@@ -314,35 +323,276 @@ def DailyTimeEntryReport():
         logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
         pass
         
-def BillableReportGenerate(month = None, year = None):
+async def generateBilling(file_path, pId, startDate, endDate, cursor, logger):
+    #Get billing Data 
+        logger.debug('Getting Labor Data')
+        #labour data 
+        cursor.execute(
+            f'''
+            Select 
+                eu.name, 
+                eu.role, 
+                SUM(en.duration), 
+                'hr' as [Unit Cost] ,
+                Cast(en.rate/100 as Decimal(10,2)),
+                cast(
+                    sum(en.duration * en.rate/100) as decimal(10,2)
+                )
+            From Entry en
+            inner join Timesheet ts on ts.id = en.time_sheet_id
+            inner join EmployeeUser eu on eu.id = ts.emp_id
+            inner join Project p on p.id = en.project_id
+            where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
+                and en.billable = 1
+                and ts.[status] = 'APPROVED'
+            group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
+            order by eu.name 
+            '''
+        )
+        labourData = cursor.fetchall()
+        logger.debug('Aquired Labor Data')
+        logger.debug('Getting Equipment Data')
+        #Equipment Data 
+        cursor.execute(
+            f'''
+            Select 
+                eu.name, 
+                eu.role, 
+                SUM(en.duration), 
+                'hr' as [Unit Cost] ,
+                Cast('18.75' as Decimal(10,2)),
+                cast(
+                    sum(en.duration * 18.75) as decimal(10,2)
+                )
+            From Entry en
+            inner join Timesheet ts on ts.id = en.time_sheet_id
+            inner join EmployeeUser eu on eu.id = ts.emp_id
+            inner join Project p on p.id = en.project_id
+            where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
+                and eu.hasTruck = 1 
+                and en.billable = 1
+                and ts.[status] = 'APPROVED'
+            group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
+            ''')
+        equipmentData = cursor.fetchall()
+        logger.debug('Aquired Equipment Data')
+        #labour Totals
+        cursor.execute(
+            f'''
+            Select 
+                Cast(SUM(en.duration * en.rate/100) as Decimal(10,2))
+            From Entry en
+            inner join Timesheet ts on ts.id = en.time_sheet_id
+            inner join EmployeeUser eu on eu.id = ts.emp_id
+            inner join Project p on p.id = en.project_id
+            where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
+                and en.billable = 1
+                and ts.[status] = 'APPROVED'
+            '''
+        )
+        labourTotal = cursor.fetchone()
+        # equipment totals
+        cursor.execute(
+            f'''
+            Select 
+                Cast(SUM(en.duration * 18.75) as Decimal(10,2))
+            From Entry en
+            inner join Timesheet ts on ts.id = en.time_sheet_id
+            inner join EmployeeUser eu on eu.id = ts.emp_id
+            inner join Project p on p.id = en.project_id
+            where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
+                and en.billable = 1
+                and ts.[status] = 'APPROVED'
+                and eu.hasTruck = 1 
+            '''
+        )
+        equipmentTotal = cursor.fetchone()
+        
+        #format results for opperations 
+        labourData = [['' if val is None else val for val in data] for data in labourData]
+        equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
+        if equipmentTotal[0] is not None:
+            grandTotal = labourTotal[0] + equipmentTotal[0]
+            equipmentTotal = float(equipmentTotal[0])
+        else: 
+            grandTotal = labourTotal[0]
+        if labourTotal[0] is not None:
+            labourTotal = float(labourTotal[0])
+        logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
+        grandTotal = float(grandTotal)
+        
+        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+            #Generate file and initilize writers and formats 
+            workbook = writer.book
+            worksheet = workbook.add_worksheet("Hill Plain - Monthly LEM")
+            writer.sheets['Hill Plain - Monthly LEM'] = worksheet        
+
+            # Merged cells Title Format
+            mergeCells = workbook.add_format({'align': 'center', 'bold': True})
+            mergeCells.set_center_across()
+            mergeCells.set_bg_color('#FCD5B4') 
+            mergeCells.set_font_size(24)
+            mergeCells.set_border(2)
+            worksheet.merge_range(0,0,1,8, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+
+            #subTotals Format
+            subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
+            subTotals.set_bg_color('#FFFF99')              
+            subTotals.set_font_size(14)              
+            subTotals.set_italic()              
+            #GrandTotal Format
+            grandTotalFormat = workbook.add_format({'align': 'left', 'bold': True}) 
+            grandTotalFormat.set_bg_color('#FCD5B4')              
+            grandTotalFormat.set_font_size(14)              
+            grandTotalFormat.set_italic()              
+            
+            #File headers info 
+            headers = {
+                "Project Name:": pId[2],
+                "Project Number:": pId[1],
+                "Invoice Month:" : getAbbreviation(startDate, endDate),
+                "Time Period Start:": startDate,
+                "Time Period End:": endDate,
+                "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%m")
+            }
+            logger.info(reverseForOutput(headers))
+
+            #bold Text format 
+            bold_format = workbook.add_format({'bold':True})
+            bold_format.set_italic()
+            row = 2
+            #write file headers
+            for key, value in headers.items():
+                worksheet.merge_range(row, 0,row,1, key, bold_format)
+                worksheet.write(row, 2, value)
+                row += 1
+                logger.debug(f'Writing to row {row}')
+            row += 1
+            
+            #insert image 
+            worksheet.insert_image("H4",
+                                    # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                                    r"C:\Users\Script\Desktop\unnamed.png",
+                                    {'x_scale': 0.4, 'y_scale': 0.4})
+
+            #table headers Formater 
+
+            headersFormat = workbook.add_format({'align': 'center', 'bold': True})
+            headersFormat.set_center_across()
+            headersFormat.set_bg_color('#F2F2F2')
+            headersFormat.set_font_size(16)
+            headersFormat.set_border(1)
+            #dollar value formats 
+            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
+            numFormat.set_border(1)
+            #dollar bold value formats 
+            boldNum = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
+            boldNum.set_num_format(7)
+            boldNum.set_font_size(14)
+            boldNum.set_bg_color('#FFFF99')
+            #Grand total value formats 
+            gt = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
+            gt.set_num_format(7)
+            gt.set_font_size(14)
+            gt.set_bg_color('#FCD5B4')
+            # table data format
+            dataFormat = workbook.add_format()
+            dataFormat.set_border(1)
+            #table column format 
+            columnFormat = workbook. add_format({'align': 'center', 'bold': True})
+            columnFormat.set_border(1)
+
+        # Table  Data 
+            worksheet.merge_range(row,0,row,8, 'LABOUR', headersFormat)
+            row += 1
+            
+            #write column names 
+            worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
+            worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
+            worksheet.write( row,4, 'Qty', columnFormat)
+            worksheet.write( row,5, 'Unit Cost', columnFormat)
+            worksheet.write( row,6, 'Rate', columnFormat)
+            worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
+            row += 1
+
+            for rowData in labourData:
+                worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
+                worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
+                worksheet.write( row,4, rowData[2], dataFormat)
+                worksheet.write( row,5, rowData[3], dataFormat)
+                worksheet.write( row,6, rowData[4], numFormat)
+                worksheet.merge_range( row,7,row, 8, rowData[5], numFormat)
+                row += 1
+            logger.info(f'Labour Items - {len(labourData)}')
+            #sub Total
+            worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
+            worksheet.merge_range(row,7,row,8, labourTotal, boldNum)
+            row += 1
+        # equipment Table 
+            if type(equipmentTotal) is float:
+                row += 1
+                worksheet.merge_range(row,0,row,8, 'EQUIPMENT', headersFormat)
+                row += 1
+
+                worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
+                worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
+                worksheet.write( row,4, 'Qty', columnFormat)
+                worksheet.write( row,5, 'Unit Cost', columnFormat)
+                worksheet.write( row,6, 'Rate', columnFormat)
+                worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
+                row += 1
+
+                for rowData in equipmentData:
+                    worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
+                    worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
+                    worksheet.write( row,4, rowData[2], dataFormat)
+                    worksheet.write( row,5, rowData[3], dataFormat)
+                    worksheet.write( row,6, rowData[4], numFormat)
+                    worksheet.merge_range( row,7,row, 8 , rowData[5], numFormat)
+                    row += 1
+
+                worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
+                worksheet.merge_range(row,7 ,row,8, equipmentTotal, boldNum)
+                row += 1
+            worksheet.merge_range(row,5,row, 6, "GRAND TOTAL", grandTotalFormat)
+            worksheet.merge_range(row,7,row,8,grandTotal, gt)
+            # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
+            # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
+            
+            
+            writer.close()
+        
+
+async def BillableReportGenerate(month = None, year = None):
     logger = setup_background_logger()
     try: 
         #obtain date range for this month 
         if month is None or year is None:
             month, year = getMonthYear()
-        else:
-            month = getAbbreviation(month, reverse=True)
-        logger.info(f'Biling Report Generating for - {month}-{year}')
+    #     else:
+    #         month = getAbbreviation(month, reverse=True)
+    #     logger.info(f'Biling Report Generating for - {month}-{year}')
 
-        if int(month) -1 == 0: 
-            previousMonth = '12'
-            previousYear = str(int(year) - 1).rjust(2, '0')
-        else: 
-            previousMonth = str(int(month) -1 ).rjust(2, '0')
-            previousYear = year
+    #     if int(month) -1 == 0: 
+    #         previousMonth = '12'
+    #         previousYear = str(int(year) - 1).rjust(2, '0')
+    #     else: 
+    #         previousMonth = str(int(month) -1 ).rjust(2, '0')
+    #         previousYear = year
 
-    #format date strings
-        endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
-        startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
-        # Calculate the most recent previous Saturday
-        if(endDateObj.weekday() != 5):
-            endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
-        else: endDate = f'20{year}-{month}-25'
-        if(startDateObj.weekday() != 6):
-            startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
-        else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
-        logger.debug(f'Date Range: {startDate}-{endDate}')
-        
+    # #format date strings
+    #     endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
+    #     startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
+    #     # Calculate the most recent previous Saturday
+    #     if(endDateObj.weekday() != 5):
+    #         endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+    #     else: endDate = f'20{year}-{month}-25'
+    #     if(startDateObj.weekday() != 6):
+    #         startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
+    #     else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
+    #     logger.debug(f'Date Range: {startDate}-{endDate}')
+        startDate = month
+        endDate = year
 
         cursor, conn = sqlConnect()
         
@@ -366,252 +616,25 @@ def BillableReportGenerate(month = None, year = None):
         current_dir = settings.BASE_DIR
         reports = 'Reports'
         directory = 'Billing'
-        folder_name = f"HP-IND-{year}-{month}"
+        # folder_name = f"HP-IND-{year}-{month}"
+        folder_name = f"HP-IND-{startDate}"
         folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
-
+        tasks = []
+        filePaths = []
         for pId in pIds:
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
-        #Get billing Data 
-            logger.debug('Getting Labor Data')
-            #labour data 
-            cursor.execute(
-                f'''
-                Select 
-                    eu.name, 
-                    eu.role, 
-                    SUM(en.duration), 
-                    'hr' as [Unit Cost] ,
-                    Cast(en.rate/100 as Decimal(10,2)),
-                    cast(
-                        sum(en.duration * en.rate/100) as decimal(10,2)
-                    )
-                From Entry en
-                inner join Timesheet ts on ts.id = en.time_sheet_id
-                inner join EmployeeUser eu on eu.id = ts.emp_id
-                inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
-                    and en.billable = 1
-                    and ts.[status] = 'APPROVED'
-                group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
-                order by eu.name 
-                '''
-            )
-            labourData = cursor.fetchall()
-            logger.debug('Aquired Labor Data')
-            logger.debug('Getting Equipment Data')
-            #Equipment Data 
-            cursor.execute(
-                f'''
-                Select 
-                    eu.name, 
-                    eu.role, 
-                    SUM(en.duration), 
-                    'hr' as [Unit Cost] ,
-                    Cast('18.75' as Decimal(10,2)),
-                    cast(
-                        sum(en.duration * 18.75) as decimal(10,2)
-                    )
-                From Entry en
-                inner join Timesheet ts on ts.id = en.time_sheet_id
-                inner join EmployeeUser eu on eu.id = ts.emp_id
-                inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
-                    and eu.hasTruck = 1 
-                    and en.billable = 1
-                    and ts.[status] = 'APPROVED'
-                group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
-                ''')
-            equipmentData = cursor.fetchall()
-            logger.debug('Aquired Equipment Data')
-            #labour Totals
-            cursor.execute(
-                f'''
-                Select 
-                    Cast(SUM(en.duration * en.rate/100) as Decimal(10,2))
-                From Entry en
-                inner join Timesheet ts on ts.id = en.time_sheet_id
-                inner join EmployeeUser eu on eu.id = ts.emp_id
-                inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
-                    and en.billable = 1
-                    and ts.[status] = 'APPROVED'
-                '''
-            )
-            labourTotal = cursor.fetchone()
-            # equipment totals
-            cursor.execute(
-                f'''
-                Select 
-                    Cast(SUM(en.duration * 18.75) as Decimal(10,2))
-                From Entry en
-                inner join Timesheet ts on ts.id = en.time_sheet_id
-                inner join EmployeeUser eu on eu.id = ts.emp_id
-                inner join Project p on p.id = en.project_id
-                where p.id = '{pId[0]}' and Cast(en.start_time as Date)>= '{startDate}' and Cast(en.start_time as Date)<= '{endDate}'
-                    and en.billable = 1
-                    and ts.[status] = 'APPROVED'
-                    and eu.hasTruck = 1 
-                '''
-            )
-            equipmentTotal = cursor.fetchone()
-            
-            #format results for opperations 
-            labourData = [['' if val is None else val for val in data] for data in labourData]
-            equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
-            if equipmentTotal[0] is not None:
-                grandTotal = labourTotal[0] + equipmentTotal[0]
-                equipmentTotal = float(equipmentTotal[0])
-            else: 
-                grandTotal = labourTotal[0]
-            if labourTotal[0] is not None:
-                labourTotal = float(labourTotal[0])
-            logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
-            grandTotal = float(grandTotal)
-            
-            with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
-                #Generate file and initilize writers and formats 
-                workbook = writer.book
-                worksheet = workbook.add_worksheet("Hill Plain - Monthly LEM")
-                writer.sheets['Hill Plain - Monthly LEM'] = worksheet        
-
-                # Merged cells Title Format
-                mergeCells = workbook.add_format({'align': 'center', 'bold': True})
-                mergeCells.set_center_across()
-                mergeCells.set_bg_color('#FCD5B4') 
-                mergeCells.set_font_size(24)
-                mergeCells.set_border(2)
-                worksheet.merge_range(0,0,1,8, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
-
-                #subTotals Format
-                subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
-                subTotals.set_bg_color('#FFFF99')              
-                subTotals.set_font_size(14)              
-                subTotals.set_italic()              
-                #GrandTotal Format
-                grandTotalFormat = workbook.add_format({'align': 'left', 'bold': True}) 
-                grandTotalFormat.set_bg_color('#FCD5B4')              
-                grandTotalFormat.set_font_size(14)              
-                grandTotalFormat.set_italic()              
-                
-                #File headers info 
-                headers = {
-                    "Project Name:": pId[2],
-                    "Project Number:": pId[1],
-                    "Invoice Month:" : getAbbreviation(month, year),
-                    "Time Period Start:": startDate,
-                    "Time Period End:": endDate,
-                    "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%m")
-                }
-                logger.info(reverseForOutput(headers))
-
-                #bold Text format 
-                bold_format = workbook.add_format({'bold':True})
-                bold_format.set_italic()
-                row = 2
-                #write file headers
-                for key, value in headers.items():
-                    worksheet.merge_range(row, 0,row,1, key, bold_format)
-                    worksheet.write(row, 2, value)
-                    row += 1
-                    logger.debug(f'Writing to row {row}')
-                row += 1
-                
-                #insert image 
-                worksheet.insert_image("H4",
-                                        # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
-                                        r"C:\Users\Script\Desktop\unnamed.png",
-                                       {'x_scale': 0.4, 'y_scale': 0.4})
-
-                #table headers Formater 
-
-                headersFormat = workbook.add_format({'align': 'center', 'bold': True})
-                headersFormat.set_center_across()
-                headersFormat.set_bg_color('#F2F2F2')
-                headersFormat.set_font_size(16)
-                headersFormat.set_border(1)
-                #dollar value formats 
-                numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
-                numFormat.set_border(1)
-                #dollar bold value formats 
-                boldNum = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
-                boldNum.set_num_format(7)
-                boldNum.set_font_size(14)
-                boldNum.set_bg_color('#FFFF99')
-                #Grand total value formats 
-                gt = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
-                gt.set_num_format(7)
-                gt.set_font_size(14)
-                gt.set_bg_color('#FCD5B4')
-                # table data format
-                dataFormat = workbook.add_format()
-                dataFormat.set_border(1)
-                #table column format 
-                columnFormat = workbook. add_format({'align': 'center', 'bold': True})
-                columnFormat.set_border(1)
-
-            # Table  Data 
-                worksheet.merge_range(row,0,row,8, 'LABOUR', headersFormat)
-                row += 1
-                
-                #write column names 
-                worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
-                worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
-                worksheet.write( row,4, 'Qty', columnFormat)
-                worksheet.write( row,5, 'Unit Cost', columnFormat)
-                worksheet.write( row,6, 'Rate', columnFormat)
-                worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
-                row += 1
-
-                for rowData in labourData:
-                    worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
-                    worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
-                    worksheet.write( row,4, rowData[2], dataFormat)
-                    worksheet.write( row,5, rowData[3], dataFormat)
-                    worksheet.write( row,6, rowData[4], numFormat)
-                    worksheet.merge_range( row,7,row, 8, rowData[5], numFormat)
-                    row += 1
-                logger.info(f'Labour Items - {len(labourData)}')
-                #sub Total
-                worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
-                worksheet.merge_range(row,7,row,8, labourTotal, boldNum)
-                row += 1
-            # equipment Table 
-                if type(equipmentTotal) is float:
-                    row += 1
-                    worksheet.merge_range(row,0,row,8, 'EQUIPMENT', headersFormat)
-                    row += 1
-
-                    worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
-                    worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
-                    worksheet.write( row,4, 'Qty', columnFormat)
-                    worksheet.write( row,5, 'Unit Cost', columnFormat)
-                    worksheet.write( row,6, 'Rate', columnFormat)
-                    worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
-                    row += 1
-
-                    for rowData in equipmentData:
-                        worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
-                        worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
-                        worksheet.write( row,4, rowData[2], dataFormat)
-                        worksheet.write( row,5, rowData[3], dataFormat)
-                        worksheet.write( row,6, rowData[4], numFormat)
-                        worksheet.merge_range( row,7,row, 8 , rowData[5], numFormat)
-                        row += 1
-
-                    worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
-                    worksheet.merge_range(row,7 ,row,8, equipmentTotal, boldNum)
-                    row += 1
-                worksheet.merge_range(row,5,row, 6, "GRAND TOTAL", grandTotalFormat)
-                worksheet.merge_range(row,7,row,8,grandTotal, gt)
-                # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
-                # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
-                
-                
-                writer.close()
-            convertXlsxPdf(folder_path, file_path)
+            filePaths.append(file_path[:-5])
+            tasks.append(generateBilling(file_path, pId, startDate, endDate, cursor, logger))
+        await asyncio.gather(*tasks)
+      
+        convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
+        tasks.clear()
+        for i, pId in enumerate(pIds):
+            tasks.append(convertAsync(folder_path, filePaths[i]))
+        await asyncio.gather(*tasks)
         return folder_path        
 
     except Exception as e: 
