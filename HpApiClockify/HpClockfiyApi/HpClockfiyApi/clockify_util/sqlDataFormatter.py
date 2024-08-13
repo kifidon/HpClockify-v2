@@ -638,7 +638,7 @@ async def BillableReportGenerate(month = None, year = None):
             tasks.append(generateBilling(file_path, pId, startDate, endDate, cursor, logger))
         await asyncio.gather(*tasks)
         for i in range(0,15):
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
             logger.info('\tPausing....')
         convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
         tasks.clear()
@@ -649,6 +649,7 @@ async def BillableReportGenerate(month = None, year = None):
 
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+        return folder_path
 
 def NonBillableReportGen(start = None, end = None):
     logger = setup_background_logger()
