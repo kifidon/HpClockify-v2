@@ -637,7 +637,9 @@ async def BillableReportGenerate(month = None, year = None):
             filePaths.append(file_path[:-5])
             tasks.append(generateBilling(file_path, pId, startDate, endDate, cursor, logger))
         await asyncio.gather(*tasks)
-      
+        for i in range(0,15):
+            asyncio.sleep(1)
+            logger.info('\tPausing....')
         convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
         tasks.clear()
         for i, pId in enumerate(pIds):
