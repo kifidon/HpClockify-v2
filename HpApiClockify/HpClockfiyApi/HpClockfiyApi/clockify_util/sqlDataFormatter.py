@@ -342,6 +342,8 @@ def BillableReportGenerate(month = None, year = None):
             startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
         else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
         logger.debug(f'Date Range: {startDate}-{endDate}')
+        
+
         cursor, conn = sqlConnect()
         
     #Get Relavant projects  
@@ -609,7 +611,7 @@ def BillableReportGenerate(month = None, year = None):
                 
                 
                 writer.close()
-        convertXlsxPdf(folder_path, file_path)
+            convertXlsxPdf(folder_path, file_path)
         return folder_path        
 
     except Exception as e: 
