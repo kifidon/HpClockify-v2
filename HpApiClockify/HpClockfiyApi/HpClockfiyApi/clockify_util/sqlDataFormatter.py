@@ -649,10 +649,9 @@ async def BillableReportGenerate(month = None, year = None):
         j = 0
         while j <= len(pIds):
             for i in range(0,5):
-                if(i + j > len(pIds)):
-                    continue
-                i += 1
-                tasks.append(convertAsync(folder_path, filePaths[i+ j]))
+                if(i + j <= len(filePaths)):
+                    tasks.append(convertAsync(folder_path, filePaths[i+ j]))
+                else: break
             await asyncio.gather(*tasks)
             tasks.clear()
             j +=5
