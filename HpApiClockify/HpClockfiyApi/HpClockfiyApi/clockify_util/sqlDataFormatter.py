@@ -331,7 +331,9 @@ def DailyTimeEntryReport():
         logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
         pass
         
-async def generateBilling(file_path, pId, startDate, endDate, cursor, logger):
+def generateBilling(file_path, pId, startDate, endDate, logger):
+    try:
+        cursor, conn = sqlConnect()
     #Get billing Data 
         logger.debug('Getting Labor Data')
         #labour data 
@@ -441,7 +443,7 @@ async def generateBilling(file_path, pId, startDate, endDate, cursor, logger):
             mergeCells.set_bg_color('#FCD5B4') 
             mergeCells.set_font_size(24)
             mergeCells.set_border(2)
-            worksheet.merge_range(0,0,1,8, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+            worksheet.merge_range(0,0,1,10, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
 
             #subTotals Format
             subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
@@ -466,7 +468,7 @@ async def generateBilling(file_path, pId, startDate, endDate, cursor, logger):
             logger.info(reverseForOutput(headers))
 
             #bold Text format 
-            bold_format = workbook.add_format({'bold':True})
+            bold_format = workbook.add_format({'bold':True, 'text_wrap': True})
             bold_format.set_italic()
             row = 2
             #write file headers
@@ -511,64 +513,67 @@ async def generateBilling(file_path, pId, startDate, endDate, cursor, logger):
             columnFormat.set_border(1)
 
         # Table  Data 
-            worksheet.merge_range(row,0,row,8, 'LABOUR', headersFormat)
+            worksheet.merge_range(row,0,row,10, 'LABOUR', headersFormat)
             row += 1
             
             #write column names 
-            worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
-            worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
-            worksheet.write( row,4, 'Qty', columnFormat)
-            worksheet.write( row,5, 'Unit Cost', columnFormat)
-            worksheet.write( row,6, 'Rate', columnFormat)
-            worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
+            worksheet.merge_range(row,0,row, 2, 'Staff Member', columnFormat)
+            worksheet.merge_range(row,3,row, 5, 'Position', columnFormat)
+            worksheet.write( row,6, 'Qty', columnFormat)
+            worksheet.write( row,7, 'Unit Cost', columnFormat)
+            worksheet.write( row,8, 'Rate', columnFormat)
+            worksheet.merge_range( row,9, row, 10, 'Amount', columnFormat)
             row += 1
 
             for rowData in labourData:
-                worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
-                worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
-                worksheet.write( row,4, rowData[2], dataFormat)
-                worksheet.write( row,5, rowData[3], dataFormat)
-                worksheet.write( row,6, rowData[4], numFormat)
-                worksheet.merge_range( row,7,row, 8, rowData[5], numFormat)
+                worksheet.merge_range(row,0,row, 2, rowData[0], dataFormat)
+                worksheet.merge_range(row,3,row, 5, rowData[1], dataFormat)
+                worksheet.write( row,6, rowData[2], dataFormat)
+                worksheet.write( row,7, rowData[3], dataFormat)
+                worksheet.write( row,8, rowData[4], numFormat)
+                worksheet.merge_range( row,9, row, 10, rowData[5], numFormat)
                 row += 1
             logger.info(f'Labour Items - {len(labourData)}')
             #sub Total
-            worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
-            worksheet.merge_range(row,7,row,8, labourTotal, boldNum)
+            worksheet.merge_range(row,7,row,8,'SUB TOTAL', subTotals)
+            worksheet.merge_range(row,9,row,10, labourTotal, boldNum)
             row += 1
         # equipment Table 
             if type(equipmentTotal) is float:
                 row += 1
-                worksheet.merge_range(row,0,row,8, 'EQUIPMENT', headersFormat)
+                worksheet.merge_range(row,0,row,10, 'EQUIPMENT', headersFormat)
                 row += 1
 
-                worksheet.merge_range(row,0,row, 1, 'Staff Member', columnFormat)
-                worksheet.merge_range(row,2,row, 3, 'Position', columnFormat)
-                worksheet.write( row,4, 'Qty', columnFormat)
-                worksheet.write( row,5, 'Unit Cost', columnFormat)
-                worksheet.write( row,6, 'Rate', columnFormat)
-                worksheet.merge_range( row,7, row, 8, 'Amount', columnFormat)
+                worksheet.merge_range(row,0,row, 2, 'Staff Member', columnFormat)
+                worksheet.merge_range(row,3,row, 5, 'Position', columnFormat)
+                worksheet.write( row,6, 'Qty', columnFormat)
+                worksheet.write( row,7, 'Unit Cost', columnFormat)
+                worksheet.write( row,8, 'Rate', columnFormat)
+                worksheet.merge_range( row,9, row, 10, 'Amount', columnFormat)
                 row += 1
 
                 for rowData in equipmentData:
-                    worksheet.merge_range(row,0, row, 1, rowData[0], dataFormat)
-                    worksheet.merge_range(row,2, row, 3 ,rowData[1], dataFormat)
-                    worksheet.write( row,4, rowData[2], dataFormat)
-                    worksheet.write( row,5, rowData[3], dataFormat)
-                    worksheet.write( row,6, rowData[4], numFormat)
-                    worksheet.merge_range( row,7,row, 8 , rowData[5], numFormat)
+                    worksheet.merge_range(row,0,row, 2, rowData[0], dataFormat)
+                    worksheet.merge_range(row,3,row, 5, rowData[1], dataFormat)
+                    worksheet.write( row,6, rowData[2], dataFormat)
+                    worksheet.write( row,7, rowData[3], dataFormat)
+                    worksheet.write( row,8, rowData[4], numFormat)
+                    worksheet.merge_range( row,9, row, 10, rowData[5], numFormat)
                     row += 1
 
-                worksheet.merge_range(row,5,row,6,'SUB TOTAL', subTotals)
-                worksheet.merge_range(row,7 ,row,8, equipmentTotal, boldNum)
+                worksheet.merge_range(row,7,row,8,'SUB TOTAL', subTotals)
+                worksheet.merge_range(row,9,row,10, equipmentTotal, boldNum)
                 row += 1
-            worksheet.merge_range(row,5,row, 6, "GRAND TOTAL", grandTotalFormat)
-            worksheet.merge_range(row,7,row,8,grandTotal, gt)
+            worksheet.merge_range(row,7,row,8, "GRAND TOTAL", grandTotalFormat)
+            worksheet.merge_range(row,9,row,10, grandTotal, gt)
             # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
             # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
             
-            
             writer.close()
+        cleanUp(conn, cursor)
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+        
         
 
 async def BillableReportGenerate(month = None, year = None):
@@ -602,8 +607,8 @@ async def BillableReportGenerate(month = None, year = None):
         startDate = month
         endDate = year
 
-        cursor, conn = sqlConnect()
         
+        cursor, conn = sqlConnect()
     #Get Relavant projects  
         cursor.execute(
             f'''
@@ -619,7 +624,7 @@ async def BillableReportGenerate(month = None, year = None):
         )
         pIds = cursor.fetchall()
         logger.debug(f'{len(pIds)} Projects')
-
+        cleanUp(conn, cursor)
         # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
         reports = 'Reports'
@@ -635,21 +640,27 @@ async def BillableReportGenerate(month = None, year = None):
                 os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{startDate}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
-            tasks.append(generateBilling(file_path, pId, startDate, endDate, cursor, logger))
+            agenerateBilling = sync_to_async(generateBilling, thread_sensitive= False)
+            tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger))
         await asyncio.gather(*tasks)
-        for i in range(0,15):
-            await asyncio.sleep(1)
-            logger.info('\tPausing....')
+        
         convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
         tasks.clear()
-        for i, pId in enumerate(pIds):
-            tasks.append(convertAsync(folder_path, filePaths[i]))
-        await asyncio.gather(*tasks)
+        j = 0
+        while j <= len(pIds):
+            for i in range(0,5):
+                if(i + j > len(pIds)):
+                    continue
+                i += 1
+                tasks.append(convertAsync(folder_path, filePaths[i+ j]))
+            await asyncio.gather(*tasks)
+            tasks.clear()
+            j +=5
         return folder_path        
 
     except Exception as e: 
-        logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
-        return folder_path
+        logger.critical(f'{e.__traceback__.tb_lineno} - {str(e)}')
+        
 
 def NonBillableReportGen(start = None, end = None):
     logger = setup_background_logger()
