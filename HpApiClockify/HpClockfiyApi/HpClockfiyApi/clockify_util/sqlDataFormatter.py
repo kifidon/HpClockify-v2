@@ -15,30 +15,38 @@ from reportlab.pdfgen import canvas
 import win32com.client as win32
 import asyncio
 from asgiref.sync import sync_to_async
+import pythoncom
 
 logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path):
     try:
         logger.info('Generating PDF from XL file')
+        pythoncom.CoInitialize()  # Initialize COM for the current thread
         excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
         pdfFile = os.path.join(folder_path, f"{file_path}.pdf")
         wb = excel.Workbooks.Open(file_path)
-        # logger.debug(len(wb))
         ws = wb.Worksheets[0]
 
         ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
         ws.PageSetup.FitToPagesWide = 1
         ws.PageSetup.FitToPagesTall = 1
 
-        ws.ExportAsFixedFormat(0,  f'{pdfFile}')
+        ws.ExportAsFixedFormat(0, f'{pdfFile}')
 
-        wb.Close()
+        wb.Close(SaveChanges=0)  # Ensure SaveChanges is set to 0 to avoid saving changes
         excel.Quit()
-        logger.info('Opperation Succesful')
+
+        # Release COM objects
+        del ws
+        del wb
+        del excel
+
+        logger.info('Operation Successful')
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
-        pass 
+    finally:
+        pythoncom.CoUninitialize()  # Uninitialize COM for the current thread
 
 def MonthylyProjReport(month = None, year = None):
     if month is None or year is None:
@@ -625,7 +633,7 @@ async def BillableReportGenerate(month = None, year = None):
         for pId in pIds:
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
-            file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
+            file_path = os.path.join(folder_path, f"{startDate}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
             tasks.append(generateBilling(file_path, pId, startDate, endDate, cursor, logger))
         await asyncio.gather(*tasks)
