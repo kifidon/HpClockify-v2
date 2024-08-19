@@ -444,7 +444,7 @@ def newTimeSheets(request: ASGIRequest):
 
 #depreciated 
 @csrf_exempt
-async def quickBackup(request: ASGIRequest, event = None):
+async def quickBackup(request: ASGIRequest = None, event = None):
     '''
     Function Description: 
         Calls every Clockify pull and Push Event syncrhonsously. takes Approx 10 min.
