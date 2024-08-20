@@ -463,7 +463,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
                 "Invoice Month:" : getAbbreviation(startDate, endDate),
                 "Time Period Start:": startDate,
                 "Time Period End:": endDate,
-                "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%m")
+                "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%M")
             }
             logger.info(reverseForOutput(headers))
 
