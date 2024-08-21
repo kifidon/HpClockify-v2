@@ -38,7 +38,8 @@ async def ClientEvent(wkSpaceName = 'Hill Plain'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    result = ClockifyPushV3.pushClients(wkSpaceName)
+    logger.debug('Transfering to handler function')
+    result = ClockifyPushV3.pushClients(wid ,conn, cursor)
     
     logger.info(result)
     cleanUp(conn=conn, cursor=cursor)
@@ -149,15 +150,15 @@ async def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     return 1
 
 async def main(): # Move the sql connection to the thread to increase performance by running async 
-    await asyncio.gather(
+    result = await asyncio.gather(
     (ClientEvent()),
     (ProjectEvent()),
     (PolicyEvent()),
-    (HolidayEvent()),
+    # (HolidayEvent()),
     # (UserGroupEvent()),
     (TimeOffEvent())
-    )
-    return 'Opperation Complete. View Logging For errors'
+    ,return_exceptions= True)
+    return result
 
 async def eventSelect(event = None):
     try:
@@ -172,7 +173,8 @@ async def eventSelect(event = None):
             'userGroup': UserGroupEvent(wkSpaceName = 'Hill Plain'),
         }
         results = await asyncio.gather(events.get(event, main()), return_exceptions= True)
-        exceptions = []  
+        logger.debug(results)
+        logger.debug(type(results))
         return results
     except Exception as e:
         logger.error(({e.__traceback__.tb_lineno}) - {str(e)})

@@ -860,43 +860,39 @@ def Payroll(start = None, end = None):
         logger.info(f'Biling Report Generating for - {start}-{end}')
 
         cursor, conn = sqlConnect()
-
+        query = f'''
+        SELECT 
+            at.name, 
+            at.[Type], 
+            at.[date], 
+            at.RegularHrs, 
+            at.Accrued,
+            at.TimeOff,
+            at.Holiday,
+            at.policy_name,
+            at.TotalHours + at.holiday as TotalHrs
+        from AttendanceApproved at
+        where at.date between '{start}' and '{end}'
+        order by at.name
+        '''
+        logger.debug(query)
         #obtain relavant data 
-        cursor.execute(
-            f'''
-            SELECT 
-                at.name, 
-                at.[Type], 
-                at.[date], 
-                at.RegularHrs, 
-                at.Accrued,
-                at.Overtime,
-                at.TimeOff,
-                at.policy_name,
-                at.TotalHours,
-                at.Holiday
-            from AttendanceApproved at
-            where at.date between '{start}' and '{end}'
-            order by at.name
-            '''
-        )
+        cursor.execute(query)
         data = cursor.fetchall()
 
         cursor.execute(f'''
         SELECT 
             at.name, 
-            Null as Type, 
-            Null as [day], 
-            SUM(at.RegularHrs) as Reg, 
-            SUM(at.Accrued) as Banked,
-            SUM(at.Overtime) as OT,
-            SUM(at.TimeOff) as PTO,
-            'Policy Name' as reason,
-            SUM(at.TotalHours) as Total,
-            Null as holiday
+            at.[Type], 
+            at.[date], 
+            at.RegularHrs, 
+            at.Accrued,
+            at.TimeOff,
+            at.Holiday,
+            at.policy_name,
+            at.TotalHours + at.holiday as TotalHrs
         from AttendanceApproved at
         where at.date between '{start}' and '{end}'
-        group by at.name
         order by at.name
         '''
         )
@@ -975,11 +971,10 @@ def Payroll(start = None, end = None):
             worksheet.write(row,3,'Date', columnNameFormat)
             worksheet.write(row,4,'REG', columnNameFormat)
             worksheet.write(row,5,'BANKED', columnNameFormat)
-            worksheet.write(row,6,'OT', columnNameFormat)
-            worksheet.write(row,7,'Used PTO', columnNameFormat)
+            worksheet.write(row,6,'Used PTO', columnNameFormat)
+            worksheet.write(row,7,'Holidy', columnNameFormat)
             worksheet.merge_range(row,8,row,9,'Policy', columnNameFormat)
             worksheet.write(row,10,'Total Paid', columnNameFormat)
-            worksheet.write(row,11,'Holidy', columnNameFormat)
             row += 1
             currentEmp = None
             previousEmp = None
@@ -1004,15 +999,14 @@ def Payroll(start = None, end = None):
                         i += 1
                         row+=1
                     worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
-                    worksheet.write(row,2,rowData[1], textFormat)
-                    worksheet.write(row,3,rowData[2], dateFormat)
-                    worksheet.write(row,4,rowData[3], textFormat)
-                    worksheet.write(row,5,rowData[4], textFormat)
-                    worksheet.write(row,6,rowData[5], textFormat)
-                    worksheet.write(row,7,rowData[6], textFormat)
+                    worksheet.write(row,2, rowData[1], textFormat)
+                    worksheet.write(row,3, rowData[2], dateFormat)
+                    worksheet.write(row,4, rowData[3], textFormat)
+                    worksheet.write(row,5, rowData[4], textFormat)
+                    worksheet.write(row,6, rowData[5], textFormat)
+                    worksheet.write(row,7, rowData[6], textFormat)
                     worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
-                    worksheet.write(row,10,rowData[8], textFormat)
-                    worksheet.write(row,11,rowData[9], textFormat)
+                    worksheet.write(row,10, rowData[8], textFormat)
                     previousEmp=str(rowData[0])
                     row+=1
                 break
@@ -1026,7 +1020,6 @@ def Payroll(start = None, end = None):
             worksheet.write(row,7,totalsData[i][6], totalFormat)
             worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
             worksheet.write(row,10,totalsData[i][8], totalFormat)
-            worksheet.write(row,11,totalsData[i][9], totalFormat)
             
 
             writer.close()

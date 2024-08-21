@@ -462,7 +462,7 @@ async def quickBackup(request: ASGIRequest = None, event = None):
         result = await eventSelect(event)
         response = JsonResponse(data = result, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        logger.error(f'Quickbackup: {str(e)}')
+        logger.error(f'Quickbackup: {e.__traceback__.tb_lineno} {str(e)}')
         response = JsonResponse(data = str(e), status=status.HTTP_207_MULTI_STATUS, safe=False)
     finally: 
         return response
@@ -672,6 +672,8 @@ async def getProjects(request: ASGIRequest):
         if request.method != 'POST': 
             response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
             return response
+        if inputData.get('clientId') is None or inputData.get('clientId') == '':
+            inputData['clientId'] = '0000000000'
         try:
             project = await Project.objects.aget(pk = inputData.get('id', ''))
             serializer = ProjectSerializer(instance=project, data=inputData)

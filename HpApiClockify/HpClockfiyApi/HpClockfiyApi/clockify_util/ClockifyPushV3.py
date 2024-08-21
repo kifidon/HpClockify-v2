@@ -363,12 +363,13 @@ def pushClients(wkSpaceID, conn, cursor):
     count = 0
     update =0
     exists = 0
-    
-    key = getApiKey()
-    clients = getClients(wkSpaceID, key)
     try:
+    
+        key = getApiKey()
+        clients = getClients(wkSpaceID, key)
         for client in clients:
             logger.debug(json.dumps(client))
+            logger.debug('Caught request')
             cID = client['id']
             cEmail = client['email']
             cAddress = client['address']

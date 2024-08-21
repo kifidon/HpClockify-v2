@@ -16,9 +16,9 @@ MAX_RETRIES = 3
 DELAY = 2 #seconds 
 
 def getApiKey():
-    # API_KEY = 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3' # Matt Dixon 
+    API_KEY = 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3' # Matt Dixon 
     # API_KEY = 'MmRiYWE2NmMtOTM3My00MjFlLWEwOTItNWEzZTY2Y2YxNDQx' # Shawn Applejohn 
-    API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
+    # API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
     return API_KEY
 
 def getWorkspaces(key):
@@ -199,11 +199,12 @@ def getClients(workspaceId, key):
         'X-Api-Key': key
     }
     url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/clients'
+    logger.debug(url)
     response = requests.get(url, headers=headers)
     if response.status_code==200:
         return response.json()
     else:
-        print(f"Error: {response.status_code}, {response.text}")
+        logger.critical(f"Error: {response.status_code}, {response.text}")
         return dict()
 
 def getPolocies(workspaceId, key):
