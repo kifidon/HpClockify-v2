@@ -945,27 +945,22 @@ def processEntry(inputData):
         if serializer.is_valid():
             serializer.save()
             logger.info('\tOperation Complete')
-            # do the rest 
-            return True, 'V'
+             
+            return True
         else:
             logger.warning(f'Serializer could not be saved: {serializer.errors}')
             for key, value in serializer.errors.items():
+                # Print the key and each error code and message
                 logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
-                # Check if the value is an instance of ErrorDetail
-                if isinstance(value, list) and all(isinstance(item, ErrorDetail) for item in value):
-                    # Print the key and each error code and message
-                    for error_detail in value:
-                        code = error_detail.code
-                        field = key
-                        '''
-                        include check for other foreign keys to know which foreign key 
-                        constraint is violated and which function should handle it
-                        '''
-                        if code == 'does_not_exist': 
-                            return False, 'C' # C for category P for Project, F for file in later updates 
-            return False, 'X' # Unknown, Raise error (BAD Request)
+                    
+            return False # Unknown, Raise error (BAD Request)
     except Exception as e:
+        '''
+        include check for other foreign keys to know which foreign key 
+        constraint is violated and which function should handle it
+        '''
         logger.error(f'({e.__traceback__.tb_lineno} - {str(e)})')
+        return False 
 @csrf_exempt
 async def newEntry(request:ASGIRequest):
     '''
@@ -1022,7 +1017,7 @@ async def newEntry(request:ASGIRequest):
                     result = await processEntryAsync(inputData)
                     
                     # generate response
-                    if result[0]:
+                    if result:
                         response = JsonResponse(data=inputData, status=status.HTTP_202_ACCEPTED)
                         break
                     else:
