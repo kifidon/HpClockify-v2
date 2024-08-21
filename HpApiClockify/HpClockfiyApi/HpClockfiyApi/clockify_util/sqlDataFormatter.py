@@ -860,170 +860,179 @@ def Payroll(start = None, end = None):
         logger.info(f'Biling Report Generating for - {start}-{end}')
 
         cursor, conn = sqlConnect()
-        query = f'''
-        SELECT 
-            at.name, 
-            at.[Type], 
-            at.[date], 
-            at.RegularHrs, 
-            at.Accrued,
-            at.TimeOff,
-            at.Holiday,
-            at.policy_name,
-            at.TotalHours + at.holiday as TotalHrs
-        from AttendanceApproved at
-        where at.date between '{start}' and '{end}'
-        order by at.name
-        '''
-        logger.debug(query)
-        #obtain relavant data 
-        cursor.execute(query)
-        data = cursor.fetchall()
-
-        cursor.execute(f'''
-        SELECT 
-            at.name, 
-            at.[Type], 
-            at.[date], 
-            at.RegularHrs, 
-            at.Accrued,
-            at.TimeOff,
-            at.Holiday,
-            at.policy_name,
-            at.TotalHours + at.holiday as TotalHrs
-        from AttendanceApproved at
-        where at.date between '{start}' and '{end}'
-        order by at.name
-        '''
-        )
-        totalsData = cursor.fetchall()
-        data = [['' if val is None else val for val in row] for row in data]
-        totalsData = [['' if val is None else val for val in row] for row in totalsData]
-
-         # Generate Folder for spreadsheets
-        current_dir = settings.BASE_DIR
-        reports = 'Reports'
-        payrollDir = 'Payroll'
-        folder_name = f"Weekly Report-Payroll-{start}-{end}"
-        folder_path = os.path.join(current_dir,reports, payrollDir,  folder_name)
-        logger.debug(f'Created Folder at {folder_path}')
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f"{folder_name}.xlsx")
-
-        
-
-        with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
-            #Generate file and initilize writers and formats 
-            workbook = writer.book
-            worksheet = workbook.add_worksheet("Hill Plain - Payroll")
-            writer.sheets['Hill Plain - Payroll'] = worksheet 
+        types = ['Salary', 'Hourly', 'Contractor']
+        for type in types:
+            query = f'''
+            SELECT 
+                Coalesce(at.name, 'Missing Name Information'), 
+                at.[Type], 
+                at.[date], 
+                at.RegularHrs, 
+                at.Accrued,
+                at.TimeOff,
+                at.Holiday,
+                at.policy_name,
+                at.TotalHours + at.holiday as TotalHrs
+            from AttendanceApproved at
             
-            row = 0 #initilize row pointer 
+            where at.date between '{start}' and '{end}' and at.[Type] = '{type}'
+            order by at.name, at.[Type], at.[date] 
+            '''
+            logger.debug(query)
+            #obtain relavant data 
+            cursor.execute(query)
+            data = cursor.fetchall()
+            query = f'''
+                SELECT 
+                    Coalesce(at.name, 'Missing Name Information'), 
+                    Null as Type, 
+                    Null as [day], 
+                    SUM(at.RegularHrs) as Reg, 
+                    SUM(at.Accrued) as Banked,
+                    SUM(at.TimeOff) as PTO,
+                    Sum(at.Holiday) as holiday,
+                    'Policy Name' as reason,
+                    SUM(at.TotalHours + at.Holiday) as Total
+                from AttendanceApproved at
+                
+                where at.date between '{start}' and '{end}'  and at.[Type] = '{type}'
+                group by at.name, at.[Type]
+                order by at.name
+            '''
+            logger.debug(query)
+            cursor.execute(query)
+            totalsData = cursor.fetchall()
+            data = [['' if val is None else val for val in row] for row in data]
+            totalsData = [['' if val is None else val for val in row] for row in totalsData]
 
-            #formats
-            titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
-            titleFormat.set_font_size(20)
-            titleFormat.set_bg_color('#D9D9D9')
-            #file Heaaders
-            headerFormat = workbook.add_format({'bold': True, "italic": True})
-            #columnNameFormat 
-            columnNameFormat = workbook.add_format({'bold': True})
-            columnNameFormat.set_border(1)
-            columnNameFormat.set_bg_color('#808080')
-            columnNameFormat.set_font_color('#ffffff')
-            # Text Data Format 
-            textFormat = workbook.add_format()
-            textFormat.set_border(1)
-            # Highlight  Data Format 
-            highlightFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
-            highlightFormat.set_border(1)
-            highlightFormat.set_bg_color('#FFCCCB')
-            # date Data Format 
-            dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
-            dateFormat.set_border(1)
-            dateFormat.set_border(1)
+            # Generate Folder for spreadsheets
+            current_dir = settings.BASE_DIR
+            reports = 'Reports'
+            payrollDir = 'Payroll'
+            folder_name = f"Weekly Report-Payroll-{start}-{end}"
+            folder_path = os.path.join(current_dir,reports, payrollDir,  folder_name)
+            logger.debug(f'Created Folder at {folder_path}')
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path )
+            file_path = os.path.join(folder_path, f"{folder_name}-{type}.xlsx")
 
-            #totals
-            totalFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
-            totalFormat.set_border(1)
-            totalFormat.set_bg_color('#D9D9D9')
-            logger.info('Writing data')
+            
 
-        #write data 
-            worksheet.merge_range(row,0,row+1,13 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
-            row += 2
+            with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+                #Generate file and initilize writers and formats 
+                workbook = writer.book
+                worksheet = workbook.add_worksheet("Hill Plain - Payroll")
+                writer.sheets['Hill Plain - Payroll'] = worksheet 
+                
+                row = 0 #initilize row pointer 
 
-            headers = {
-                "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-                "Date Range Start:": start,
-                "Date Range End:": end
-            }
-            for key, value in headers.items():
-                worksheet.merge_range(row,0,row,1,key, headerFormat)
-                worksheet.merge_range(row,2,row,3,value)
+                #formats
+                titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
+                titleFormat.set_font_size(20)
+                titleFormat.set_bg_color('#D9D9D9')
+                #file Heaaders
+                headerFormat = workbook.add_format({'bold': True, "italic": True})
+                #columnNameFormat 
+                columnNameFormat = workbook.add_format({'bold': True})
+                columnNameFormat.set_border(1)
+                columnNameFormat.set_bg_color('#808080')
+                columnNameFormat.set_font_color('#ffffff')
+                # Text Data Format 
+                textFormat = workbook.add_format()
+                textFormat.set_border(1)
+                # Highlight  Data Format 
+                highlightFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+                highlightFormat.set_border(1)
+                highlightFormat.set_bg_color('#FFCCCB')
+                # date Data Format 
+                dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+                dateFormat.set_border(1)
+                dateFormat.set_border(1)
+
+                #totals
+                totalFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+                totalFormat.set_border(1)
+                totalFormat.set_bg_color('#D9D9D9')
+                logger.info('Writing data')
+
+            #write data 
+                worksheet.merge_range(row,0,row+1,13 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
+                row += 2
+
+                headers = {
+                    "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+                    "Date Range Start:": start,
+                    "Date Range End:": end
+                }
+                for key, value in headers.items():
+                    worksheet.merge_range(row,0,row,1,key, headerFormat)
+                    worksheet.merge_range(row,2,row,3,value)
+                    row += 1
                 row += 1
-            row += 1
 
-            #write columns 
-            worksheet.merge_range(row,0,row,1, 'Staff Member', columnNameFormat)
-            worksheet.write(row,2,'Type', columnNameFormat)
-            worksheet.write(row,3,'Date', columnNameFormat)
-            worksheet.write(row,4,'REG', columnNameFormat)
-            worksheet.write(row,5,'BANKED', columnNameFormat)
-            worksheet.write(row,6,'Used PTO', columnNameFormat)
-            worksheet.write(row,7,'Holidy', columnNameFormat)
-            worksheet.merge_range(row,8,row,9,'Policy', columnNameFormat)
-            worksheet.write(row,10,'Total Paid', columnNameFormat)
-            row += 1
-            currentEmp = None
-            previousEmp = None
-            i = 0
-            while i < len(totalsData): 
-                for rowData in data:
-                    currentEmp = str(rowData[0])
-                    if currentEmp is not None and previousEmp is not None and currentEmp != previousEmp:
-                        logger.debug(totalsData[i])
-                        worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
-                        worksheet.write(row,2,totalsData[i][1], totalFormat)
-                        worksheet.write(row,3,totalsData[i][2], totalFormat)
-                        worksheet.write(row,4,totalsData[i][3], totalFormat)
-                        worksheet.write(row,5,totalsData[i][4], totalFormat)
-                        worksheet.write(row,6,totalsData[i][5], totalFormat)
-                        worksheet.write(row,7,totalsData[i][6], totalFormat)
-                        worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-                        if float(totalsData[i][8]) > 80: 
-                            worksheet.write(row,10,totalsData[i][8], highlightFormat)
-                        else: worksheet.write(row,10,totalsData[i][8], totalFormat)
-                        worksheet.write(row,11,totalsData[i][9], totalFormat)
-                        i += 1
+                #write columns 
+                worksheet.merge_range(row,0,row,1, 'Staff Member', columnNameFormat)
+                worksheet.write(row,2,'Type', columnNameFormat)
+                worksheet.write(row,3,'Date', columnNameFormat)
+                worksheet.write(row,4,'REG', columnNameFormat)
+                worksheet.write(row,5,'BANKED', columnNameFormat)
+                worksheet.write(row,6,'Used PTO', columnNameFormat)
+                worksheet.write(row,7,'Holidy', columnNameFormat)
+                worksheet.merge_range(row,8,row,9,'Policy', columnNameFormat)
+                worksheet.write(row,10,'Total Paid', columnNameFormat)
+                row += 1
+                currentEmp = None
+                previousEmp = None
+                i = 0
+                while i < len(totalsData): 
+                    logger.debug(len(totalsData))
+                    logger.debug(i)
+                    for rowData in data:
+                        currentEmp = rowData
+                        if currentEmp is not None and previousEmp is not None and str(currentEmp[0]) != str(previousEmp[0]):
+                            logger.debug(totalsData[i])
+                            worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
+                            worksheet.write(row,2,totalsData[i][1], totalFormat)
+                            worksheet.write(row,3,totalsData[i][2], totalFormat)
+                            worksheet.write(row,4,totalsData[i][3], totalFormat)
+                            worksheet.write(row,5,totalsData[i][4], totalFormat)
+                            worksheet.write(row,6,totalsData[i][5], totalFormat)
+                            worksheet.write(row,7,totalsData[i][6], totalFormat)
+                            worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
+                            if float(totalsData[i][8]) != 80 and str(previousEmp[1]) == 'Salary': 
+                                worksheet.write(row,10,totalsData[i][8], highlightFormat)
+                            else: worksheet.write(row,10,totalsData[i][8], totalFormat)
+                            
+                            i += 1
+                            row+=1
+                        worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
+                        worksheet.write(row,2, rowData[1], textFormat)
+                        worksheet.write(row,3, rowData[2], dateFormat)
+                        worksheet.write(row,4, rowData[3], textFormat)
+                        worksheet.write(row,5, rowData[4], textFormat)
+                        worksheet.write(row,6, rowData[5], textFormat)
+                        worksheet.write(row,7, rowData[6], textFormat)
+                        worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
+                        worksheet.write(row,10, rowData[8], textFormat)
+                        previousEmp=rowData
                         row+=1
-                    worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
-                    worksheet.write(row,2, rowData[1], textFormat)
-                    worksheet.write(row,3, rowData[2], dateFormat)
-                    worksheet.write(row,4, rowData[3], textFormat)
-                    worksheet.write(row,5, rowData[4], textFormat)
-                    worksheet.write(row,6, rowData[5], textFormat)
-                    worksheet.write(row,7, rowData[6], textFormat)
-                    worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
-                    worksheet.write(row,10, rowData[8], textFormat)
-                    previousEmp=str(rowData[0])
-                    row+=1
-                break
-            logger.debug(totalsData[i])
-            worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
-            worksheet.write(row,2,totalsData[i][1], totalFormat)
-            worksheet.write(row,3,totalsData[i][2], totalFormat)
-            worksheet.write(row,4,totalsData[i][3], totalFormat)
-            worksheet.write(row,5,totalsData[i][4], totalFormat)
-            worksheet.write(row,6,totalsData[i][5], totalFormat)
-            worksheet.write(row,7,totalsData[i][6], totalFormat)
-            worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-            worksheet.write(row,10,totalsData[i][8], totalFormat)
-            
+                    break
+                if totalsData is None or  len(TotalsData) < 1: 
+                    return folder_path
+                logger.debug(totalsData[i])
+                worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
+                worksheet.write(row,2,totalsData[i][1], totalFormat)
+                worksheet.write(row,3,totalsData[i][2], totalFormat)
+                worksheet.write(row,4,totalsData[i][3], totalFormat)
+                worksheet.write(row,5,totalsData[i][4], totalFormat)
+                worksheet.write(row,6,totalsData[i][5], totalFormat)
+                worksheet.write(row,7,totalsData[i][6], totalFormat)
+                worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
+                worksheet.write(row,10,totalsData[i][8], totalFormat)
+                
 
-            writer.close()
-        convertXlsxPdf(folder_path, file_path)
+                writer.close()
+            # convertXlsxPdf(folder_path, file_path)
 
         return folder_path
             
