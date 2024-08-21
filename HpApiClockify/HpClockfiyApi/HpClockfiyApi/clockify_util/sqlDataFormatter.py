@@ -1017,7 +1017,7 @@ def Payroll(start = None, end = None):
                         previousEmp=rowData
                         row+=1
                     break
-                if totalsData is None or  len(TotalsData) < 1: 
+                if totalsData is None or  len(totalsData) < 1: 
                     return folder_path
                 logger.debug(totalsData[i])
                 worksheet.merge_range(row,0,row,1, totalsData[i][0], totalFormat)
@@ -1032,7 +1032,7 @@ def Payroll(start = None, end = None):
                 
 
                 writer.close()
-            # convertXlsxPdf(folder_path, file_path)
+            convertXlsxPdf(folder_path, file_path)
 
         return folder_path
             
