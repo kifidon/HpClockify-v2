@@ -860,7 +860,7 @@ def Payroll(start = None, end = None):
         logger.info(f'Biling Report Generating for - {start}-{end}')
 
         cursor, conn = sqlConnect()
-        types = ['Salary', 'Hourly', 'Contractor']
+        types = ['Salary', 'Hourly']
         for type in types:
             query = f'''
             SELECT 
@@ -1032,7 +1032,7 @@ def Payroll(start = None, end = None):
                 
 
                 writer.close()
-            convertXlsxPdf(folder_path, file_path)
+            # convertXlsxPdf(folder_path, file_path[:-5])
 
         return folder_path
             
