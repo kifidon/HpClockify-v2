@@ -1381,7 +1381,7 @@ def insertRoleOrEquipment(request:ASGIRequest):
         inputData = loads(request.body)
         logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
-            inputData['id'] = hash50(inputData['name'])
+            inputData['_id'] = hash50(inputData['name'])
             if inputData['isRole']:
                 logger.info("Creating serializer for Role Table")
                 serializer = RoleSerializer(data=inputData)
