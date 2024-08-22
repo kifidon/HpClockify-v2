@@ -291,7 +291,7 @@ class WorkerRateSheet(models.Model):
         managed = False
         db_table = 'WorkerRateSheet'
         constraints = [
-            models.UniqueConstraint(fields=['clientId', 'roleId', 'workspaceId'], name='unique_client_role')
+            models.UniqueConstraint(fields=['clientId', 'roleId', 'workspaceId', 'projectId'], name='unique_client_role')
         ]
 
 class EqpRateSheet(models.Model):
