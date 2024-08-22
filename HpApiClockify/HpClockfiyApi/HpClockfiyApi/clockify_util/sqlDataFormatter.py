@@ -367,7 +367,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
             f'''
             Select 
                 eu.name, 
-                eu.role, 
+                eu.truckDetails, 
                 SUM(en.duration), 
                 'hr' as [Unit Cost] ,
                 Cast('18.75' as Decimal(10,2)),
@@ -382,7 +382,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
                 and eu.hasTruck = 1 
                 and en.billable = 1
                 and ts.[status] = 'APPROVED'
-            group by eu.name, eu.role, cast(en.rate/100 as Decimal(10,2))
+            group by eu.name, eu.truckDetails, cast(en.rate/100 as Decimal(10,2))
             ''')
         equipmentData = cursor.fetchall()
         logger.debug('Aquired Equipment Data')
@@ -545,7 +545,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
                 row += 1
 
                 worksheet.merge_range(row,0,row, 2, 'Staff Member', columnFormat)
-                worksheet.merge_range(row,3,row, 5, 'Position', columnFormat)
+                worksheet.merge_range(row,3,row, 5, 'Equipment Type', columnFormat)
                 worksheet.write( row,6, 'Qty', columnFormat)
                 worksheet.write( row,7, 'Unit Cost', columnFormat)
                 worksheet.write( row,8, 'Rate', columnFormat)
@@ -574,44 +574,41 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
         
-        
-
 async def BillableReportGenerate(month = None, year = None):
     logger = setup_background_logger()
     try: 
         #obtain date range for this month 
         if month is None or year is None:
             month, year = getMonthYear()
-    #     else:
-    #         month = getAbbreviation(month, reverse=True)
-    #     logger.info(f'Biling Report Generating for - {month}-{year}')
+        else:
+            month = getAbbreviation(month, reverse=True)
+        logger.info(f'Biling Report Generating for - {month}-{year}')
 
-    #     if int(month) -1 == 0: 
-    #         previousMonth = '12'
-    #         previousYear = str(int(year) - 1).rjust(2, '0')
-    #     else: 
-    #         previousMonth = str(int(month) -1 ).rjust(2, '0')
-    #         previousYear = year
+        if int(month) -1 == 0: 
+            previousMonth = '12'
+            previousYear = str(int(year) - 1).rjust(2, '0')
+        else: 
+            previousMonth = str(int(month) -1 ).rjust(2, '0')
+            previousYear = year
 
-    # #format date strings
-    #     endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
-    #     startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
-    #     # Calculate the most recent previous Saturday
-    #     if(endDateObj.weekday() != 5):
-    #         endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
-    #     else: endDate = f'20{year}-{month}-25'
-    #     if(startDateObj.weekday() != 6):
-    #         startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
-    #     else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
-    #     logger.debug(f'Date Range: {startDate}-{endDate}')
-        startDate = month
-        endDate = year
+    #format date strings
+        endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
+        startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
+        # Calculate the most recent previous Saturday
+        if(endDateObj.weekday() != 5):
+            endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
+        else: endDate = f'20{year}-{month}-25'
+        if(startDateObj.weekday() != 6):
+            startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
+        else: f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
+        logger.debug(f'Date Range: {startDate}-{endDate}')
+        # startDate = month
+        # endDate = year
 
         
         cursor, conn = sqlConnect()
     #Get Relavant projects  
-        cursor.execute(
-            f'''
+        query = f'''
             select p.id, p.code, p.title from Project p 
             where exists(
                 select en.id from Entry en
@@ -621,7 +618,8 @@ async def BillableReportGenerate(month = None, year = None):
                 and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
             )
             '''
-        )
+        logger.debug(query)
+        cursor.execute(query)
         pIds = cursor.fetchall()
         logger.debug(f'{len(pIds)} Projects')
         cleanUp(conn, cursor)
@@ -644,17 +642,17 @@ async def BillableReportGenerate(month = None, year = None):
             tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger))
         await asyncio.gather(*tasks)
         
-        convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
-        tasks.clear()
-        j = 0
-        while j <= len(pIds):
-            for i in range(0,5):
-                if(i + j < len(filePaths)):
-                    tasks.append(convertAsync(folder_path, filePaths[i+ j]))
-                else: break
-            await asyncio.gather(*tasks)
-            tasks.clear()
-            j +=5
+        # convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
+        # tasks.clear()
+        # j = 0
+        # while j <= len(pIds):
+        #     for i in range(0,5):
+        #         if(i + j < len(filePaths)):
+        #             tasks.append(convertAsync(folder_path, filePaths[i+ j]))
+        #         else: break
+        #     await asyncio.gather(*tasks)
+        #     tasks.clear()
+        #     j +=5
         return folder_path        
 
     except Exception as e: 
