@@ -872,9 +872,10 @@ def Payroll(start = None, end = None):
                 at.TimeOff,
                 at.Holiday,
                 at.policy_name,
-                at.TotalHours + at.holiday as TotalHrs
+                at.TotalHours + at.holiday as TotalHrs,
+                Coalesce(eu.manager, 'Missing Manager Information')
             from AttendanceApproved at
-            
+            Left Join EmployeeUser eu on eu.name = at.name
             where at.date between '{start}' and '{end}' and at.[Type] = '{type}'
             order by at.name, at.[Type], at.[date] 
             '''
@@ -948,6 +949,13 @@ def Payroll(start = None, end = None):
                 dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
                 dateFormat.set_border(1)
                 dateFormat.set_border(1)
+                # staff name title format 
+                nameFormat = workbook.add_format({'align': 'center', 'bold': True, 'italic': True})
+                nameFormat.set_border(1)
+                nameFormat.set_bg_color('#dce6f1')
+                #manager Format
+                managerFormat = workbook.add_format({'bold': True, "italic": True, 'align':'center'})
+                managerFormat.set_border(1)
 
                 #totals
                 totalFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
@@ -956,7 +964,7 @@ def Payroll(start = None, end = None):
                 logger.info('Writing data')
 
             #write data 
-                worksheet.merge_range(row,0,row+1,13 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
+                worksheet.merge_range(row,0,row+1,10 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
                 row += 2
 
                 headers = {
@@ -1005,6 +1013,10 @@ def Payroll(start = None, end = None):
                             
                             i += 1
                             row+=1
+                        if previousEmp is None or str(currentEmp[0]) != str(previousEmp[0]):
+                            worksheet.merge_range(row,0,row,10, rowData[0], nameFormat, )
+                            worksheet.merge_range(row+1,0,row+1,10, f'Reporting Manager: {rowData[9]}', managerFormat)
+                            row += 2
                         worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                         worksheet.write(row,2, rowData[1], textFormat)
                         worksheet.write(row,3, rowData[2], dateFormat)

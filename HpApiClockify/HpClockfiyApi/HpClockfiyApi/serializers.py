@@ -70,6 +70,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()  # validate this later 
     Truck = serializers.SerializerMethodField() 
+    hourly = serializers.SerializerMethodField()
 
     def get_status(self, obj):
         status = obj['status']
@@ -108,6 +109,15 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         except Exception: 
             return date.today().strftime('%Y-%m-%d')
     
+    def get_hourly(self, obj): 
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+        try:
+            return field['Rate Type']
+        except Exception: 
+            return 5
+    
     def create(self, validated_data):
         logger = setup_background_logger() 
         try:
@@ -116,6 +126,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data) 
+            validated_data['hourly'] = self.get_hourly(self.initial_data) 
             logger.info(dumps(validated_data, indent = 4))
             return super().create(validated_data=validated_data)
         except Exception as e: 
@@ -129,6 +140,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data)
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
+            validated_data['hourly'] = self.get_hourly(self.initial_data) 
             logger.debug(dumps(validated_data, indent = 4))
             updated = super().update(instance= instance, validated_data=validated_data)
             updated.save(force_update= True )
