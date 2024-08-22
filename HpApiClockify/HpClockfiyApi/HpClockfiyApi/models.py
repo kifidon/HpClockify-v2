@@ -221,7 +221,7 @@ class LemSheet(models.Model):
         ]
 
 class Role(models.Model):
-    _id = models.CharField(max_length = 50, primary_key= False) #hashed by name
+    id = models.CharField(max_length = 50, primary_key= True) #hashed by name
     name = models.CharField(max_length = 50, blank= False, null = False)
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')
@@ -231,7 +231,7 @@ class Role(models.Model):
         db_table = 'Role'
 
 class Equipment(models.Model):
-    _id = models.CharField(primary_key=False, max_length=50, null=False, blank=False)
+    id = models.CharField(primary_key=True, max_length=50, null=False, blank=False)
     name = models.CharField(max_length=50, null=False, blank= False)
     clientId = models.ForeignKey(Client, on_delete=models.DO_NOTHING, db_column= 'clientId')
     workspaceId = models.ForeignKey(Workspace, models.DO_NOTHING, db_column='workspaceId')    
