@@ -627,8 +627,8 @@ async def BillableReportGenerate(month = None, year = None):
         current_dir = settings.BASE_DIR
         reports = 'Reports'
         directory = 'Billing'
-        # folder_name = f"HP-IND-{year}-{month}"
-        folder_name = f"HP-IND-{startDate}"
+        folder_name = f"HP-IND-{year}-{month}"
+        # folder_name = f"HP-IND-{startDate}"
         folder_path = os.path.join(current_dir,reports, directory, folder_name)
         logger.debug(f'Created Folder at {folder_path}')
         tasks = []
