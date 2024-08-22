@@ -72,7 +72,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
     Truck = serializers.SerializerMethodField() 
     hourly = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
-
+    truckDetails = serializers.SerializerMethodField()
     def get_status(self, obj):
         status = obj['status']
         return status 
@@ -127,6 +127,15 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             return field['Reporting Manager']
         except Exception: 
             return 'Missing Manager Information'
+    
+    def get_truckDetails(self, obj):
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+        try:
+            return field['Truck Details']
+        except Exception: 
+            return 'Missing Details'
 
     def create(self, validated_data):
         logger = setup_background_logger() 
@@ -138,6 +147,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['start_date'] = self.get_start_date(self.initial_data) 
             validated_data['hourly'] = self.get_hourly(self.initial_data) 
             validated_data['manager'] = self.get_manager(self.initial_data) 
+            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data) 
             logger.info(dumps(validated_data, indent = 4))
             return super().create(validated_data=validated_data)
         except Exception as e: 
@@ -152,7 +162,8 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['start_date'] = self.get_start_date(self.initial_data)
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['hourly'] = self.get_hourly(self.initial_data) 
-            validated_data['manager'] = self.get_manager(self.initial_data) 
+            validated_data['manager'] = self.get_manager(self.initial_data)
+            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data)  
             logger.debug(dumps(validated_data, indent = 4))
             updated = super().update(instance= instance, validated_data=validated_data)
             updated.save(force_update= True )
