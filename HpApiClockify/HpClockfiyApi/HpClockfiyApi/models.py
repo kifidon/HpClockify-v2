@@ -46,6 +46,7 @@ class Employeeuser(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=50, blank=True, null=True)
     role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    manager = models.CharField(db_column='manager', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
     Truck = models.IntegerField(blank= False, null = True, default=0, db_column='hasTruck')
     hourly = models.IntegerField(blank = True, null = True, default = 0, db_column = 'hourly')
