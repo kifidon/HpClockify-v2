@@ -941,10 +941,26 @@ def Payroll(start = None, end = None):
                 # Text Data Format 
                 textFormat = workbook.add_format()
                 textFormat.set_border(1)
+                # red text format 
+                redTextFormat = workbook.add_format()
+                redTextFormat.set_border(1)
+                redTextFormat.set_bg_color('#ff0000')
+                #missing info format = 
+                missingFormat = workbook.add_format()
+                missingFormat.set_border(1)
+                missingFormat.set_bg_color('#ffff00')
+                # missing date Format 
+                missingDateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+                missingDateFormat.set_border(1)
+                missingDateFormat.set_bg_color('#ffff00')
                 # Highlight  Data Format 
                 highlightFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
                 highlightFormat.set_border(1)
                 highlightFormat.set_bg_color('#FFCCCB')
+                #highlight Green format 
+                hlGreenFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+                hlGreenFormat.set_border(1)
+                hlGreenFormat.set_bg_color('#92d050')
                 # date Data Format 
                 dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
                 dateFormat.set_border(1)
@@ -968,7 +984,7 @@ def Payroll(start = None, end = None):
                 row += 2
 
                 headers = {
-                    "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+                    "Issue Date/Time Stamp:" : datetime.now().strftime('%Y-%m-%d at %H:%M'),
                     "Date Range Start:": start,
                     "Date Range End:": end
                 }
@@ -985,7 +1001,7 @@ def Payroll(start = None, end = None):
                 worksheet.write(row,4,'REG', columnNameFormat)
                 worksheet.write(row,5,'BANKED', columnNameFormat)
                 worksheet.write(row,6,'Used PTO', columnNameFormat)
-                worksheet.write(row,7,'Holidy', columnNameFormat)
+                worksheet.write(row,7,'STAT', columnNameFormat)
                 worksheet.merge_range(row,8,row,9,'Policy', columnNameFormat)
                 worksheet.write(row,10,'Total Paid', columnNameFormat)
                 row += 1
@@ -1009,7 +1025,7 @@ def Payroll(start = None, end = None):
                             worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
                             if float(totalsData[i][8]) != 80 and str(previousEmp[1]) == 'Salary': 
                                 worksheet.write(row,10,totalsData[i][8], highlightFormat)
-                            else: worksheet.write(row,10,totalsData[i][8], totalFormat)
+                            else: worksheet.write(row,10,totalsData[i][8], hlGreenFormat)
                             
                             i += 1
                             row+=1
@@ -1017,15 +1033,27 @@ def Payroll(start = None, end = None):
                             worksheet.merge_range(row,0,row,10, rowData[0], nameFormat, )
                             worksheet.merge_range(row+1,0,row+1,10, f'Reporting Manager: {rowData[9]}', managerFormat)
                             row += 2
-                        worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
-                        worksheet.write(row,2, rowData[1], textFormat)
-                        worksheet.write(row,3, rowData[2], dateFormat)
-                        worksheet.write(row,4, rowData[3], textFormat)
-                        worksheet.write(row,5, rowData[4], textFormat)
-                        worksheet.write(row,6, rowData[5], textFormat)
-                        worksheet.write(row,7, rowData[6], textFormat)
-                        worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
-                        worksheet.write(row,10, rowData[8], textFormat)
+                        if rowData[0] == 'Missing Name Information': 
+                            worksheet.merge_range(row,0,row,1, rowData[0], missingFormat)
+                            worksheet.write(row,2, rowData[1], missingFormat)
+                            worksheet.write(row,3, rowData[2], missingDateFormat)
+                            worksheet.write(row,4, rowData[3], missingFormat)
+                            worksheet.write(row,5, rowData[4], missingFormat)
+                            worksheet.write(row,6, rowData[5], missingFormat)
+                            worksheet.write(row,7, rowData[6], missingFormat)
+                            worksheet.merge_range(row,8,row,9,rowData[7], missingFormat)
+                            worksheet.write(row,10, rowData[8], missingFormat)
+                        else: 
+                            worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
+                            worksheet.write(row,2, rowData[1], textFormat)
+                            worksheet.write(row,3, rowData[2], dateFormat)
+                            worksheet.write(row,4, rowData[3], textFormat)
+                            worksheet.write(row,5, rowData[4], textFormat)
+                            worksheet.write(row,6, rowData[5], textFormat)
+                            worksheet.write(row,7, rowData[6], textFormat)
+                            worksheet.merge_range(row,8,row,9,rowData[7], textFormat)
+                            if int(rowData[8]) > 8: worksheet.write(row,10, rowData[8], redTextFormat)
+                            else: worksheet.write(row,10, rowData[8], textFormat)
                         previousEmp=rowData
                         row+=1
                     break
@@ -1040,7 +1068,9 @@ def Payroll(start = None, end = None):
                 worksheet.write(row,6,totalsData[i][5], totalFormat)
                 worksheet.write(row,7,totalsData[i][6], totalFormat)
                 worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-                worksheet.write(row,10,totalsData[i][8], totalFormat)
+                if float(totalsData[i][8]) != 80 and str(previousEmp[1]) == 'Salary': 
+                    worksheet.write(row,10,totalsData[i][8], highlightFormat)
+                else: worksheet.write(row,10,totalsData[i][8], hlGreenFormat)
                 
 
                 writer.close()
