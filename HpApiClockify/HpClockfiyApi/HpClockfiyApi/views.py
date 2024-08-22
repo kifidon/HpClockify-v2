@@ -1449,7 +1449,7 @@ def rateSheets(request: ASGIRequest): #maybe make async later
                     raise ValidationError(serializer.initial_data)
             else: #Eqp rate sheet 
                 logger.info('Equipment Rate sheet path')
-                inputData['_id'] = hash50(inputData['clientId'], inputData['equipId']) #maybe include workspace in this later 
+                inputData['_id'] = hash50(inputData['clientId'], inputData['equipId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
                 try:
                     rates = EqpRateSheet.objects.get(pk=inputData['_id'])
