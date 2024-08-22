@@ -1423,7 +1423,7 @@ def rateSheets(request: ASGIRequest): #maybe make async later
         if request.method == 'POST': 
             if inputData['isRole']: # Worker rate sheet 
                 logger.info("Worker Rate sheet path")
-                inputData['_id'] = hash50(inputData['clientId'], inputData['roleId']) #maybe include workspace in this later 
+                inputData['_id'] = hash50(inputData['clientId'], inputData['roleId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
                 try:
                     rates = WorkerRateSheet.objects.get(pk=inputData['_id'])
