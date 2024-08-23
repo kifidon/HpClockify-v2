@@ -20,11 +20,12 @@ import pythoncom
 logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path):
     try:
+        logger.info(f'File path {file_path}')
         logger.info('Generating PDF from XL file')
         pythoncom.CoInitialize()  # Initialize COM for the current thread
         excel = win32.Dispatch('Excel.Application')
         excel.Visible = False
-        pdfFile = os.path.join(folder_path, f"{file_path}.pdf")
+        pdfFile = os.path.join(folder_path, f"{os.path.splitext(file_path)[0]}.pdf")
         wb = excel.Workbooks.Open(file_path)
         ws = wb.Worksheets[0]
 
@@ -1346,7 +1347,7 @@ def lemGenerator( projectCode: str, lemId: str):
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
-        file_path = os.path.join(folder_path, f" {lemDir}-{projDir} - {folder_name}.xlsx")
+        file_path = os.path.join(folder_path, f"{projDir}-{folder_name}.xlsx")
         logger.debug(f'File at {file_path}')
 
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
@@ -1361,7 +1362,7 @@ def lemGenerator( projectCode: str, lemId: str):
             #title 
             titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
             titleFormat.set_font_size(20)
-            titleFormat.set_bg_color('#D9D9D9')
+            titleFormat.set_bg_color('#FFDB69')
             #file Heaaders
             headerFormat = workbook.add_format({'bold': True, "italic": True, 'align': 'right', 'valign':'top'})
             headerValueFormat = workbook.add_format({'italic': True,'align': 'left', 'text_wrap': True, 'valign':'top'})
@@ -1370,24 +1371,29 @@ def lemGenerator( projectCode: str, lemId: str):
             columnNameFormat.set_border(1)
             columnNameFormat.set_bg_color('#d9d9d9')
             # Text Data Format 
-            textFormat = workbook.add_format({ 'align': 'center'})
+            textFormat = workbook.add_format({ 'align': 'center', 'text_wrap': True, 'valign': 'vcenter'})
             textFormat.set_border(1)
+            textFormat.set_font_size(10)
             #numFormat
-            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
+            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00', 'valign': 'vcenter', 'text_wrap': True})
             numFormat.set_border(1)
+            numFormat.set_font_size(10)
             dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd', 'align':'left', 'valign':'top'})
             
-            descripTitleFormat = workbook.add_format({'bold': True, 'align':'left'})
+            descripTitleFormat = workbook.add_format({'bold': True, 'align':'center'})
             descripTitleFormat.set_font_size(15)
             descripTitleFormat.set_border(1)
             descripTitleFormat.set_bg_color('#D9D9D9')
 
-            descripFormat = workbook.add_format({'italic': True,'align': 'left', 'text_wrap': True, 'valign': 'top'})
+            descripFormat = workbook.add_format({'italic': True,'align': 'center', 'text_wrap': True, 'valign': 'vcenter'})
             descripFormat.set_border(1)
-            descripFormat.set_font_size(10)
+            descripFormat.set_font_size(9)
+            descripFormat.set_bg_color('#F2F2F2')
             
 
             logger.info('Writting Data....')
+            
+
             logger.debug(row)
             row += 2
             headersLeft = {
@@ -1405,10 +1411,10 @@ def lemGenerator( projectCode: str, lemId: str):
             for key, value in headersLeft.items():
                 if key != 'Date:':
                     worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
-                    worksheet.merge_range(row,2,row+1,4, value, headerValueFormat)
+                    worksheet.merge_range(row,2,row+1,3, value, headerValueFormat)
                 else: 
                     worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
-                    worksheet.merge_range(row,2,row+1, 4, value, dateFormat)
+                    worksheet.merge_range(row,2,row+1, 3, value, dateFormat)
                 row += 2
             
             bottom = row
@@ -1417,19 +1423,24 @@ def lemGenerator( projectCode: str, lemId: str):
 
             for key, value in headersRight.items():
                 if key != "Task Description:":
-                    worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
-                    worksheet.merge_range(row,8,row+1, 10, value, headerValueFormat)
+                    worksheet.merge_range(row,4,row+1, 5, key, headerFormat)
+                    worksheet.merge_range(row,6,row+1, 8, value, headerValueFormat)
                     row += 2
                     continue
                 else: 
-                    worksheet.merge_range(row,6,row+1, 7, key, headerFormat)
-                    worksheet.merge_range(row,8,row+3, 10, value,headerValueFormat)
+                    worksheet.merge_range(row,4,row+1, 5, key, headerFormat)
+                    worksheet.merge_range(row,6,row+3, 8, value,headerValueFormat)
                     row += 4
                     continue
             logger.debug(row)
             row = bottom 
             row += 1
             logger.debug(row)
+            worksheet.insert_image("J3",
+                r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                # r"C:\Users\Script\Desktop\unnamed.png",
+                {'x_scale': 0.08, 'y_scale': 0.08}
+                )
 
             workerEntriesColumns = [
                 'Emp Name',
@@ -1442,11 +1453,11 @@ def lemGenerator( projectCode: str, lemId: str):
             ]
 
             top = row
-            column = 1
+            column = 0
             for i in range(0,len(workerEntriesColumns)):
                 if i in [0,1]:
-                    worksheet.merge_range(row, column, row, column+1,workerEntriesColumns[i],columnNameFormat)
-                    column +=2
+                    worksheet.merge_range(row, column, row, column+2,workerEntriesColumns[i],columnNameFormat)
+                    column += 3
                     continue
                 worksheet.write(row,column, workerEntriesColumns[i], columnNameFormat)
                 column += 1
@@ -1454,11 +1465,11 @@ def lemGenerator( projectCode: str, lemId: str):
             logger.debug(row)
 
             for rowData in workerEntries:
-                column = 1
+                column = 0
                 for i in range(0,len(rowData)):
                     if i<= 1:
-                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
-                        column += 2
+                        worksheet.merge_range(row,column,row,column+2, rowData[i], textFormat)
+                        column += 3
                         continue
                     elif i in [3,5,7]: #not includesd in this table 
                         # worksheet.write(row,column, rowData[i], numFormat )
@@ -1474,9 +1485,9 @@ def lemGenerator( projectCode: str, lemId: str):
 
             row += 1
             top = row
-            worksheet.merge_range(row,0,row,4, 'Description of Work Performed', descripTitleFormat)
+            worksheet.merge_range(row,0,row,5, 'Description of Work Performed', descripTitleFormat)
             row += 1
-            worksheet.merge_range(row,0, row+6, 4, lemInfo[5] , descripFormat)
+            worksheet.merge_range(row,0, row+6, 5, lemInfo[5] , descripFormat)
             row += 7
 
             # column += 1 #write next table to the right of the second table
@@ -1495,8 +1506,8 @@ def lemGenerator( projectCode: str, lemId: str):
             
             for i in range(0,len(summaryColumns)):
                 if i < 1:
-                    worksheet.merge_range(row, column, row, column+1,summaryColumns[i],columnNameFormat)
-                    column +=2
+                    worksheet.merge_range(row, column, row, column+2,summaryColumns[i],columnNameFormat)
+                    column +=3
                     continue
                 worksheet.write(row,column, summaryColumns[i], columnNameFormat)
                 column += 1
@@ -1506,11 +1517,11 @@ def lemGenerator( projectCode: str, lemId: str):
                 column = left
                 for i in range(0,len(rowData)):
                     if i == 0:
-                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
-                        column += 2
+                        worksheet.merge_range(row,column,row+1,column+2, rowData[i], textFormat)
+                        column += 3
                         continue
                     elif i in [2,3]:
-                        worksheet.write(row,column, rowData[i], numFormat )
+                        worksheet.merge_range(row,column,row+1,column, rowData[i], numFormat )
                         column += 1
                         if i ==3 and type(rowData[i]):
                             try:
@@ -1520,10 +1531,10 @@ def lemGenerator( projectCode: str, lemId: str):
 
                         continue
                     else:
-                        worksheet.write(row,column, rowData[i], textFormat)
+                        worksheet.merge_range(row,column,row+1,column, rowData[i], textFormat)
                         column += 1
                         continue
-                row += 1
+                row += 2
             
             row = top
             column += 1 #write next table to the right of the description  table
@@ -1555,11 +1566,11 @@ def lemGenerator( projectCode: str, lemId: str):
                 column = left
                 for i in range(0,len(rowData)):
                     if i == 0:
-                        worksheet.merge_range(row,column,row,column+1, rowData[i], textFormat)
+                        worksheet.merge_range(row,column,row+1,column+1, rowData[i], textFormat)
                         column += 2
                         continue
                     elif i in [2,3]:
-                        worksheet.write(row,column, rowData[i], numFormat )
+                        worksheet.merge_range(row,column,row+1, column, rowData[i], numFormat )
                         column += 1
                         if i ==3:
                             try:    
@@ -1569,10 +1580,10 @@ def lemGenerator( projectCode: str, lemId: str):
 
                         continue
                     else:
-                        worksheet.write(row,column, rowData[i], textFormat)
+                        worksheet.merge_range(row,column,row+1, column, rowData[i], textFormat)
                         column += 1
                         continue
-                row += 1
+                row += 2
             right = column -1
             row += 1
             
