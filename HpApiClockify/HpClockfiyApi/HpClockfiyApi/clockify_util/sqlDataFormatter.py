@@ -1438,8 +1438,9 @@ def lemGenerator( projectCode: str, lemId: str):
             logger.debug(row)
             worksheet.insert_image("J3",
                 # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                # {'x_scale': 0.08, 'y_scale': 0.08}
                 r"C:\Users\Script\Desktop\unnamed.png",
-                {'x_scale': 0.08, 'y_scale': 0.08}
+                {'x_scale': 0.5, 'y_scale': 0.5}
                 )
 
             workerEntriesColumns = [
