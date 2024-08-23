@@ -416,6 +416,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
                 and eu.hasTruck = 1 
             '''
         )
+        
         equipmentTotal = cursor.fetchone()
         
         #format results for opperations 
@@ -436,7 +437,6 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
             workbook = writer.book
             worksheet = workbook.add_worksheet("Hill Plain - Monthly LEM")
             writer.sheets['Hill Plain - Monthly LEM'] = worksheet        
-
             # Merged cells Title Format
             mergeCells = workbook.add_format({'align': 'center', 'bold': True})
             mergeCells.set_center_across()
@@ -1563,7 +1563,7 @@ def lemGenerator( projectCode: str, lemId: str):
                         column += 1
                         if i ==3:
                             try:    
-                                equipTotal += rowData[i]
+                                equipTotal += float(rowData[i])
                             except (ValueError, TypeError) as e:
                                 logger.warning(f'Row Data type is {type(rowData[i])}')
 
