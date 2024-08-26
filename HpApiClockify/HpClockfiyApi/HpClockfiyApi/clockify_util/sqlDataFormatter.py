@@ -50,6 +50,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 ws.PageSetup.CenterFooter = '&P'  # Page number
                 ws.PageSetup.LeftFooter = '&D'    # Date
                 ws.PageSetup.RightFooter = '&T'   # Time
+                # ws.HPageBreaks.Add(ws.Rows(72))
 
             logger.info(f'Exporting as Pdf')
             wb.ExportAsFixedFormat(0, f'{pdfFile}')
@@ -629,6 +630,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             dateDataFormat.set_border(1)
             textFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'text_wrap': True})
             textFormat.set_border(1)
+            textFormat.set_font(8)
             previousEmp = None 
             for description in descriptionData:
                 if description[0] != previousEmp:
@@ -659,11 +661,13 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                     worksheet.write(row, 2, 'QTY', columnFormat)
                     worksheet.merge_range(row, 3, row, 15, 'Description', columnFormat)
                     row+=1
-                worksheet.merge_range(row, 0, row + 3, 1, f'{description[1]}', dateDataFormat)
-                worksheet.merge_range(row, 2, row + 3, 2, f'{description[2]}', textFormat)
+                worksheet.merge_range(row, 0, row + 2, 1, f'{description[1]}', dateDataFormat)
+                worksheet.merge_range(row, 2, row + 2, 2, f'{description[2]}', textFormat)
                 # row+=1 
-                worksheet.merge_range(row, 3, row + 3, 15, description[3].replace('\n', ' // '), textFormat)
-                row += 4
+                worksheet.merge_range(row, 3, row + 2, 15, description[3].replace('\n', ' // '), textFormat)
+                row += 3
+                # if row != 76: row += 4
+                # else: row += 6
                 
 
             writer.close()
@@ -1278,6 +1282,9 @@ def TimeStatus(start = None, end = None):
                 missingFormat = workbook.add_format()
                 missingFormat.set_bg_color("#f7c7ac")
                 missingFormat.set_border(1)
+                unknownFormat = workbook.add_format()
+                unknownFormat.set_bg_color("#FFC000")
+                unknownFormat.set_border(1)
                 timeOffFormat = workbook.add_format()
                 timeOffFormat.set_bg_color("#caedfb")
                 timeOffFormat.set_border(1)
@@ -1318,6 +1325,9 @@ def TimeStatus(start = None, end = None):
                     ],
                     '4': [
                         'NOT APPLICABLE', timeOffFormat, 'No Entries need. Time Off/Vacation'
+                    ],
+                    '5': [
+                        'UNKNOWN STATUS', unknownFormat, 'Time Status for this user cannot be asserted. Review Clockify and logs for more information'
                     ]
                 }
                 for key, value in statuses.items():
@@ -1330,7 +1340,7 @@ def TimeStatus(start = None, end = None):
                 worksheet.merge_range(row,2,row,3, 'Reporting Manager', columnNameFormat)
                 worksheet.merge_range(row,4,row,5,'Status', columnNameFormat)
                 worksheet.merge_range(row,6,row,8, 'Notes', columnNameFormat)
-                row += 1
+                row +=1
                 for rowData in data:
                     worksheet.merge_range(row,0,row,1, rowData[0], textFormat)
                     worksheet.merge_range(row,2,row,3, rowData[1], textFormat)
