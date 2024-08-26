@@ -737,7 +737,7 @@ async def BillableReportGenerate(month = None, year = None):
         for pId in pIds:
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path )
-            file_path = os.path.join(folder_path, f"{startDate}-{pId[1]}.xlsx")
+            file_path = os.path.join(folder_path, f"{month}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
             agenerateBilling = sync_to_async(generateBilling, thread_sensitive= False)
             tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger, month, year))
@@ -769,7 +769,6 @@ async def BillableReportGenerate(month = None, year = None):
     except Exception as e: 
         logger.critical(f'{e.__traceback__.tb_lineno} - {str(e)}')
         
-
 def NonBillableReportGen(start = None, end = None):
     logger = setup_background_logger()
     try: 
