@@ -50,7 +50,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 ws.PageSetup.CenterFooter = '&P'  # Page number
                 ws.PageSetup.LeftFooter = '&D'    # Date
                 ws.PageSetup.RightFooter = '&T'   # Time
-                # ws.HPageBreaks.Add(ws.Rows(72))
+                ws.HPageBreaks.Add(ws.Rows(54))
 
             logger.info(f'Exporting as Pdf')
             wb.ExportAsFixedFormat(0, f'{pdfFile}')
