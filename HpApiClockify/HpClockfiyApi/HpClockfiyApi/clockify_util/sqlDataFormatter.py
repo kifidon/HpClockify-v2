@@ -14,38 +14,75 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import win32com.client as win32
 import asyncio
+import time
+import random 
 from asgiref.sync import sync_to_async
 import pythoncom
+from concurrent.futures import ThreadPoolExecutor
 
 logger = setup_background_logger()
-def convertXlsxPdf(folder_path, file_path):
+def convertXlsxPdf(folder_path, file_path, retry = 0):
     try:
-        logger.info(f'File path {file_path}')
-        logger.info('Generating PDF from XL file')
-        pythoncom.CoInitialize()  # Initialize COM for the current thread
-        excel = win32.Dispatch('Excel.Application')
-        excel.Visible = False
-        pdfFile = os.path.join(folder_path, f"{os.path.splitext(file_path)[0]}.pdf")
-        wb = excel.Workbooks.Open(file_path)
-        ws = wb.Worksheets[0]
+        while retry < 4:
+            # wait = random.randint(0,10)
+            # logger.info(f'Waiting for - {wait}s.')
+            # time.sleep(wait)
+            logger.info(f'File path {file_path}')
+            logger.info('Generating PDF from XL file')
+            pythoncom.CoInitialize()  # Initialize COM for the current thread
+            excel = win32.Dispatch('Excel.Application')
+            excel.Visible = False
+            excel.ScreenUpdating = False
+            pdfFile = os.path.join(folder_path, f"{os.path.splitext(file_path)[0]}.pdf")
+            wb = excel.Workbooks.Open(file_path)
+            i = 0
+            for ws in wb.Worksheets :
+                i += 1
+                # ws = wb.Worksheets[i]
+                logger.info(f'Formating Page {i}')
+                ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
+                ws.PageSetup.FitToPagesWide = 1
+                ws.PageSetup.FitToPagesTall = 4
+                ws.PageSetup.CenterHorizontally = True
+                
+                # ws.PageSetup.Orientation = 1
+                # ws.PageSetup.CenterVertically = True
+                ws.PageSetup.CenterFooter = '&P'  # Page number
+                ws.PageSetup.LeftFooter = '&D'    # Date
+                ws.PageSetup.RightFooter = '&T'   # Time
 
-        ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
-        ws.PageSetup.FitToPagesWide = 1
-        ws.PageSetup.FitToPagesTall = 1
+            logger.info(f'Exporting as Pdf')
+            wb.ExportAsFixedFormat(0, f'{pdfFile}')
+            logger.info('Operation Successful')
+            wb.Close(SaveChanges=0)  # Ensure SaveChanges is set to 0 to avoid saving changes
 
-        ws.ExportAsFixedFormat(0, f'{pdfFile}')
-
-        wb.Close(SaveChanges=0)  # Ensure SaveChanges is set to 0 to avoid saving changes
-        excel.Quit()
-
-        # Release COM objects
-        del ws
-        del wb
-        del excel
-
-        logger.info('Operation Successful')
+            excel.Quit()
+            # Release COM objects
+            del ws
+            del wb
+            del excel
+            break
+        if retry >=4:
+            logger.warning('Operation failed after exceeding max Retries')
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+        wait = random.randint(0,10)
+        logger.info(f'Pausing for {wait}s...')
+        for i in range(0,wait):
+            logger.info(f'\tWaiting...{file_path}')
+            time.sleep(1)
+        logger.info(f'Resuming operation. Retry at {retry+ 1}')
+        try:
+            wb.Close(SaveChanges=0)  # Ensure SaveChanges is set to 0 to avoid saving changes
+
+            excel.Quit()
+            # Release COM objects
+            del ws
+            del wb
+            del excel
+        except Exception as e:
+            logger.warning(f'Error occured when trying to close resources {str(e)}')
+        convertXlsxPdf(folder_path, file_path, retry=retry+ 1)
     finally:
         pythoncom.CoUninitialize()  # Uninitialize COM for the current thread
 
@@ -332,7 +369,7 @@ def DailyTimeEntryReport():
         logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
         pass
         
-def generateBilling(file_path, pId, startDate, endDate, logger):
+def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
     try:
         cursor, conn = sqlConnect()
     #Get billing Data 
@@ -417,8 +454,25 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
                 and eu.hasTruck = 1 
             '''
         )
-        
         equipmentTotal = cursor.fetchone()
+        #entries data 
+        query =f'''
+                Select 
+                    Coalesce(eu.name, 'Missing name info'),
+                    Cast(en.start_time as date),
+                    en.duration,
+                    Coalesce(en.[description],'No Description')
+                from Entry en 
+                Inner join TimeSheet ts on ts.id = en.time_sheet_id
+                Inner join EmployeeUser eu on eu.id = ts.emp_id
+                inner join Project p on p.id = '{pId[0]}' and en.project_id = p.id
+                where en.billable = 1 and Cast(en.start_time as Date) between '{startDate}' and '{endDate}'
+                and ts.status = 'APPROVED'
+                order by eu.name, Cast(en.start_time as date)
+        '''   
+        logger.debug(query)
+        cursor.execute(query)
+        descriptionData = cursor.fetchall()
         
         #format results for opperations 
         labourData = [['' if val is None else val for val in data] for data in labourData]
@@ -456,12 +510,12 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
             grandTotalFormat.set_bg_color('#FCD5B4')              
             grandTotalFormat.set_font_size(14)              
             grandTotalFormat.set_italic()              
-            
+            worksheet.set_column('E:E', 15)  # Width for column B
             #File headers info 
             headers = {
                 "Project Name:": pId[2],
                 "Project Number:": pId[1],
-                "Invoice Month:" : getAbbreviation(startDate, endDate),
+                "Invoice Month:" : getAbbreviation(month, year),
                 "Time Period Start:": startDate,
                 "Time Period End:": endDate,
                 "Generated On:": datetime.now().strftime("%Y-%m-%d at %H:%M")
@@ -570,6 +624,48 @@ def generateBilling(file_path, pId, startDate, endDate, logger):
             # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
             # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
             
+        # Description of work data 
+            dateDataFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'num_format': 'yyyy-mm-dd'})
+            dateDataFormat.set_border(1)
+            textFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'text_wrap': True})
+            textFormat.set_border(1)
+            previousEmp = None 
+            for description in descriptionData:
+                if description[0] != previousEmp:
+                    # logger.debug(f'Writing to Headers - {row}')
+                    logger.debug(pId)
+                    row = 2
+                    previousEmp = description[0]
+                    worksheet = workbook.add_worksheet(f"{previousEmp}")
+                    writer.sheets[f"{previousEmp}"] = worksheet   
+                    worksheet.merge_range(0,0,1,15, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+                    # worksheet.print_area('A1:K100')
+                    for key, value in headers.items():
+                        worksheet.merge_range(row, 0,row,1, key, bold_format)
+                        worksheet.write(row, 2, value)
+                        row += 1
+                    row += 1
+                    
+                    #insert image 
+                    worksheet.insert_image("N4",
+                                            # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                                            # {'x_scale': 0.04, 'y_scale': 0.04})
+                                            r"C:\Users\Script\Desktop\unnamed.png",
+                                            {'x_scale': 0.4, 'y_scale': 0.4})
+                    
+                    worksheet.merge_range(row,0,row,15, description[0], headersFormat)
+                    row +=1
+                    worksheet.merge_range(row, 0, row, 1, 'Date', columnFormat)
+                    worksheet.write(row, 2, 'QTY', columnFormat)
+                    worksheet.merge_range(row, 3, row, 15, 'Description', columnFormat)
+                    row+=1
+                worksheet.merge_range(row, 0, row + 3, 1, f'{description[1]}', dateDataFormat)
+                worksheet.merge_range(row, 2, row + 3, 2, f'{description[2]}', textFormat)
+                # row+=1 
+                worksheet.merge_range(row, 3, row + 3, 15, description[3].replace('\n', ' // '), textFormat)
+                row += 4
+                
+
             writer.close()
         cleanUp(conn, cursor)
     except Exception as e:
@@ -640,20 +736,30 @@ async def BillableReportGenerate(month = None, year = None):
             file_path = os.path.join(folder_path, f"{startDate}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
             agenerateBilling = sync_to_async(generateBilling, thread_sensitive= False)
-            tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger))
+            tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger, month, year))
         await asyncio.gather(*tasks)
         
-        # convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=False)
-        # tasks.clear()
-        # j = 0
+        convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=True)
+        tasks.clear()
+        j = 0
+        # def batch_convert(filePaths, folder_path):
+        #     logger.info(f'Converting: {len(filePaths)} files')
+        #     with ThreadPoolExecutor(max_workers=2) as executor:
+        #         for file_path in filePaths:
+        #             executor.submit(convertXlsxPdf, folder_path, file_path)
+        # batch_convert(filePaths, folder_path)
         # while j <= len(pIds):
-        #     for i in range(0,5):
+        for file in filePaths:    
+            tasks.append(convertAsync(folder_path, file))
+        await asyncio.gather(*tasks)
+        # while j <= len(pIds):
+        #     for i in range(0,2):
         #         if(i + j < len(filePaths)):
         #             tasks.append(convertAsync(folder_path, filePaths[i+ j]))
         #         else: break
         #     await asyncio.gather(*tasks)
         #     tasks.clear()
-        #     j +=5
+        #     j +=2
         return folder_path        
 
     except Exception as e: 

@@ -407,6 +407,6 @@ def cleanUp(conn, cursor):
         conn.close()
         return "Completed"
     except pyodbc.Error as e:
-        print(f"Error: {str(e)}")
+        logger.error(f"Error: {str(e)}")
         return "Bad Clean UP"
     
