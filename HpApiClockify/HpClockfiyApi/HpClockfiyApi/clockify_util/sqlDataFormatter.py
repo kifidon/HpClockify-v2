@@ -1224,10 +1224,12 @@ def TimeStatus(start = None, end = None):
                             and DATEADD(day ,1, ts.start_time) between '{start}' and '{end}'
                             and ts.emp_id = eu.id 
                         ) then 2
-                        when not Exists (
+                        when Exists (
                             select 1 from AttendanceApproved ap
                             where ap.name = eu.name 
                             and ap.date between '{start}' and '{end}'
+                            and ap.Accrued = 0
+                            and ap.TotalHours = 0
                         ) then 3
                         when Exists (
                             select 1 from AttendanceApproved ap
@@ -1239,6 +1241,7 @@ def TimeStatus(start = None, end = None):
                 From EmployeeUser eu
                 where eu.status = 'ACTIVE'
                 order by eu.name
+                
                 '''
             logger.debug(query)
             #obtain relavant data 
