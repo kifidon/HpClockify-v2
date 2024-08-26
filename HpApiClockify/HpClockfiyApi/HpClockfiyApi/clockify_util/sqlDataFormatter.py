@@ -42,7 +42,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 logger.info(f'Formating Page {i}')
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
                 ws.PageSetup.FitToPagesWide = 1
-                ws.PageSetup.FitToPagesTall = 4
+                # ws.PageSetup.FitToPagesTall = 4
                 ws.PageSetup.CenterHorizontally = True
                 
                 # ws.PageSetup.Orientation = 1
