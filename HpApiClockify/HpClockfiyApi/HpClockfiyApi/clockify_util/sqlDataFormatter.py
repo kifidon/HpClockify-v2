@@ -538,7 +538,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             row += 1
             
             #insert image 
-            worksheet.insert_image("H4",
+            worksheet.insert_image("J4",
                                     # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
                                     r"C:\Users\Script\Desktop\unnamed.png",
                                     {'x_scale': 0.4, 'y_scale': 0.4})
@@ -772,25 +772,10 @@ async def BillableReportGenerate(month = None, year = None, pCode = None):
         
         convertAsync = sync_to_async(convertXlsxPdf, thread_sensitive=True)
         tasks.clear()
-        j = 0
-        # def batch_convert(filePaths, folder_path):
-        #     logger.info(f'Converting: {len(filePaths)} files')
-        #     with ThreadPoolExecutor(max_workers=2) as executor:
-        #         for file_path in filePaths:
-        #             executor.submit(convertXlsxPdf, folder_path, file_path)
-        # batch_convert(filePaths, folder_path)
-        # while j <= len(pIds):
         for file in filePaths:    
             tasks.append(convertAsync(folder_path, file))
         await asyncio.gather(*tasks)
-        # while j <= len(pIds):
-        #     for i in range(0,2):
-        #         if(i + j < len(filePaths)):
-        #             tasks.append(convertAsync(folder_path, filePaths[i+ j]))
-        #         else: break
-        #     await asyncio.gather(*tasks)
-        #     tasks.clear()
-        #     j +=2
+        
         return folder_path        
 
     except Exception as e: 
