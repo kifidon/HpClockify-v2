@@ -41,6 +41,8 @@ urlpatterns = [
     #depreciated
     path('billableReport', views.monthlyBillableReport),
     path('billableReport/<str:month>/<str:year>/', views.monthlyBillableReport),
+    path('billableReport/<str:month>/<str:year>/<str:pCode>', views.monthlyBillableReport),
+    
     path('billableReportEqp', views.monthlyBillableReportEquipment),
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
     

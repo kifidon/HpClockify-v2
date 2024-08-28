@@ -682,7 +682,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
         
-async def BillableReportGenerate(month = None, year = None):
+async def BillableReportGenerate(month = None, year = None, pCode = None):
     logger = setup_background_logger()
     try: 
         #obtain date range for this month 
@@ -715,28 +715,30 @@ async def BillableReportGenerate(month = None, year = None):
 
         
         cursor, conn = sqlConnect()
-    #Get Relavant projects  
-        query = f'''
-            select p.id, p.code, p.title from Project p 
-            where exists(
-                select en.id from Entry en
-                inner join TimeSheet ts on ts.id = en.time_sheet_id 
-                where en.billable = 1 and ts.status = 'APPROVED' and
-                en.project_id = p.id 
-                and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
-            )
-            and p.id = '65e77a8dd73ace7fcd592e55'
-            '''
-        # query = f'''
-        #     select p.id, p.code, p.title from Project p 
-        #     where exists(
-        #         select en.id from Entry en
-        #         inner join TimeSheet ts on ts.id = en.time_sheet_id 
-        #         where en.billable = 1 and ts.status = 'APPROVED' and
-        #         en.project_id = p.id 
-        #         and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
-        #     )
-        #     '''
+    #Get Relavant projects 
+        if pCode: 
+            query = f'''
+                select p.id, p.code, p.title from Project p 
+                where exists(
+                    select en.id from Entry en
+                    inner join TimeSheet ts on ts.id = en.time_sheet_id 
+                    where en.billable = 1 and ts.status = 'APPROVED' and
+                    en.project_id = p.id 
+                    and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
+                )
+                and p.code = '{pCode}'
+                '''
+        else:
+            query = f'''
+                select p.id, p.code, p.title from Project p 
+                where exists(
+                    select en.id from Entry en
+                    inner join TimeSheet ts on ts.id = en.time_sheet_id 
+                    where en.billable = 1 and ts.status = 'APPROVED' and
+                    en.project_id = p.id 
+                    and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
+                )
+                '''
         logger.debug(query)
         cursor.execute(query)
         pIds = cursor.fetchall()
