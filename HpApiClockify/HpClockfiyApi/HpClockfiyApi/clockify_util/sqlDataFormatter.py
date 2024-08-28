@@ -40,10 +40,10 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 i += 1
                 # ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
-                ws.PageSetup.PaperSize = 1
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
                 ws.PageSetup.FitToPagesWide = 1
                 ws.PageSetup.FitToPagesTall = 3
+                ws.PageSetup.PaperSize = 1
                 ws.PageSetup.CenterHorizontally = True
                 
                 # ws.PageSetup.Orientation = 1
@@ -51,7 +51,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 ws.PageSetup.CenterFooter = '&P'  # Page number
                 ws.PageSetup.LeftFooter = '&D'    # Date
                 ws.PageSetup.RightFooter = '&T'   # Time
-                ws.HPageBreaks.Add(ws.Rows(54))
+
 
             logger.info(f'Exporting as Pdf')
             wb.ExportAsFixedFormat(0, f'{pdfFile}')
@@ -667,12 +667,15 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 # row+=1 
                 worksheet.merge_range(row, 3, row + 2, 15, description[3].replace('\n', ' // '), textFormat)
                 # row += 3
-                for i in range(1,4):
-                    if 69 * i <= row <= 72 * i: 
-                        logger.info(f'Page Break Occured at row {row}')
+                for i in range(0,3):
+                    if  row == 71 + 74*i : 
+                        logger.info(f'Page Break Occured at row {row} for {description[0]}')
                         pageBreak = True
+                        break
                     else: pageBreak = False 
-                if pageBreak: row += 5
+                if pageBreak: 
+                    logger.debug('Jumping 5 rows')
+                    row += 5
                 else: row += 3                   
                     
 
