@@ -764,7 +764,7 @@ async def BillableReportGenerate(month = None, year = None, pCode = None):
         filePaths = []
         if os.path.exists(folder_path):
             shutil.rmtree(folder_path)
-            print(f"Clearing existing folder: {folder_path}")
+            logger.info(f"Clearing existing folder: {folder_path}")
         os.makedirs(folder_path )
         
         for pId in pIds:
