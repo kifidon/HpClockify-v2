@@ -41,13 +41,12 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
             ws.PageSetup.FitToPagesWide = 1
             ws.PageSetup.PaperSize = 1
             ws.PageSetup.CenterHorizontally = True
-            for i in range(0, len(wb.Worksheets)) :
-                i += 1
+            for i in range(1, len(wb.Worksheets)) :
                 ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
                 ws.PageSetup.FitToPagesWide = 1
-                ws.PageSetup.FitToPagesTall = 3
+                ws.PageSetup.FitToPagesTall = False
                 ws.PageSetup.PaperSize = 1
                 ws.PageSetup.CenterHorizontally = True
                 
@@ -56,6 +55,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 ws.PageSetup.CenterFooter = '&P'  # Page number
                 ws.PageSetup.LeftFooter = '&D'    # Date
                 ws.PageSetup.RightFooter = '&T'   # Time
+                i += 1
 
 
             logger.info(f'Exporting as Pdf')
