@@ -679,7 +679,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 if pageBreak or columnsPerPage == 11: 
                     logger.info(f'Page Break Occured at row {row} for {description[0]}')
                     columnsPerPage = 0
-                    row += 7
+                    row += 8
                 else: row += 5                   
                     
 
