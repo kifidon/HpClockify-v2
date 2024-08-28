@@ -19,6 +19,7 @@ import random
 from asgiref.sync import sync_to_async
 import pythoncom
 from concurrent.futures import ThreadPoolExecutor
+import shutil
 
 logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path, retry = 0):
@@ -761,9 +762,12 @@ async def BillableReportGenerate(month = None, year = None, pCode = None):
         logger.debug(f'Created Folder at {folder_path}')
         tasks = []
         filePaths = []
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
+            print(f"Clearing existing folder: {folder_path}")
+        os.makedirs(folder_path )
+        
         for pId in pIds:
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
             file_path = os.path.join(folder_path, f"{getAbbreviation(month)}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
             agenerateBilling = sync_to_async(generateBilling, thread_sensitive= False)
