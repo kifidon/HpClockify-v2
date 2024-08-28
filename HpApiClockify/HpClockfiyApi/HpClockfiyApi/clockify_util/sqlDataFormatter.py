@@ -36,14 +36,8 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
             pdfFile = os.path.join(folder_path, f"{os.path.splitext(file_path)[0]}.pdf")
             wb = excel.Workbooks.Open(file_path)
             i = 0
-            ws = wb.Worksheets[0]
-            ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
-            ws.PageSetup.FitToPagesWide = 1
-            ws.PageSetup.PaperSize = 1
-            ws.PageSetup.CenterHorizontally = True
-            ws.PageSetup.CenterVertically = True
-            for i in range(1, len(wb.Worksheets)) :
-                ws = wb.Worksheets[i]
+            for ws in wb.Worksheets :
+                # ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
                 ws.PageSetup.FitToPagesWide = 1
