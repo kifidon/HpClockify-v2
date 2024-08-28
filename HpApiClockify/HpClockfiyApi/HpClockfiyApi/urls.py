@@ -29,6 +29,7 @@ urlpatterns = [
     path('quickBackup/<str:event>', views.quickBackup),
     path('billing', views.billableReport),
     path('billing/<str:month>/<str:year>/', views.billableReport),
+    path('billing/<str:month>/<str:year>/<str:pCode>', views.billableReport),
     path('billingSummary', views.billableNonBillable),
     path('billingSummary/<str:start_date>/<str:end_date>/', views.billableNonBillable),
     path('payroll', views.weeklyPayrollReport),
@@ -42,7 +43,7 @@ urlpatterns = [
     path('billableReport', views.monthlyBillableReport),
     path('billableReport/<str:month>/<str:year>/', views.monthlyBillableReport),
     path('billableReport/<str:month>/<str:year>/<str:pCode>', views.monthlyBillableReport),
-    
+
     path('billableReportEqp', views.monthlyBillableReportEquipment),
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
     
