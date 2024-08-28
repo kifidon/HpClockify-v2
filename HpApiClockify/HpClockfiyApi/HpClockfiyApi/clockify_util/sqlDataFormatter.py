@@ -652,7 +652,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                     row += 1
                     
                     #insert image 
-                    worksheet.insert_image("N4",
+                    worksheet.insert_image("J4",
                                             # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
                                             # {'x_scale': 0.04, 'y_scale': 0.04})
                                             r"C:\Users\Script\Desktop\unnamed.png",
