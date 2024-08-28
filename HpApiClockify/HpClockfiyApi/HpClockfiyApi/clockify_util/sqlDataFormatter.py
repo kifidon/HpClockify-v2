@@ -36,7 +36,8 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
             pdfFile = os.path.join(folder_path, f"{os.path.splitext(file_path)[0]}.pdf")
             wb = excel.Workbooks.Open(file_path)
             i = 0
-            for ws in wb.Worksheets :
+            logger.debug(f'Number of worksheets {len(wb.Worksheets)}')
+            for ws in wb.Worksheets:
                 # ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
@@ -623,7 +624,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 row += 1
             worksheet.merge_range(row,8,row,9, "GRAND TOTAL", grandTotalFormat)
             worksheet.merge_range(row,10,row,11, grandTotal, gt)
-            worksheet.print_area(0,0,row+ 2, 15)
+
             
 
         # Description of work data 
@@ -635,13 +636,14 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             previousEmp = None 
             for description in descriptionData:
                 if description[0] != previousEmp:
+                    columnsPerPage = 0
                     # logger.debug(f'Writing to Headers - {row}')
                     logger.debug(pId)
                     row = 2
                     previousEmp = description[0]
                     worksheet = workbook.add_worksheet(f"{previousEmp}")
                     writer.sheets[f"{previousEmp}"] = worksheet   
-                    worksheet.merge_range(0,0,1,15, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+                    worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
                     # worksheet.print_area('A1:K100')
                     for key, value in headers.items():
                         worksheet.merge_range(row, 0,row,1, key, bold_format)
@@ -656,27 +658,29 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                                             r"C:\Users\Script\Desktop\unnamed.png",
                                             {'x_scale': 0.4, 'y_scale': 0.4})
                     
-                    worksheet.merge_range(row,0,row,15, description[0], headersFormat)
+                    worksheet.merge_range(row,0,row,11, description[0], headersFormat)
                     row +=1
                     worksheet.merge_range(row, 0, row, 1, 'Date', columnFormat)
                     worksheet.write(row, 2, 'QTY', columnFormat)
-                    worksheet.merge_range(row, 3, row, 15, 'Description', columnFormat)
+                    worksheet.merge_range(row, 3, row, 11, 'Description', columnFormat)
                     row+=1
-                worksheet.merge_range(row, 0, row + 2, 1, f'{description[1]}', dateDataFormat)
-                worksheet.merge_range(row, 2, row + 2, 2, f'{description[2]}', textFormat)
+                worksheet.merge_range(row, 0, row + 4, 1, f'{description[1]}', dateDataFormat)
+                worksheet.merge_range(row, 2, row + 4, 2, f'{description[2]}', textFormat)
                 # row+=1 
-                worksheet.merge_range(row, 3, row + 2, 15, description[3].replace('\n', ' // '), textFormat)
+                worksheet.merge_range(row, 3, row + 4, 11, description[3].replace('\n', ' // '), textFormat)
                 # row += 3
-                for i in range(0,3):
-                    if  row == 71 + 74*i : 
-                        logger.info(f'Page Break Occured at row {row} for {description[0]}')
-                        pageBreak = True
-                        break
-                    else: pageBreak = False 
-                if pageBreak: 
-                    logger.debug('Jumping 5 rows')
-                    row += 5
-                else: row += 3                   
+                if  row == 51 : # first page break with headers 
+                    columnsPerPage = 0
+                    pageBreak = True
+                    
+                else: 
+                    columnsPerPage += 1 # counts rows per page therafter 
+                    pageBreak = False 
+                if pageBreak or columnsPerPage == 11: 
+                    logger.info(f'Page Break Occured at row {row} for {description[0]}')
+                    columnsPerPage = 0
+                    row += 7
+                else: row += 5                   
                     
 
             writer.close()
