@@ -41,6 +41,7 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
             ws.PageSetup.FitToPagesWide = 1
             ws.PageSetup.PaperSize = 1
             ws.PageSetup.CenterHorizontally = True
+            ws.PageSetup.CenterVertically = True
             for i in range(1, len(wb.Worksheets)) :
                 ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
@@ -505,7 +506,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             mergeCells.set_bg_color('#FCD5B4') 
             mergeCells.set_font_size(24)
             mergeCells.set_border(2)
-            worksheet.merge_range(0,0,1,10, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+            worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
 
             #subTotals Format
             subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
@@ -517,7 +518,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             grandTotalFormat.set_bg_color('#FCD5B4')              
             grandTotalFormat.set_font_size(14)              
             grandTotalFormat.set_italic()              
-            worksheet.set_column('E:E', 15)  # Width for column B
+            # worksheet.set_column('E:E', 15)  # Width for column B
             #File headers info 
             headers = {
                 "Project Name:": pId[2],
@@ -575,59 +576,59 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             columnFormat.set_border(1)
 
         # Table  Data 
-            worksheet.merge_range(row,0,row,10, 'LABOUR', headersFormat)
+            worksheet.merge_range(row,0,row,11, 'LABOUR', headersFormat)
             row += 1
             
             #write column names 
             worksheet.merge_range(row,0,row, 2, 'Staff Member', columnFormat)
-            worksheet.merge_range(row,3,row, 5, 'Position', columnFormat)
-            worksheet.write( row,6, 'Qty', columnFormat)
-            worksheet.write( row,7, 'Unit Cost', columnFormat)
-            worksheet.write( row,8, 'Rate', columnFormat)
-            worksheet.merge_range( row,9, row, 10, 'Amount', columnFormat)
+            worksheet.merge_range(row,3,row, 6, 'Position', columnFormat)
+            worksheet.write( row,7, 'Qty', columnFormat)
+            worksheet.write( row,8, 'Unit Cost', columnFormat)
+            worksheet.write( row,9, 'Rate', columnFormat)
+            worksheet.merge_range( row,10, row, 11, 'Amount', columnFormat)
             row += 1
 
             for rowData in labourData:
                 worksheet.merge_range(row,0,row, 2, rowData[0], dataFormat)
-                worksheet.merge_range(row,3,row, 5, rowData[1], dataFormat)
-                worksheet.write( row,6, rowData[2], dataFormat)
-                worksheet.write( row,7, rowData[3], dataFormat)
-                worksheet.write( row,8, rowData[4], numFormat)
-                worksheet.merge_range( row,9, row, 10, rowData[5], numFormat)
+                worksheet.merge_range(row,3,row, 6, rowData[1], dataFormat)
+                worksheet.write( row,7, rowData[2], dataFormat)
+                worksheet.write( row,8, rowData[3], dataFormat)
+                worksheet.write( row,9, rowData[4], numFormat)
+                worksheet.merge_range( row,10, row, 11, rowData[5], numFormat)
                 row += 1
             logger.info(f'Labour Items - {len(labourData)}')
             #sub Total
-            worksheet.merge_range(row,7,row,8,'SUB TOTAL', subTotals)
-            worksheet.merge_range(row,9,row,10, labourTotal, boldNum)
+            worksheet.merge_range(row,8,row,9,'SUB TOTAL', subTotals)
+            worksheet.merge_range(row,10,row,11, labourTotal, boldNum)
             row += 1
         # equipment Table 
             if type(equipmentTotal) is float:
                 row += 1
-                worksheet.merge_range(row,0,row,10, 'EQUIPMENT', headersFormat)
+                worksheet.merge_range(row,0,row,11, 'EQUIPMENT', headersFormat)
                 row += 1
 
                 worksheet.merge_range(row,0,row, 2, 'Staff Member', columnFormat)
-                worksheet.merge_range(row,3,row, 5, 'Equipment Type', columnFormat)
-                worksheet.write( row,6, 'Qty', columnFormat)
-                worksheet.write( row,7, 'Unit Cost', columnFormat)
-                worksheet.write( row,8, 'Rate', columnFormat)
-                worksheet.merge_range( row,9, row, 10, 'Amount', columnFormat)
+                worksheet.merge_range(row,3,row, 6, 'Equipment Type', columnFormat)
+                worksheet.write( row,7, 'Qty', columnFormat)
+                worksheet.write( row,8, 'Unit Cost', columnFormat)
+                worksheet.write( row,9, 'Rate', columnFormat)
+                worksheet.merge_range( row,10, row,  11, 'Amount', columnFormat)
                 row += 1
 
                 for rowData in equipmentData:
                     worksheet.merge_range(row,0,row, 2, rowData[0], dataFormat)
-                    worksheet.merge_range(row,3,row, 5, rowData[1], dataFormat)
-                    worksheet.write( row,6, rowData[2], dataFormat)
-                    worksheet.write( row,7, rowData[3], dataFormat)
-                    worksheet.write( row,8, rowData[4], numFormat)
-                    worksheet.merge_range( row,9, row, 10, rowData[5], numFormat)
+                    worksheet.merge_range(row,3,row, 6, rowData[1], dataFormat)
+                    worksheet.write( row,7, rowData[2], dataFormat)
+                    worksheet.write( row,8, rowData[3], dataFormat)
+                    worksheet.write( row,9, rowData[4], numFormat)
+                    worksheet.merge_range( row,10, row, 11, rowData[5], numFormat)
                     row += 1
 
-                worksheet.merge_range(row,7,row,8,'SUB TOTAL', subTotals)
-                worksheet.merge_range(row,9,row,10, equipmentTotal, boldNum)
+                worksheet.merge_range(row,8,row,9,'SUB TOTAL', subTotals)
+                worksheet.merge_range(row,10,row,11, equipmentTotal, boldNum)
                 row += 1
-            worksheet.merge_range(row,7,row,8, "GRAND TOTAL", grandTotalFormat)
-            worksheet.merge_range(row,9,row,10, grandTotal, gt)
+            worksheet.merge_range(row,8,row,9, "GRAND TOTAL", grandTotalFormat)
+            worksheet.merge_range(row,10,row,11, grandTotal, gt)
             worksheet.print_area(0,0,row+ 2, 15)
             
 
