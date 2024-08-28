@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path, retry = 0):
     try:
-        while retry < 4:
+        while retry < 2:
             # wait = random.randint(0,10)
             # logger.info(f'Waiting for - {wait}s.')
             # time.sleep(wait)
@@ -40,9 +40,10 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
                 i += 1
                 # ws = wb.Worksheets[i]
                 logger.info(f'Formating Page {i}')
+                ws.PageSetup.PaperSize = 1
                 ws.PageSetup.Zoom = False  # Disable Zoom to use FitToPages
                 ws.PageSetup.FitToPagesWide = 1
-                # ws.PageSetup.FitToPagesTall = 4
+                ws.PageSetup.FitToPagesTall = 3
                 ws.PageSetup.CenterHorizontally = True
                 
                 # ws.PageSetup.Orientation = 1
@@ -665,12 +666,18 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 worksheet.merge_range(row, 2, row + 2, 2, f'{description[2]}', textFormat)
                 # row+=1 
                 worksheet.merge_range(row, 3, row + 2, 15, description[3].replace('\n', ' // '), textFormat)
-                row += 3
-                # if row != 76: row += 4
-                # else: row += 6
-                
+                # row += 3
+                for i in range(1,4):
+                    if 69 * i <= row <= 72 * i: 
+                        logger.info(f'Page Break Occured at row {row}')
+                        pageBreak = True
+                    else: pageBreak = False 
+                if pageBreak: row += 5
+                else: row += 3                   
+                    
 
             writer.close()
+            
         cleanUp(conn, cursor)
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
@@ -718,7 +725,18 @@ async def BillableReportGenerate(month = None, year = None):
                 en.project_id = p.id 
                 and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
             )
+            and p.id = '65e77a8dd73ace7fcd592e55'
             '''
+        # query = f'''
+        #     select p.id, p.code, p.title from Project p 
+        #     where exists(
+        #         select en.id from Entry en
+        #         inner join TimeSheet ts on ts.id = en.time_sheet_id 
+        #         where en.billable = 1 and ts.status = 'APPROVED' and
+        #         en.project_id = p.id 
+        #         and Cast(en.start_time As Date) between '{startDate}' and '{endDate}'
+        #     )
+        #     '''
         logger.debug(query)
         cursor.execute(query)
         pIds = cursor.fetchall()
