@@ -628,9 +628,9 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 row += 1
             worksheet.merge_range(row,7,row,8, "GRAND TOTAL", grandTotalFormat)
             worksheet.merge_range(row,9,row,10, grandTotal, gt)
-            # df = pd.DataFrame([], columns=["GRAND TOTAL", None, f"{grandTotal}"])
-            # df.to_excel(writer, sheet_name="Hill Plain - Monthly LEM", startrow=row, startcol= 4, index=False)
+            worksheet.print_area(0,0,row+ 2, 15)
             
+
         # Description of work data 
             dateDataFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'num_format': 'yyyy-mm-dd'})
             dateDataFormat.set_border(1)
