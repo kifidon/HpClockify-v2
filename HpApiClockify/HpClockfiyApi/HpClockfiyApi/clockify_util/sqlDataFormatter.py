@@ -1,5 +1,5 @@
 from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle, reverseForOutput
-from .ClockifyPushV3 import getWID, pushApprovedTime, pushTimeOff
+from .ClockifyPushV3 import getWID, pushTimeOff
 from .ClockifyPullV3 import getDetailedEntryReport
 from decimal import Decimal
 import pyodbc
