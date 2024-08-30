@@ -282,52 +282,6 @@ def MonthylyProjReportEqp(month = None, year = None):
         logging.error(f"Error: {str(e)}")
         return None
 
-# def WeeklyTimeSheet(startDate = "2024-02-11" , endDate = "2024-02-17"):
-    #     if startDate is None or endDate is None:
-    #         start, end = getCurrentPaycycle()
-    #         startDate = start
-    #         endDate = end
-    #     current_dir = settings.BASE_DIR
-    #     folder_name = f"PayrollLog-{startDate}-{endDate}"
-    #     folder_path = os.path.join(current_dir, folder_name)
-    #     if not os.path.exists(folder_path):
-    #         os.makedirs(folder_path )
-    #     file_path = os.path.join(folder_path, f"{folder_name}-Data.xlsx")
-
-    #     cursor, conn = sqlConnect()
-
-    #     try:
-    #         cursor.execute(
-    #             '''
-    #             SELECT att.name, att.Date, att.RegularHrs, att.Overtime, att.TotalHours , att.TimeOff, att.policy_name, att.Holiday  FROM AttendanceApproved att
-    #             WHERE att.Date BETWEEN ? AND ?
-
-    #             Union ALL
-
-    #             Select tt.name,Null, Sum(tt.RegularHrs), Sum(tt.Overtime), Sum(tt.TotalHours), Sum(tt.TimeOff), 'Policy_name', 'Holiday' From AttendanceApproved tt
-    #             WHERE [Date] BETWEEN ? AND ?
-    #             Group By tt.name
-
-    #             ORDER BY [name], Date DESC
-    #             ''', ( startDate, endDate, startDate, endDate)
-    #         )
-    #         rows = cursor.fetchall()
-
-    #         rows = [['' if val is None else val for val in row] for row in rows]
-    #         df = pd.DataFrame(rows, columns = ['Name', 'Date', 'Regular Hours', 'Overtime', 'Total', 'Paid Time Off', 'Reason', 'Holiday'])
-    #         if not (df.empty):
-    #             df.to_excel(file_path, index = False)
-    #         # Combine the directory path with the file name
-    #         cleanUp(conn, cursor) 
-
-    #         return folder_path 
-    #     except pyodbc.Error as e:
-    #         logging.error( f"{get_current_time()} - ERROR: SQL Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
-    #     except FileNotFoundError as e:
-    #         logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
-    #     except PermissionError as e:
-    #         logging.error(f"{get_current_time()} - ERROR: Error: {str(e)} at line {e.__traceback__.tb_lineno} in sqlDataFormatter.py")
-
 def DailyTimeEntryReport():
     try:
         logger = setup_background_logger()

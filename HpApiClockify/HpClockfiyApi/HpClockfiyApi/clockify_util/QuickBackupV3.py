@@ -81,7 +81,7 @@ async def PolicyEvent(wkSpaceName = 'Hill Plain'):
     cleanUp(conn=conn, cursor=cursor)
     return result
 
-async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
+async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = ['APPROVED', 'PENDING', 'WITHDRAWN_APPROVAL']):
     logger.info('Timesheet Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
     cursor , conn = sqlConnect()
@@ -93,9 +93,13 @@ async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'):
     if cursor is None and conn is None:
         logger.error('cannot connect to server')
         return 0
-    result =  ClockifyPushV3.pushApprovedTime(wid, conn, cursor, status)
-    logger.info(result)
+    output = []
+    for stat in status: 
+        result = await ClockifyPushV3.pushTimesheet(wid, conn, cursor, stat)
+        logger.info(result)
+        output.append(result)
     cleanUp(conn=conn, cursor=cursor)
+    return output 
 
 async def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     logger.info('Timeoff Event Called')
@@ -167,14 +171,14 @@ async def eventSelect(event = None):
             'client': ClientEvent(wkSpaceName = 'Hill Plain'),
             'project': ProjectEvent(wkSpaceName = 'Hill Plain'),
             'policy': PolicyEvent(wkSpaceName = 'Hill Plain'),
-            'timesheet': TimesheetEvent(wkSpaceName = 'Hill Plain', status = 'APPROVED'),
+            'timesheet': TimesheetEvent(wkSpaceName = 'Hill Plain'),
             'timeoff': TimeOffEvent(wkSpaceName = 'Hill Plain'),
             'holiday': HolidayEvent(wkSpaceName = 'Hill Plain'),
             'userGroup': UserGroupEvent(wkSpaceName = 'Hill Plain'),
         }
         results = await asyncio.gather(events.get(event, main()), return_exceptions= True)
-        logger.debug(results)
-        logger.debug(type(results))
+        logger.debug(f'Results Data {results}')
+        logger.debug(f'Results Type {type(results)}')
         return results
     except Exception as e:
         logger.error(({e.__traceback__.tb_lineno}) - {str(e)})

@@ -1,10 +1,14 @@
 import pyodbc
 import copy
 import json
+import asyncio
+from .. models import *
 # import logging
 from .. Loggers import setup_background_logger, setup_server_logger
 from .ClockifyPullV3 import getApiKey, getWorkspaces,getWorkspaceUsers, getProjects, getApprovedRequests, getHolidays, getClients, getPolocies, getTimeOff, getUserGroups
 from .hpUtil import sqlConnect, cleanUp, pytz, datetime, timedelta, timeZoneConvert, timeDuration, count_working_days
+import concurrent.futures
+
 logger = setup_server_logger('DEBUG')
 
 def pushWorkspaces(conn, cursor):
@@ -432,463 +436,6 @@ def pushClients(wkSpaceID, conn, cursor):
         logger.info("Committing changes...")  # Commit changes if no exceptions occurred                    
         return(f"Client: {count} new records. {exists} unchanged. {update} updated.\n")
 
-def pushTags(wkSpaceID, conn, cursor, tags: list, aID, enID):
-    update = 0; exists = 0; count = 0
-    try:
-        for tag in tags: 
-            cursor.execute(
-                '''
-                select id, entryID, timeID, name, workspace_id
-                from TagsFor
-                where id = ? and entryID = ? and workspace_id =?
-                ''', (tag["id"], enID, wkSpaceID)
-            )
-            existingTag = cursor.fetchone()
-            if existingTag is None: # insert new 
-                cursor.execute(
-                    '''
-                    insert into TagsFor (id, entryID, timeID, name, workspace_id)
-                    values (?, ?, ?, ?, ?)
-                    ''', (tag["id"], enID, aID, tag["name"], wkSpaceID)
-                )
-                count += 1
-                logger.info(f"\t\tAdding Tag {tag['name']} to Entry")
-            else: # Check if update is needed 
-                if existingTag[3] == tag['name']: # exists 
-                    exists += 1
-                    logger.info (f"\t\t\tLoading tag {tag['name']}")
-                else: # update 
-                    cursor.execute(
-                        '''
-                        Update TagFor
-                        set name = ?
-                        where id = ? and workspace_id = ?, and entryId = ?
-                        ''', (tag["name"], tag["id"], wkSpaceID, enID)
-                    )
-                    update += 1
-                    logger.info(f"\t\t\tUpdating tag name {existingTag[3]} to {tag['name']}")
-    except Exception as  exc :
-        conn.rollback()  # Roll back changes if an exception occurs
-        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
-        raise
-    else:
-        # Commit changes in Timesheet Function function if no exceptions occurred       
-        # logger.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
-        return(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated.")
-         
-def deleteEntries(conn, cursor, entries, aID):
-    """
-    Deletes entries for a given time sheet. Delete condition is "If still in database but not pullable from clockify"
-
-    Args:
-        conn: Connection object for the database.
-        cursor: Cursor object for executing SQL queries.
-        aID (str): Time sheet ID.
-        entries (list): List of entries to delete.
-
-    Returns:
-        int: Number of entries deleted.
-    """
-    newEntries = []
-    deleted =0 
-    try: 
-        cursor.execute(
-            '''
-            SELECT id From Entry
-            WHERE time_sheet_id = ?
-            ''',(aID,)
-        )
-        entriesForTimesheet = cursor.fetchall()
-        for entry in entries:
-            newEntries.append(entry['id'])
-        for delete in entriesForTimesheet:
-            if delete[0] not in newEntries:
-                cursor.execute(
-                    '''
-                    DELETE FROM Entry
-                    WHERE id = ? AND time_sheet_id = ?
-                    ''', (delete[0], aID)
-                )
-                logger.info(f"\t\t\tDeleted...{deleted}")
-                deleted += 1
-    except Exception as  exc :
-        conn.rollback()  # Roll back changes if an exception occurs
-        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
-        raise
-    else:
-        # Commit changes in timesheet function if no exceptions occurred      
-        return(deleted)
-
-def pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry):
-    logger.info('\t\tPush time Entries')
-    """
-    Pushes entries data to the database. 
-
-    Parameters:
-        approve (dict): A dictionary containing entries data to be pushed.
-        conn (pyodbc.Connection): A connection object to the database.
-        cursor (pyodbc.Cursor): A cursor object to execute SQL queries.
-        wkSpaceID (str): Workspace ID associated with the entries data.
-
-    Returns:
-        str: A string indicating the status of the operation, including the number of new records, updates, and errors.
-    """
-    update = 0
-    exists = 0
-    count = 0
-    entries = approve['entries']
-    deleted = 0 
-    deleteEntries(conn, cursor, entries, aID) # delete stale entries before inserting, as to minimize transactions
-    try:
-        for entry in entries:
-            approval = entry['approvalRequestId'] or aID
-            if entry['approvalRequestId'] is not None and entry['approvalRequestId'] != '' and entry['approvalRequestId'] != aID:
-                logger.critical("Critical logic error - Timesheet ID and 'approvalRequestId' do not match")
-            eID = entry['id']
-            duration = timeDuration(entry['timeInterval']['duration'])
-            description = entry['description']
-            billable = entry['billable']
-            projectID = entry['project']['id']
-            type = entry['type']
-            # set default start time to 8am and end time to {duration} hours after
-            startTime = timeZoneConvert(entry['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ')
-            endTime = timeZoneConvert(entry['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ') 
-            rate = entry['hourlyRate']['amount'] if entry['hourlyRate'] is not None else 0
-            tags = entry['tags']
-            logger.info(f'\t\t\t{description}')
-            while True:
-                try: # insert entry
-                    cursor.execute( 
-                        '''
-                        SELECT time_sheet_id, duration, description, billable, project_id, type, start_time, end_time, rate 
-                        FROM Entry
-                        WHERE id = ?  and workspace_id = ?
-                        ''', (eID, wkSpaceID)
-                    )
-                    oldEntry = cursor.fetchone()
-                    if(oldEntry is None): # insert new 
-                        cursor.execute(
-                            '''
-                                INSERT INTO Entry (id, time_sheet_id, duration, description, billable, project_id, type, start_time, end_time, rate, workspace_id)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ''',(
-                                eID, 
-                                approval, 
-                                duration, 
-                                description, 
-                                billable,
-                                projectID, 
-                                type, 
-                                startTime,
-                                endTime, 
-                                rate, 
-                                wkSpaceID
-                                )
-                        )
-                        count +=1
-                        break
-                    else: # update entry
-                        try:
-                            cursor.execute(
-                                '''
-                                UPDATE Entry
-                                SET 
-                                    duration = ?,
-                                    description = ?,
-                                    billable = ?,
-                                    project_id = ?,
-                                    type = ?,
-                                    start_time = ?,
-                                    end_time = ?,
-                                    rate = ?
-                                WHERE id = ? and workspace_id = ?
-                                ''',
-                                (duration, description, billable, projectID, type, startTime, endTime, rate, eID,  wkSpaceID)
-                            )
-                            logger.info(f"\tUpdating Entry information...({startTime})")
-                            update += 1
-                            break
-                        except pyodbc.IntegrityError as ex:
-                            if "FOREIGN KEY constraint" in str(ex): # update projects and re try for this entry
-                                logger.info(pushProjects(wkSpaceID, conn, cursor) + ". Called from Entries Function. (Update) \n")
-                            else: # could be any error
-                                raise                                 
-                except pyodbc.IntegrityError as e:                   
-                    if 'FOREIGN KEY constraint' in str(e): # update projects and try agaun. Only once per push request of timesheets
-                        FK_ConstraintOnEntry += 1
-                        if FK_ConstraintOnEntry <=1:
-                            logger.info(f"Foreign Key Constraint on Projects. Attempting to handle\n----------------------")
-                            logger.info(pushProjects(wkSpaceID, conn, cursor) + "\tCalled from Entries Function. (Insert) \n")
-                        else:
-                            if (FK_ConstraintOnEntry ==2):
-                                logger.info(f"\tstaleEntry for TimeSheet{approval}- Project ({projectID}) No Longer Exists")
-                            break
-                        # Loop through this record again after adding reference 
-                    elif 'PRIMARY KEY constraint' in str(e): 
-                        logger.warning(f'Trying to insert a douplicate record - {eID}. Skipping operation and proceding to the next')
-                        break
-                        
-            if len(tags)!= 0:
-                logger.info(pushTags(wkSpaceID, conn, cursor, tags, approval, enID=eID))            
-    except Exception as  exc :
-        conn.rollback()  # Roll back changes if an exception occurs
-        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
-        raise
-    else: # Commit changes in Timesheet function  if no exceptions occurredand check to delete 
-        conn.commit()
-        logger.info(f"\t\tEntry:  {count} new records. {update} updated. {deleted} deleted.")
-        return(FK_ConstraintOnEntry)
-'''
-def pushExpenses(approve, timesheetID, conn, cursor):
-
-    count = 0
-    expenses = approve['expenses']
-    for expense in expenses:
-        eID = expense['id']
-        billable = expense['billable']
-        date = expense['date']
-        notes = expense['notes']
-        projectID = expense['project']['id']
-        qty = expense['quantity']
-        total = expense['total']
-        category = expense['category']['id']
-        try: 
-            cursor.execute(
-                \'''
-                INSERT INTO Expenses(id, billable, date, notes, project_id, quantity, total, timesheet_id, category_id)
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?
-                WHERE NOT EXISTS(
-                    SELECT 1 FROM Expense WHERE id = ?
-                )
-                \''',
-                (eID, billable, date, notes, projectID, qty, total, timesheetID, category, eID)
-            )
-            conn.commit()
-    logger.info("Committing changes...")
-            count += 1
-        except pyodbc.IntegrityError as e:
-            if 'PRIMARY KEY constraint' in str(e):
-                continue
-            else:
-                logger.info(f"IntegrityError: {e}")
-        except pyodbc.Error as e: 
-            logger.info(f"Error: {e}")
-    return(f"Operation Completed. Expenses table has {count} new records")
-'''
-
-def updateApprovals(update, count, exists, cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
-                    billableAmount, costAmount, expenseTotal, status,  approve, approved, conn, wkSpaceID,FK_ConstraintOnEntry ):  
-    try:
-        cursor.execute(
-            '''
-            SELECT emp_id ,
-                start_time,
-                end_time,
-                approved_time ,
-                billable_time ,
-                billable_amount ,
-                cost_amount ,
-                expense_total,
-                status
-            FROM TimeSheet 
-            Where id = ? and workspace_id = ?
-            ''', (aID, wkSpaceID)
-        )
-        oldTime = cursor.fetchone()
-
-        startDateObject = copy.copy(startDateO).date()
-        endDateObject = copy.copy(endDateO).date()
-
-        if ((userID != oldTime[0]) or (startDateObject != oldTime[1]) or (endDateObject != oldTime[2])
-            or (round(approvedTime, 2) != round(oldTime[3], 2))
-            or (round(billableTime, 2) != round(oldTime[4], 2))
-            or (round(float(billableAmount), 2) != round(float(oldTime[5]), 2))
-            or (round(float(costAmount), 2) != round(float(oldTime[6]), 2))
-            or (round(float(expenseTotal), 2) != round(float(oldTime[7]), 2)) or (status != oldTime[8])
-        ):
-            
-            cursor.execute(
-                '''
-                UPDATE TimeSheet
-                SET emp_id = ?,
-                    start_time = ?,
-                    end_time = ?,
-                    approved_time = ?,
-                    billable_time = ?,
-                    billable_amount = ?,
-                    cost_amount = ?,
-                    expense_total = ?,
-                    status = ?
-                WHERE id = ? and workspace_id = ?;    
-                ''', (userID, startDateO, endDateO, approvedTime, billableTime,
-                    billableAmount, costAmount, expenseTotal, status, aID, wkSpaceID)
-            )
-            logger.info(f"\t\tUpdating Time Sheet...{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% ({aID})")
-            update += 1
-        else:
-            exists += 1
-            logger.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}% (updateAproval)")
-        # regardless if update on Time Sheet, Check for update on entries
-        if status != 'WITHDRAWN_APPROVAL':
-            FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
-            logger.info("\t\tTime Entry Information Added\n")
-        return update, count, exists, True, FK_ConstraintOnEntry
-    except pyodbc.IntegrityError as ex:
-        if "FOREIGN KEY constraint" in str(ex):
-            pushUsers(wkSpaceID, conn, cursor)
-            return update, count, exists, False, FK_ConstraintOnEntry
-        else:
-            raise
-    except Exception as e:
-        logger.error(f'({e.__traceback__.tb_lineno}) - (str)')
-        logger.warning(f'Skipping operaiion')
-        return update, count, exists, True , FK_ConstraintOnEntry
-
-#deprecitated 
-def pushApprovedTime(wkSpaceID, conn, cursor, stat):
-
-    """
-    Pushes approved time data to the database. TimeSheets should not be updated. Include deletion in a future update 
-
-    Parameters:
-        wkSpaceID (str): The workspace ID associated with the approved time data.
-        conn (pyodbc.Connection): A connection object to the database.
-        cursor (pyodbc.Cursor): A cursor object to execute SQL queries.
-
-    Returns:
-        str: A string indicating the status of the operation, including the number of new records added.
-    """
-    key = getApiKey()
-    approved = getApprovedRequests(wkSpaceID, key, status= stat)
-    page = 1
-    gCount = 0
-    gUpdate = 0
-    gExists = 0
-    count = 0
-    update = 0
-    exists = 0
-    FK_ConstraintOnEntry = 0
-    try:
-        while len(approved) != 0 and page < 30:
-            
-            logger.info(f"Inserting Page: {page} of TimeSheets ({len(approved)} records)")
-            for approve in approved:
-                aID = approve['approvalRequest']['id']
-                userID = approve['approvalRequest']['owner']['userId']
-                status = approve['approvalRequest']['status']['state']
-                
-                startDateO = timeZoneConvert(approve['approvalRequest']['dateRange']['start'])
-                endDateO = timeZoneConvert(approve['approvalRequest']['dateRange']['end'])
-
-                approvedTime = timeDuration(approve['approvedTime'])
-                billableTime = timeDuration(approve['billableTime'])
-                billableAmount = approve['billableAmount']
-                costAmount = approve['costAmount']
-                expenseTotal = approve['expenseTotal']
-                # logger.info(f'{aID}, {userID}, {status}, {startDateO},')
-                
-                # continue
-                while True:
-                    try:   
-                        #Check for the existance of this time sheet   
-                        cursor.execute(
-                            ''' 
-                            select id, workspace_id, status, emp_id , start_time from Timesheet
-                            where id = ? and workspace_id = ? and emp_id=?
-                            ''', (aID, wkSpaceID, userID)
-                        )
-                        tsExists = cursor.fetchone()
-                        if tsExists is None:
-                            '''
-                            New timesheet being added, or timesheet status has 
-                            been reversed -> create a new timesheet 
-                            '''
-                            cursor.execute(
-                                '''
-                                INSERT INTO TimeSheet (
-                                    id, 
-                                    emp_id,
-                                    start_time, 
-                                    end_time, 
-                                    approved_time, 
-                                    billable_time, 
-                                    billable_amount, 
-                                    cost_amount, 
-                                    expense_total,
-                                    [status], 
-                                    workspace_id)
-                                VALUES (?, ?, CAST(? AS DATE) , CAST(? AS DATE) , ?, ?, ?, ?, ? ,?, ?)
-                                '''
-                                ,(
-                                    aID, 
-                                    userID, 
-                                    startDateO, 
-                                    endDateO,
-                                    approvedTime, 
-                                    billableTime, 
-                                    billableAmount, 
-                                    costAmount, 
-                                    expenseTotal, 
-                                    status, 
-                                    wkSpaceID
-                                    )
-                            )
-                            logger.info(f"\tAdding TimeSheet information...{aID}({count})")
-                            FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
-                            logger.info("\tTime Entry Information Added\n")
-                            # pushExpenses(approve, aID, conn, cursor)
-                            count += 1
-                            logger.debug(f'{approvedTime}, {costAmount}, {str(startDateO)}')
-                            break
-                        # elif tsExists is not None:
-                        elif tsExists is not None or (tsExists[2] != status):
-                            # logging.debug(f'DEBUG: Existing timeSheet "{aID}"')
-                            # if (status != 'PENDING'):
-                            #     logger.info(f'\tStatus change from {tsExists[2]} to {status} on timesheet: {aID}')
-                            # else:
-                            logger.info(f'\tChecking for updates Timesheet: {aID}')
-                            update, count, exists, FK_errorOnUpdate ,FK_ConstraintOnEntry = updateApprovals( update, count, exists,
-                                    cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
-                                    billableAmount, costAmount, expenseTotal, status,  approve, approved, conn, wkSpaceID, FK_ConstraintOnEntry
-                                    )
-                            if (FK_errorOnUpdate):
-                                break
-                        else:
-                            exists += 1
-                            # logging.debug(f'{aID} {status}, {userID} {str(startDateO)}, {tsExists}')
-                            logger.info(f"\tTimeSheet Loading({aID})----------{str(round((exists + update + count) / len(approved), 2) * 100)[:5]}%")
-                           # FK_ConstraintOnEntry = pushEntries(approve, conn, cursor, wkSpaceID, aID, FK_ConstraintOnEntry)
-                            break
-                    except pyodbc.IntegrityError as e: 
-                        if "FOREIGN KEY constraint" in str(e):
-                            logger.info(pushUsers(wkSpaceID, conn, cursor) + ". Called by Approval Function")
-                        elif "PRIMARY KEY constraint" or 'UNIQUE KEY constraint'in str(e):
-                            update, count, exists, FK_errorOnUpdate, FK_ConstraintOnEntry = updateApprovals( update, count, exists,
-                                    cursor, aID, userID, startDateO, endDateO, approvedTime, billableTime, 
-                                    billableAmount, costAmount, expenseTotal, status,  approve, approved, conn, wkSpaceID, FK_ConstraintOnEntry
-                                    )
-                            if (FK_errorOnUpdate):
-                                break
-                        else:
-                            raise # unknown integrity error on timesheet insert 
-            
-            page += 1
-            gCount += count;  count = 0 
-            gUpdate += update; update = 0
-            gExists += exists ; exists = 0
-            approved = getApprovedRequests(wkSpaceID, key, page, stat)
-    except Exception as  exc :
-        conn.rollback()  # Roll back changes if an exception occurs
-        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        return f"Operation failed. Changes rolled back. Contact administer of problem persists"
-    else:
-        conn.commit()
-        logger.info("Committing changes...")  # Commit changes if no exceptions occurred                      
-        return(f"Operation Completed: TimeSheet table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated.\n")
-
 def pushPolicies(wkSpaceID, conn, cursor):
     """
     Updates or inserts time off policies into the database.
@@ -1244,7 +791,6 @@ def pushHolidays(wkSpaceID, conn, cursor):
         logger.info("Committing changes...")  # Commit changes if no exceptions occurred                 
         return ( f"Operation Complete: Holidays table has {count} new records and {exists} unchanged. {update} records updated.\n")
 
-
 def deleteTimeOff(wkSpaceID, conn , cursor , timeOff):
     deleted = 0
     """
@@ -1539,4 +1085,276 @@ logger.info("Committing changes...")
         attendance = ClockifyPull.getAttendance(wkSpaceID, startDate, endDate, page)               
     return(f"Operation Completed: Attendance table has {count} new records and {exists} unchanged. {update} records updated. ({errors} errors)")
 '''
+####################################################################################################################################################################################
+async def pushTags(wkSpaceID, tags: list, enID):
+    cursor, conn = sqlConnect()
+    update = 0; exists = 0; count = 0
+    try:
+        for tag in tags: 
+            cursor.execute(
+                '''
+                select id, entryID, name, workspace_id
+                from TagsFor
+                where id = ? and entryID = ? and workspace_id =?
+                ''', (tag["id"], enID, wkSpaceID)
+            )
+            existingTag = cursor.fetchone()
+            if existingTag is None: # insert new 
+                cursor.execute(
+                    '''
+                    insert into TagsFor (id, entryID, name, workspace_id)
+                    values (?, ?, ?, ?, ?)
+                    ''', (tag["id"], enID, tag["name"], wkSpaceID)
+                )
+                count += 1
+                logger.info(f"\t\tAdding Tag {tag['name']} to Entry")
+            else: # Check update   
+                cursor.execute(
+                    '''
+                    Update TagsFor
+                    set name = ?
+                    where id = ?
+                    ''', (tag["name"], tag["id"])
+                )
+                update += 1
+                logger.info(f"\t\t\tUpdating tag name {existingTag[3]} to {tag['name']}")
+    except Exception as  exc :
+        conn.rollback()  # Roll back changes if an exception occurs
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        raise
+    else:
+        # Commit changes in Timesheet Function function if no exceptions occurred       
+        # logger.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated. {deleted} deleted.")
+        cleanUp(conn,cursor)
+        logger.info(f"\t\t\tTag:  {count} new records. {exists} unchanged. {update} updated.")
+         
+async def deleteEntries(entries, aID):
+    """
+    Deletes entries for a given time sheet. Delete condition is "If still in database but not pullable from clockify"
+
+    Args:
+        conn: Connection object for the database.
+        cursor: Cursor object for executing SQL queries.
+        aID (str): Time sheet ID.
+        entries (list): List of entries to delete.
+
+    Returns:
+        int: Number of entries deleted.
+    """
+    cursor, conn = sqlConnect()
+    newEntries = []
+    deleted =0 
+    try: 
+        cursor.execute(
+            '''
+            SELECT id From Entry
+            WHERE time_sheet_id = ?
+            ''',(aID,)
+        )
+        entriesForTimesheet = cursor.fetchall()
+        for entry in entries:
+            newEntries.append(entry['id'])
+        for delete in entriesForTimesheet:
+            if delete[0] not in newEntries:
+                cursor.execute(
+                    '''
+                    DELETE FROM Entry
+                    WHERE id = ?
+                    ''', (delete[0], )
+                )
+                logger.info(f"\t\t\tDeleted...{deleted}")
+                deleted += 1
+    except Exception as  exc :
+        conn.rollback()  # Roll back changes if an exception occurs
+        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
+        logger.error("Operation failed. Changes rolled back. Contact administer of problem persists")
+        raise
+    else:
+        # Commit changes in timesheet function if no exceptions occurred  
+        cleanUp(conn, cursor)    
+        return(deleted)
+
+async def processEntry(entryData, conn, cursor, wkspaceId, fkc, aId = None):
+    logger.info('processEntry execute ')
+    try:
+        logger.debug(json.dumps(entryData, indent = 4))
+        approval = entryData['approvalRequestId']
+        eID = entryData['id']
+        duration = timeDuration(entryData['timeInterval']['duration'])
+        description = entryData['description']
+        billable = entryData['billable']
+        projectID = entryData['project']['id']
+        startTime = timeZoneConvert(entryData['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
+        endTime = timeZoneConvert(entryData['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
+        rate = entryData['hourlyRate']['amount'] if entryData['hourlyRate'] is not None else 0
+        tags = []
+        tags = entryData['tags']
+        try:
+            try:
+                entry = await Entry.objects.aget(id = eID)
+                if approval is not None:
+                    entry.timesheetId = await Timesheet.objects.aget(id=approval)
+                else:
+                    entry.timesheetId = None
+
+                entry.duration = duration
+                entry.description = description
+                entry.billable = billable
+                entry.project = await Project.objects.aget(id = projectID)
+                entry.start = startTime
+                entry.end = endTime
+                entry.hourlyRate = rate
+
+                entry.asave()
+                
+            except Entry.DoesNotExist: 
+                entry = Entry(
+                    id = eID,
+                    timesheetId = await Timesheet.objects.aget(id=approval),
+                    duration = duration,
+                    description = description,
+                    billable = billable,
+                    project = await Project.objects.aget(id = projectID),
+                    start = startTime,
+                    end = endTime,
+                    hourlyRate = rate,
+                    workspaceId = await Workspace.objects.aget(id = wkspaceId)
+                )
+                entry.asave()
+
+                
+            finally:
+                if len(tags) != 0:
+                    logger.info(f'\t\t\tNumber of tags - {len(tags)}')
+                    await pushTags(wkspaceId,tags,eID)
+                logger.info(f'\t\tEntry added succsesfully to database {eID}')
+        except Project.DoesNotExist:
+            logger.warning('\tFK Constraint on Project  violated. Retrying... ')
+            if not fkc:
+                pushProjects(wkspaceId, conn, cursor)
+                return await processEntry(entry, conn, cursor, wkspaceId, True, aId)
+            else:
+                raise
+        except Timesheet.DoesNotExist:
+            logger.warning('\tFK Constraint on Timesheet  violated. Retrying... ')
+            if not fkc:
+                logger.info(f'Caller Timesheet - {aId}')
+                logger.info(f'Collected Data id - {approval}')
+                logger.info('Retrying with caller...')
+                entryData['approvalRequestId'] = aId
+                return await processEntry(entryData, conn, cursor, wkspaceId, True, aId)
+            else:
+                logger.critical(f'Could not resolve FK Constraint ')
+                raise
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno}) in ClockifyPushV3')
+        raise e
+
+async def processApproval(approve, wkspaceId, conn, cursor, fkc):
+    logger.info('\tprocessApproval Function executing...')
+    try:
+        # logger.debug(json.dumps(approve, indent=4))
+        
+        aID = approve['approvalRequest']['id']
+
+        userID = approve['approvalRequest']['owner']['userId']
+        status = approve['approvalRequest']['status']['state']
+        
+        startDate = timeZoneConvert(approve['approvalRequest']['dateRange']['start']).strftime('%Y-%m-%d')
+        endDate = timeZoneConvert(approve['approvalRequest']['dateRange']['end']).strftime('%Y-%m-%d')
+
+
+        try: #FK constraints 
+            try: 
+                #patch
+                timesheet =await  Timesheet.objects.aget(id = aID)
+                logger.info('Update Path taken for Timesheet')
+                timesheet.emp = await Employeeuser.objects.aget(id = userID)
+                timesheet.status = status 
+                timesheet.start_time = startDate
+                timesheet.end_time = endDate
+
+                timesheet.asave()
+                logger.info('Update Complete')
+                state = 1
+            except Timesheet.DoesNotExist: 
+                #post request
+                logger.info('Insert Path taken')
+                timesheet = Timesheet(
+                    id = aID,
+                    emp = await Employeeuser.objects.aget(id = userID),
+                    status = status ,
+                    start_time = startDate,
+                    end_time = endDate,
+                    workspace = await Workspace.objects.aget(id=wkspaceId)
+                )
+                timesheet.asave()
+                logger.info('Insert Complete')
+                state = 2
+            finally: 
+                entriesTask = []
+                deleted = asyncio.create_task(deleteEntries(approve['entries'],aID))
+                for entry in approve['entries']:
+                    entriesTask.append(asyncio.create_task(processEntry(entry, conn, cursor, wkspaceId, fkc, aID)))
+                await asyncio.gather(*entriesTask)
+                await deleted
+                return state or -1
+        except Employeeuser.DoesNotExist: 
+            logger.warning('FK Constraint on employee user violated. Retrying ')
+            if not fkc:
+                pushUsers(wkspaceId, conn, cursor)
+                return await processApproval(approve, wkspaceId, conn, cursor, True)
+            else:
+                raise
+    except Exception as e: 
+        logger.error(f'({e.__traceback__.tb_lineno}) in ClockifyPushV3')
+        raise e
+    
+async def pushTimesheet(wkspaceId, conn, cursor, stat):
+    logger.info(f'PushTimeSheet Function executing ... ')
+    key = getApiKey()
+    
+    pullApproved = asyncio.create_task(getApprovedRequests(wkspaceId, key, status= stat))
+    logger.debug(f'Getting Data')
+    count = 0
+    update = 0
+    error = 0
+    inserted = 0
+    
+    try:
+        approved = await pullApproved
+        logger.debug(f'Approved tpe: {type(approved)}')
+        for page in range(2,50):
+            pullApproved = asyncio.create_task(getApprovedRequests(wkspaceId, key, status= stat, page=page))
+            tasks = []
+            cursor2, conn2 = sqlConnect()
+            for approve in approved:
+                if len(approve) == 0: 
+                    continue
+                tasks.append(asyncio.create_task(processApproval(approve, wkspaceId, conn2, cursor2, False)))
+
+                # await processApproval(approve, wkspaceId, conn, cursor, False)
+            cleanUp(conn2, cursor2)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for result in results :
+                if  isinstance(result, Exception):
+                    logger.warning('An Exception occured while handling one of the requests')
+                    logger.error(result)
+                    error +=1 
+                elif result == 1:
+                    update += 1
+                elif result ==2 :
+                    inserted += 1
+                else:
+                    raise Exception(f'Unknown return value from function {result}') 
+                count += 1
+            
+            approved = await pullApproved
+            logger.info('Next Page Recieved')
+        logger.info('PushTimeSheet Function Done')
+        return f"Operation Completed: Timesheet table has {inserted} new records, {update} records updated, {error} errors ({count} Items) "
+    except Exception as e:
+        logger.critical(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+        raise e
 

@@ -1,24 +1,22 @@
 
 from .serializers import *
 from .models import *
-from django.utils import timezone
 from django.core.handlers.asgi import ASGIRequest
-from django.http import HttpRequest, JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils 
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from asgiref.sync import sync_to_async
 
-from json import loads, dumps
+from json import dumps
 from .Loggers import setup_background_logger
 from .clockify_util.ClockifyPullV3 import getCategories
 from .clockify_util import ClockifyPullV3
 from .clockify_util.hpUtil import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, pauseOnDeadlock
-from random import randint
-import time 
 import requests
 import asyncio
+
 MAX_RETRY = 3
 loggerLevel = 'WARNING'
 logger = setup_background_logger(loggerLevel) #pass level argument 
@@ -242,7 +240,6 @@ def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread
         logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}') 
         raise e
                     
-
 @csrf_exempt
 async def approvedEntries(request: ASGIRequest): 
     '''
@@ -393,7 +390,6 @@ async def approvedExpenses(request:ASGIRequest):
         response = JsonResponse(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED, safe = False)
         asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response
-
 
 def postThreadLemEntryTask(inputData: dict):
     logger = setup_background_logger()

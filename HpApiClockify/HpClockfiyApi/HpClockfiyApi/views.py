@@ -21,7 +21,6 @@ Clockify sends all requests as POST thus seprate views are used to handle differ
 
 from django.http import JsonResponse, HttpResponse
 from django.core.handlers.asgi import ASGIRequest
-from rest_framework.exceptions import ErrorDetail
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.db import  utils  #, transaction
@@ -38,12 +37,8 @@ from .clockify_util import SqlClockPull
 from .clockify_util.hpUtil import asyncio, taskResult, dumps, loads, reverseForOutput, download_text_file, create_hash, hash50, pauseOnDeadlock, log_sql_queries
 from . Loggers import setup_server_logger
 from . import settings
-from rest_framework.exceptions import ErrorDetail
-from json.decoder import JSONDecodeError
-from datetime import datetime
 import time 
 import httpx
-import base64
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger()
