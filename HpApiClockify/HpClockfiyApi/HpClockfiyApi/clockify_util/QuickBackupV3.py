@@ -95,6 +95,7 @@ async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = ['APPROVED', 'PEND
         return 0
     output = []
     for stat in status: 
+        logger.info(f'Updating {stat}')
         result = await ClockifyPushV3.pushTimesheet(wid, conn, cursor, stat)
         logger.info(result)
         output.append(result)
