@@ -1224,11 +1224,6 @@ async def processEntry(entryData, conn, cursor, wkspaceId, fkc, aId = None):
                 entry.asave()
 
                 
-            finally:
-                if len(tags) != 0:
-                    logger.info(f'\t\t\tNumber of tags - {len(tags)}')
-                    await pushTags(wkspaceId,tags,eID)
-                logger.info(f'\t\tEntry added succsesfully to database {eID}')
         except Project.DoesNotExist:
             logger.warning('\tFK Constraint on Project  violated. Retrying... ')
             if not fkc:
@@ -1247,6 +1242,11 @@ async def processEntry(entryData, conn, cursor, wkspaceId, fkc, aId = None):
             else:
                 logger.critical(f'Could not resolve FK Constraint ')
                 raise
+        finally:
+            if len(tags) != 0:
+                logger.info(f'\t\t\tNumber of tags - {len(tags)}')
+                await pushTags(wkspaceId,tags,eID)
+            logger.info(f'\t\tEntry Processed - {eID}')
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) in ClockifyPushV3')
         raise e
