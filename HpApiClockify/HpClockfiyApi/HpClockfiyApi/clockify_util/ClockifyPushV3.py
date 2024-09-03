@@ -1103,7 +1103,7 @@ async def pushTags(wkSpaceID, tags: list, enID):
                 cursor.execute(
                     '''
                     insert into TagsFor (id, entryID, name, workspace_id)
-                    values (?, ?, ?, ?, ?)
+                    values (?, ?, ?, ?)
                     ''', (tag["id"], enID, tag["name"], wkSpaceID)
                 )
                 count += 1
