@@ -460,7 +460,7 @@ async def quickBackup(request: ASGIRequest = None, event = None):
         logger.error(f'Quickbackup: {e.__traceback__.tb_lineno} {str(e)}')
         response = JsonResponse(data = str(e), status=status.HTTP_207_MULTI_STATUS, safe=False)
     finally: 
-        return response
+        return response or JsonResponse(data = 'An Error Occured', status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #depreciated
 @api_view(['GET'])
