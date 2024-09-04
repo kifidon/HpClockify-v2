@@ -1292,14 +1292,6 @@ async def processApproval(approve, wkspaceId, conn, cursor, fkc):
                 timesheet.asave()
                 logger.info('Insert Complete')
                 state = 2
-            finally: 
-                entriesTask = []
-                deleted = asyncio.create_task(deleteEntries(approve['entries'],aID))
-                for entry in approve['entries']:
-                    entriesTask.append(asyncio.create_task(processEntry(entry, conn, cursor, wkspaceId, fkc, aID)))
-                await asyncio.gather(*entriesTask)
-                await deleted
-                return state or -1
         except Employeeuser.DoesNotExist: 
             logger.warning('FK Constraint on employee user violated. Retrying ')
             if not fkc:
@@ -1307,6 +1299,14 @@ async def processApproval(approve, wkspaceId, conn, cursor, fkc):
                 return await processApproval(approve, wkspaceId, conn, cursor, True)
             else:
                 raise
+        finally: 
+            entriesTask = []
+            deleted = asyncio.create_task(deleteEntries(approve['entries'],aID))
+            for entry in approve['entries']:
+                entriesTask.append(asyncio.create_task(processEntry(entry, conn, cursor, wkspaceId, fkc, aID)))
+            await asyncio.gather(*entriesTask)
+            await deleted
+            return state or -1
     except Exception as e: 
         logger.error(f'({e.__traceback__.tb_lineno}) in ClockifyPushV3')
         raise e
@@ -1325,7 +1325,7 @@ async def pushTimesheet(wkspaceId, conn, cursor, stat):
     try:
         approved = await pullApproved
         logger.debug(f'Approved tpe: {type(approved)}')
-        for page in range(2,50):
+        for page in range(2,10):
             pullApproved = asyncio.create_task(getApprovedRequests(wkspaceId, key, status= stat, page=page))
             tasks = []
             cursor2, conn2 = sqlConnect()

@@ -373,20 +373,23 @@ async def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
     Returns:
         dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
     """
-    output = []  # Initialize an empty list
-    headers = {
-        'X-Api-Key': key
-    }
-    url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=10&sort-column=UPDATED_AT"    
-    response = requests.get(url, headers=headers)
-    # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
-    #     pass
-    if response.status_code == 200:
-        return response.json()  # Append JSON data to the list
-    else:
-            print(f"Error: {response.status_code}, {response.text}")
-            output.append({})
-    return output
+    try: 
+        output = []  # Initialize an empty list
+        headers = {
+            'X-Api-Key': key
+        }
+        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=10&sort-column=UPDATED_AT"    
+        response = requests.get(url, headers=headers)
+        # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
+        #     pass
+        if response.status_code == 200:
+            return response.json()  # Append JSON data to the list
+        else:
+                print(f"Error: {response.status_code}, {response.text}")
+                output.append({})
+        return output
+    except Exception as e:
+        logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
 
 def getCategories(workspaceId, page):
     logger.info(f' Begining Clockify data pull')
