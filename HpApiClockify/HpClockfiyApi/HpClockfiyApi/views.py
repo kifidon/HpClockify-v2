@@ -1190,7 +1190,7 @@ def requestFilesForExpense(request:ASGIRequest):
 # @api_view(["PUT", "POST", "GET"])
 def postThreadLemSheet(inputData):
     try:
-        inputData["id"] = hash50(inputData['clientId'], str(time.now()), inputData['projectId'])
+        inputData["id"] = hash50(inputData['clientId'], datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S'), inputData['projectId'])
         #gen LemNumber
         lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
         # logger.debug(type(lems))
