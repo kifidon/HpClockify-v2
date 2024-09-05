@@ -69,6 +69,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()  # validate this later 
+    end_date = serializers.SerializerMethodField()  # validate this later 
     Truck = serializers.SerializerMethodField() 
     hourly = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
@@ -110,13 +111,24 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
         except Exception: 
             return date.today().strftime('%Y-%m-%d')
     
+    def get_end_date(self, obj): 
+        field = dict()
+        for custom in obj['userCustomFields']:
+            field[custom['name']] = custom['value']
+        try:
+            return field['End Date']
+        except Exception: 
+            return date.today().strftime('%Y-%m-%d')
+    
     def get_hourly(self, obj): 
+        logger = setup_background_logger()
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Rate Type']
-        except Exception: 
+        except Exception as e: 
+            logger.error(f'({str(e)})')
             return 5
     
     def get_manager(self, obj):
@@ -145,6 +157,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data) 
+            validated_data['end_date'] = self.get_end_date(self.initial_data) 
             validated_data['hourly'] = self.get_hourly(self.initial_data) 
             validated_data['manager'] = self.get_manager(self.initial_data) 
             validated_data['truckDetails'] = self.get_truckDetails(self.initial_data) 
@@ -160,6 +173,7 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['status'] = self.get_status(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
             validated_data['start_date'] = self.get_start_date(self.initial_data)
+            validated_data['end_date'] = self.get_end_date(self.initial_data)
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['hourly'] = self.get_hourly(self.initial_data) 
             validated_data['manager'] = self.get_manager(self.initial_data)

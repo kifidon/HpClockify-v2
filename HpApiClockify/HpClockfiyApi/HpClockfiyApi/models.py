@@ -48,6 +48,7 @@ class Employeeuser(models.Model):
     role = models.CharField(db_column='role', max_length=50, blank=True, null=True)  # Field name made lowercase.
     manager = models.CharField(db_column='manager', max_length=50, blank=True, null=True)  # Field name made lowercase.
     start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     hourly = models.IntegerField(blank = True, null = True, default = 0, db_column = 'hourly')
     Truck = models.IntegerField(blank= False, null = True, default=0, db_column='hasTruck')
     truckDetails = models.CharField(blank= True, null= True, db_column= 'truckDetails', max_length=50)
