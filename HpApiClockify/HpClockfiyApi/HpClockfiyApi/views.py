@@ -372,7 +372,7 @@ async def updateTimesheets(request:ASGIRequest):
         await saveTaskResult(response, inputData, 'UpdateTimesheet Function')
         return response
 
-@api_view(['POST'])
+@csrf_exempt
 async def newTimeSheets(request: ASGIRequest):
     '''
     Function Description: 
@@ -393,30 +393,35 @@ async def newTimeSheets(request: ASGIRequest):
     secret = 'Qzotb4tVT5QRlXc3HUjwZmkgIk58uUyK'
     if not aunthenticateRequst(request, secret):
         response = JsonResponse(data={'Invalid Request': 'SECURITY ALERT'}, status=status.HTTP_423_LOCKED)
-        taskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
         return response
     if request.method != 'POST':
         logger = setup_server_logger(loggerLevel)
         response = Response(data=None, status = status.HTTP_405_METHOD_NOT_ALLOWED)
-        taskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
+        await saveTaskResult(response, dumps(loads(request.body)), 'NewTimesheet Function')
         return response
         
     try:
         data = loads(request.body)
-        serializer = TimesheetSerializer(data= data)
-        if serializer.is_valid():
-            serializer.save()
-            response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
-            logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
-        else:
-            response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
-            logger.error(f'{response}')
-
+        def postNewTimesheet(data):
+            serializer = TimesheetSerializer(data= data)
+            if serializer.is_valid():
+                serializer.save()
+                response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
+                logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
+            else:
+                response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
+                logger.error(f'{response}')
+        post = sync_to_async(postNewTimesheet, thread_sensitive= False)
+        
         async def callBackgroungEntry():
                 url =  'http://localhost:5000/HpClockifyApi/task/Entry'
                 async with httpx.AsyncClient(timeout=300) as client:
                     await client.post(url=url, data=data)
 
+        await post(data)
+        await callBackgroungEntry()
+        
     except utils.IntegrityError as e:
         if 'PRIMARY KEY constraint' in str(e): 
             response = JsonResponse(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT, safe=False)
