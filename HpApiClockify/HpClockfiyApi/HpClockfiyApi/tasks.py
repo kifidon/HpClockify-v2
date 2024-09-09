@@ -280,7 +280,7 @@ async def approvedEntries(request: ASGIRequest):
                 workspaceId = inputData.get('workspaceId')
                 stat = inputData.get('status').get('state') or None
             
-                if stat != 'APPROVED':
+                if stat not in ('APPROVED', 'PENDING'):
                     logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
                     response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
                     break

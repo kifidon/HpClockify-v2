@@ -421,7 +421,7 @@ async def newTimeSheets(request: ASGIRequest):
 
         await post(data)
         await callBackgroungEntry()
-        
+
     except utils.IntegrityError as e:
         if 'PRIMARY KEY constraint' in str(e): 
             response = JsonResponse(data={'Message': f'Cannot create new Timesheet because id {request.data["id"]} already exists'}, status=status.HTTP_409_CONFLICT, safe=False)
@@ -441,7 +441,7 @@ async def newTimeSheets(request: ASGIRequest):
         response = JsonResponse(data=str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE, safe= False)
     
     finally: 
-        taskResult(response, data, 'New Timesheet Function')
+        await saveTaskResult(response, data, 'New Timesheet Function')
         return response
 
    
