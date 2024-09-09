@@ -1153,7 +1153,7 @@ def Payroll(start = None, end = None):
                 worksheet.write(row,6,totalsData[i][5], totalFormat)
                 worksheet.write(row,7,totalsData[i][6], totalFormat)
                 worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
-                if float(totalsData[i][8]) != 80 and str(previousEmp[1]) == 'Salary': 
+                if float(totalsData[i][8]) not in (80, 50, 68) and str(previousEmp[1]) == 'Salary': 
                     worksheet.write(row,10,totalsData[i][8], highlightFormat)
                 else: worksheet.write(row,10, totalsData[i][8], hlGreenFormat)
                 worksheet.write(row,11, '', totalFormat)
