@@ -952,7 +952,7 @@ def Payroll(start = None, end = None):
                 at.policy_name,
                 at.TotalHours + at.holiday as TotalHrs,
                 Coalesce(eu.manager, 'Missing Manager Information'),
-                at.status
+                Coalesce(at.status, 'NO SUBMISSION')
             from AttendanceApproved at
             Left Join EmployeeUser eu on eu.name = at.name
             where at.date between '{start}' and '{end}' and at.[Type] = '{type}'
