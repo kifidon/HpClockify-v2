@@ -216,7 +216,7 @@ def syncUpdateEntries(entries, workspaceId, timeId, inputData): # create thread
     try: 
         #refactoring 
         entries['workspaceId']= workspaceId
-        entries['timesheetId'] = entries['approvalRequestId']
+        entries['timesheetId'] = entries['approvalRequestId'] or timeId
         try: # try and update if exists, otherwise create
             entry = Entry.objects.get(id = entries["id"], workspaceId = workspaceId )
             serializer = EntrySerializer(data=entries, instance=entry, context = {'workspaceId': workspaceId,'timesheetId': timeId})

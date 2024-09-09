@@ -373,7 +373,7 @@ async def updateTimesheets(request:ASGIRequest):
         return response
 
 @api_view(['POST'])
-def newTimeSheets(request: ASGIRequest):
+async def newTimeSheets(request: ASGIRequest):
     '''
     Function Description: 
         Syncrhonosuly inserts a timesheet as a pending approval request. Does not search for entries or Expenses yet. In a future version move the entry/expense
@@ -411,6 +411,11 @@ def newTimeSheets(request: ASGIRequest):
         else:
             response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
             logger.error(f'{response}')
+
+        async def callBackgroungEntry():
+                url =  'http://localhost:5000/HpClockifyApi/task/Entry'
+                async with httpx.AsyncClient(timeout=300) as client:
+                    await client.post(url=url, data=data)
 
     except utils.IntegrityError as e:
         if 'PRIMARY KEY constraint' in str(e): 
