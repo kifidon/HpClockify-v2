@@ -92,7 +92,7 @@ def getProjects(workspaceId, key, page =1):
         return dict()
 
 async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
-    while page < 50:
+    while page < 10:
         if entry and expense:
             logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
             return []
