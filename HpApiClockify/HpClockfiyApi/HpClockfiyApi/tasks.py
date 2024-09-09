@@ -265,27 +265,27 @@ async def approvedEntries(request: ASGIRequest):
         return response           
    
     logger.info('\tWaiting for Approved Entry Semaphore')
-    async with approvedEntrySemaphore:
-        logger.info('\tAquired Approved Entry Semaphore')
-        retryCount = 0
-        while  retryCount < MAX_RETRY:
-            retryCount += 1
-            try:
-                logger.debug(type(request.body))
-                inputData = bytes_to_dict(request.body)
-                logger.debug(dumps(inputData,indent=4))
-                key = ClockifyPullV3.getApiKey()
-                
-                timeId = inputData.get("id")
-                workspaceId = inputData.get('workspaceId')
-                stat = inputData.get('status').get('state') or None
+    logger.info('\tAquired Approved Entry Semaphore')
+    retryCount = 0
+    while  retryCount < MAX_RETRY:
+        retryCount += 1
+        try:
+            logger.debug(type(request.body))
+            inputData = bytes_to_dict(request.body)
+            logger.debug(dumps(inputData,indent=4))
+            key = ClockifyPullV3.getApiKey()
             
-                if stat not in ('APPROVED', 'PENDING'):
-                    logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
-                    response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
-                    break
-                
-                allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+            timeId = inputData.get("id")
+            workspaceId = inputData.get('workspaceId')
+            stat = inputData.get('status').get('state') or None
+        
+            if stat not in ('APPROVED', 'PENDING'):
+                logger.info(f'UpdateEntries on timesheet({timeId}): Update on Pending or Withdrawn timesheet not necessary: {stat}  406 NOT_ACCEPTED    ')
+                response = JsonResponse(data = None, status=status.HTTP_204_NO_CONTENT, safe = False)
+                break
+            
+            allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+            async with approvedEntrySemaphore:
 
                 if len(allEntries) == 0: #timesheet has no entries 
                     logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
@@ -302,7 +302,7 @@ async def approvedEntries(request: ASGIRequest):
                 logger.info(f'All Entries added for timesheet {timeId}') 
                 break
     
-            except Exception as e:
+        except Exception as e:
                 logger.error(f'{str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
                 response = JsonResponse(data = str(e), status=status.HTTP_417_EXPECTATION_FAILED, safe = False)
                 
