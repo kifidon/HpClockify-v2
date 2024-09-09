@@ -1155,8 +1155,9 @@ def Payroll(start = None, end = None):
                 worksheet.merge_range(row,8,row,9,totalsData[i][7], totalFormat)
                 if float(totalsData[i][8]) != 80 and str(previousEmp[1]) == 'Salary': 
                     worksheet.write(row,10,totalsData[i][8], highlightFormat)
-                else: worksheet.write(row,10, '', hlGreenFormat)
+                else: worksheet.write(row,10, totalsData[i][8], hlGreenFormat)
                 worksheet.write(row,11, '', totalFormat)
+                
                 writer.close()
             # convertXlsxPdf(folder_path, file_path[:-5])
 
