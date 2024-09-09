@@ -409,9 +409,11 @@ async def newTimeSheets(request: ASGIRequest):
                 serializer.save()
                 response = JsonResponse(data={'timesheet':serializer.validated_data} ,status=status.HTTP_201_CREATED)
                 logger.info(f'NewTimesheet:{dumps(data["id"])}{response.status_code}')
+                return response
             else:
                 response = Response(data= serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
                 logger.error(f'{response}')
+                return response
         post = sync_to_async(postNewTimesheet, thread_sensitive= False)
         
         async def callBackgroungEntry():
@@ -419,8 +421,8 @@ async def newTimeSheets(request: ASGIRequest):
                 async with httpx.AsyncClient(timeout=300) as client:
                     await client.post(url=url, data=data)
 
-        await post(data)
-        await callBackgroungEntry()
+        response = await post(data)
+        asyncio.create_task(callBackgroungEntry())
 
     except utils.IntegrityError as e:
         if 'PRIMARY KEY constraint' in str(e): 
