@@ -1007,6 +1007,8 @@ def Payroll(start = None, end = None):
                 row = 0 #initilize row pointer 
 
                 #formats
+                worksheet.set_column(11, 11, 30)
+
                 titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
                 titleFormat.set_font_size(20)
                 titleFormat.set_bg_color('#D9D9D9')
