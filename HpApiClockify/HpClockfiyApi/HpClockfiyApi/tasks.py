@@ -264,8 +264,6 @@ async def approvedEntries(request: ASGIRequest):
         asyncio.create_task(saveTaskResult(response, inputData, caller))
         return response           
    
-    logger.info('\tWaiting for Approved Entry Semaphore')
-    logger.info('\tAquired Approved Entry Semaphore')
     retryCount = 0
     while  retryCount < MAX_RETRY:
         retryCount += 1
@@ -285,7 +283,9 @@ async def approvedEntries(request: ASGIRequest):
                 break
             
             allEntries = await ClockifyPullV3.getDataForApproval(workspaceId, key, timeId, stat, entryFlag=True)
+            logger.info('\tWaiting for Approved Entry Semaphore')
             async with approvedEntrySemaphore:
+                logger.info('\tAquired Approved Entry Semaphore')
 
                 if len(allEntries) == 0: #timesheet has no entries 
                     logger.warning('No Content. Is this expected?') #some timesheet may be expenses only. This could also be an error where timesheet is not found 
