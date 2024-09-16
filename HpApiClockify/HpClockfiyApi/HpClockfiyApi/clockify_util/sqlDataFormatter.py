@@ -864,6 +864,8 @@ def NonBillableReportGen(start = None, end = None):
             subTotal = 0
             billingAmount = 0
             nonBillingAmount = 0
+            grandBill = 0
+            grandNonBill = 0
             for rowData in data:
                 current = rowData[0]
                 
@@ -876,10 +878,11 @@ def NonBillableReportGen(start = None, end = None):
                         worksheet.write(row,9,totalNonBillable,textFormat)
                         worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
+                        
                         totalBillable = 0
                         totalNonBillable = 0
                     if subTotal!= 0 :
-                        worksheet.merge_range(row,0,row,8, 'GRAND TOTAL', subTotalFormat)
+                        worksheet.merge_range(row,0,row,8, 'SUB TOTAL', subTotalFormat)
                         worksheet.write(row,9,subTotal,subTotalFormat)
                         worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
@@ -909,19 +912,21 @@ def NonBillableReportGen(start = None, end = None):
                 billingAmount +=  rowData[5] 
                 nonBillingAmount += rowData[4]
                 previous = rowData[0]
+                grandBill +=float(rowData[4])
+                grandNonBill +=float(rowData[5])
                 row+= 1
             
             if subTotal!= 0 :
-                worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
-                worksheet.write(row,8,subTotal,subTotalFormat)
-                worksheet.write(row,9, '', textFormat)
-                worksheet.write(row,10, '', textFormat)
+                worksheet.merge_range(row,0,row,8, 'SUB TOTAL', subTotalFormat)
+                worksheet.write(row,9,subTotal,subTotalFormat)
+                worksheet.merge_range(row,10,row, 11, '', textFormat)
+                
                 row += 1
 
-            worksheet.merge_range(row,5,row,6, 'Totals', columnNameFormat)
-            worksheet.write(row,6,totalBillable,columnNameFormat)
-            worksheet.write(row,7,totalNonBillable,columnNameFormat)
-            worksheet.write(row,8,(totalBillable+ totalNonBillable),columnNameFormat)
+            worksheet.merge_range(row,5,row,7, 'GRAND TOTAL', columnNameFormat)
+            worksheet.write(row,8, grandBill,columnNameFormat)
+            worksheet.write(row,9,grandNonBill,columnNameFormat)
+            worksheet.write(row+1,9,(grandBill+ grandNonBill),columnNameFormat)
             writer.close()
 
         convertXlsxPdf(folder_path, file_path)
