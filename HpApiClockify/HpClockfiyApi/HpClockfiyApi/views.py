@@ -1412,7 +1412,8 @@ def insertRoleOrEquipment(request:ASGIRequest):
                 serializer.save()
                 logger.info("Operation Completed Succesfully")
                 request.session['inputData'] = inputData
-                return redirect('ratesheets' )
+                url = redirect('ratesheets' )
+                return JsonResponse(data=url, status=status.HTTP_201_CREATED, safe=False)
             else:
                 for key, value in serializer.errors.items():
                     logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
