@@ -39,6 +39,7 @@ from . Loggers import setup_server_logger
 from . import settings
 import time 
 import httpx
+from django.shortcuts import redirect
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger()
@@ -1392,14 +1393,26 @@ def insertRoleOrEquipment(request:ASGIRequest):
             if inputData['isRole']:
                 logger.info("Creating serializer for Role Table")
                 serializer = RoleSerializer(data=inputData)
+                inputData['roleId'] = inputData['id']
+                #make default later 
+                inputData["workRate"]= 0
+                inputData["travelRate"]=0
+                inputData["calcRate"] = 0
+                inputData["mealRate"] =0 
+                inputData["hotelRate"] = 0
             else:
                 logger.info("Creating serializer for Equipment Table")                 
                 serializer = EquipmentSerializer(data=inputData)
+                inputData['equipId'] = inputData['id']
+                #make these the default when no key is passed 
+                inputData["dayRate"] = 0
+                inputData["unitRate"] = 0
             if serializer.is_valid():
                 logger.info("Saving Request Data...")
                 serializer.save()
                 logger.info("Operation Completed Succesfully")
-                return JsonResponse(data=inputData, status=status.HTTP_201_CREATED)
+                request.session['inputData'] = inputData
+                return redirect('ratesheets' )
             else:
                 for key, value in serializer.errors.items():
                     logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
@@ -1421,14 +1434,19 @@ def insertRoleOrEquipment(request:ASGIRequest):
         return response
 
 
-@api_view(["POST"])
-def rateSheets(request: ASGIRequest): #maybe make async later 
+@api_view(["POST", "GET"])
+def rateSheets(request: ASGIRequest = None): #maybe make async later 
     logger = setup_server_logger()
     logger.info("Inserting Data for Client Rate Sheet")
-    inputData = loads(request.body)
+    try: 
+        inputData = request.session['inputData']
+        logger.info('Redirect Caught')
+    except KeyError : 
+        inputData = loads(request.body)
+    logger.debug(dumps(inputData, indent= 4))
     try:
-        if request.method == 'POST': 
-            if inputData['isRole']: # Worker rate sheet 
+        if request.method == 'POST' or request.method == 'GET': 
+            if inputData['isRole'] == True: # Worker rate sheet 
                 logger.info("Worker Rate sheet path")
                 inputData['_id'] = hash50(inputData['clientId'], inputData['roleId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
@@ -1456,6 +1474,7 @@ def rateSheets(request: ASGIRequest): #maybe make async later
                     raise ValidationError(serializer.initial_data)
             else: #Eqp rate sheet 
                 logger.info('Equipment Rate sheet path')
+                logger.debug(f'Hash Fields: {inputData.get('clientId', "Missing")}, {inputData.get('equipId', "Missing")}, {inputData.get('projectId', "Missing")}')
                 inputData['_id'] = hash50(inputData['clientId'], inputData['equipId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
                 try:
@@ -1488,7 +1507,7 @@ def rateSheets(request: ASGIRequest): #maybe make async later
         logger.debug(f"Validation error - ({v.__traceback__.tb_lineno}) {str(v.args[0])}")
         return JsonResponse(data='Invalid Requests. Check selections and try again. If problem persists, contact server admin', status=status.HTTP_400_BAD_REQUEST, safe=False)
     except KeyError as k:
-        logger.error(f"Missing or incorrect key. Check isRole: \n{reverseForOutput(inputData)}")
+        logger.error(f"({k.__traceback__.tb_lineno})Missing or incorrect key. Check isRole: \n{reverseForOutput(inputData)}")
         return JsonResponse(data='Internal server Key Error', status=status.HTTP_500_INTERNAL_SERVER_ERROR, safe= False)
     except Exception as e:
         response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)

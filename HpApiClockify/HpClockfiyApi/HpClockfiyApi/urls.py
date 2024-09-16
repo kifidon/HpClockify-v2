@@ -70,7 +70,7 @@ urlpatterns = [
     path('HpClockifyApi/lemEntry', views.LemWorkerEntry),
     path('HpClockifyApi/equipmentEntry', views.equipmentEntries),
     path('HpClockifyApi/recordName', views.insertRoleOrEquipment),
-    path('HpClockifyApi/rateSheet', views.rateSheets),
+    path('HpClockifyApi/rateSheet', views.rateSheets, name = 'ratesheets'),
     
     path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
     
