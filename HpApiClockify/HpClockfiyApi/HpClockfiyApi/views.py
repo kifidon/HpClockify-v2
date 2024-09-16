@@ -1412,7 +1412,7 @@ def insertRoleOrEquipment(request:ASGIRequest):
                 serializer.save()
                 logger.info("Operation Completed Succesfully")
                 request.session['inputData'] = inputData
-                url = redirect('ratesheets' )
+                url ='https://hillplain-api.ngrok.app/HpClockifyApi/rateSheet'
                 return JsonResponse(data={"url": url, "inputdata": inputData} , status=status.HTTP_201_CREATED, safe=False)
             else:
                 for key, value in serializer.errors.items():
