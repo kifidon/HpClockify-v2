@@ -611,24 +611,42 @@ class ProjectSerializer(serializers.ModelSerializer):
     '''
     title = serializers.SerializerMethodField(required = False)
     code = serializers.SerializerMethodField(required = False)
-
-    def get_code(self, obj):
-        return obj[:8]
+    def get_code(self, obj: str):
+        logger = setup_background_logger()
+        try: 
+            code = obj.split(' - ')
+            if len(code) != 2:
+                raise ValueError
+            return str(code[0])
+        except ValueError as v:
+            logger.warning('Project must have format XXX-XXX - Project Name ')
+            return 'INVALID NAME FORMAT'
+            
+        
     
-    def get_title(self, obj):
-        return obj[11:]
+    def get_title(self, obj: str):
+        logger = setup_background_logger()
+        try:
+            title = obj.split(' - ')
+            if len(title) != 2: 
+                raise(ValueError)
+            return str(title[1])
+        except ValueError as v:
+            logger.warning('Project must have format XXX-XXX - Project Name ')
+            return 'INVALID NAME FORMAT'
+
     
     class Meta:
         model = Project
         fields = '__all__'  
 
-        def create(self, validated_data):
-            obj = validated_data.get('name', '')
-            validated_data['title'] = self.get_title(obj)
-            validated_data['code'] = self.get_code(obj)
-            return super().create(validated_data)
-        
-        def update(self, instance,  validated_data):
+    def create(self, validated_data):
+        obj = validated_data.get('name', '')
+        validated_data['title'] = self.get_title(obj)
+        validated_data['code'] = self.get_code(obj)
+        return super().create(validated_data)
+    
+    def update(self, instance,  validated_data):
             obj = validated_data.get('name', '')
             validated_data['title'] = self.get_title(obj)
             validated_data['code'] = self.get_code(obj)
