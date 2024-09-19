@@ -1207,21 +1207,33 @@ def postThreadLemSheet(inputData):
         #gen LemNumber
         lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
         # logger.debug(type(lems))
-        inputData['lemNumber'] = 'LEM-' + str(lems.count() + 1).zfill(4)
+        lemNum = 0
+        for lem in lems:
+            if int(lem.lemNumber.split('-')[1]) > lemNum:
+                lemNum = int(lem.lemNumber.split('-')[1])
+        
+        inputData['lemNumber'] = 'LEM-' + str(lemNum+1).zfill(4)
         serializer = LemSheetSerializer(data=inputData)
         if serializer.is_valid():
             serializer.save()
+            logger.info('Opperation Succesful')
             return True
         else:
             for key, value in serializer.errors.items():
                 logger.error(dumps({'Error Key': key, 'Error Value': value}, indent =4))
             raise ValidationError(serializer.errors)
     except ValidationError as v:
-        return False
+        logger.warning(f'Serializer could not be saved: {serializer.errors}')
+        for key, value in serializer.errors.items():
+            # Print the key and each error code and message
+            logger.error(dumps({'Error Key': key, 'Error Value': value}, indent = 4))
+                
+        return False # Unknown, Raise error (BAD Request)
     except utils.IntegrityError as c:
+        logger.error(f'{str(c)}')
         if "PRIMARY KEY constraint" in str(c):
-            logger.error(reverseForOutput(inputData))
             raise(utils.IntegrityError("A similar Lem already exists. Update the old Lem or change the current inputs "))
+        return False
     except Exception as e: 
         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
         raise e
@@ -1237,6 +1249,7 @@ async def lemSheet(request:ASGIRequest):
             post = sync_to_async(postThreadLemSheet, thread_sensitive=False)
             try:
                 result = await post(inputData)
+                logger.debug(result)
                 if result:
                     return JsonResponse(data=inputData['id'], status= status.HTTP_201_CREATED, safe=False)
                 else: return JsonResponse(data='There was a problem creating your LEM. A similar record may already exist. Review selection and try again. To update lem visit the View Lem Screen. If problem continues contact Admin', status =status.HTTP_400_BAD_REQUEST, safe = False)
