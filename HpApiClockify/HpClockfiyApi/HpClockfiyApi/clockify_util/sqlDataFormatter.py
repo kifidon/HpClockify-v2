@@ -670,7 +670,7 @@ async def BillableReportGenerate(month = None, year = None, pCode = None):
         else: endDate = f'20{year}-{month}-25'
         if(startDateObj.weekday() != 6):
             startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
-        else: startDate = f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d'
+        else: startDate = f'20{previousYear}-{previousMonth}-25'
         logger.debug(f'Date Range: {startDate}-{endDate}')
         # startDate = month
         # endDate = year
