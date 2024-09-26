@@ -823,6 +823,9 @@ def NonBillableReportGen(start = None, end = None):
             subTotalFormat = workbook.add_format({'bold': True, 'align': 'right'})
             subTotalFormat.set_bg_color('#DAEEF3')
             subTotalFormat.set_border(1)
+            subTotalFormatNum = workbook.add_format({'bold': True, 'align': 'center'})
+            subTotalFormatNum.set_bg_color('#DAEEF3')
+            subTotalFormatNum.set_border(1)
             # rowTotals 
             rowTotalFormat = workbook.add_format({'bold': True, 'align': 'right'})
             rowTotalFormat.set_border(1)
@@ -871,21 +874,23 @@ def NonBillableReportGen(start = None, end = None):
                 
                 if (current is not None or previous is not None) and current != previous:
                     if billingAmount != 0 or nonBillingAmount != 0:
-                        worksheet.merge_range(row,0,row,3, '', textFormat)
-                        worksheet.write(row,4, '', textFormat)
-                        worksheet.merge_range(row,5,row,7, 'TOTAL', rowTotalFormat)
-                        worksheet.write(row,8,totalBillable,textFormat)
-                        worksheet.write(row,9,totalNonBillable,textFormat)
+                        worksheet.merge_range(row,0,row,7, 'SUB TOTAL', subTotalFormat)
+                        worksheet.write(row,8,totalBillable,subTotalFormatNum)
+                        worksheet.write(row,9,totalNonBillable,subTotalFormatNum)
                         worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
-                        
-                        totalBillable = 0
-                        totalNonBillable = 0
-                    if subTotal!= 0 :
-                        worksheet.merge_range(row,0,row,8, 'SUB TOTAL', subTotalFormat)
-                        worksheet.write(row,9,subTotal,subTotalFormat)
+                        worksheet.merge_range(row,0,row,7, 'PERCENTAGE', subTotalFormat)
+                        worksheet.write(row,8,f'%{round((totalBillable/subTotal)*100, 2)}',subTotalFormatNum)
+                        worksheet.write(row,9,f'%{round((totalNonBillable/subTotal)*100, 2)}',subTotalFormatNum)
                         worksheet.merge_range(row,10,row, 11, '', textFormat)
                         row += 1
+                        worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
+                        worksheet.merge_range(row,8,row,9, subTotal,subTotalFormatNum)
+                        worksheet.merge_range(row,10,row, 11, '', textFormat)
+                        row += 1
+                    
+                    totalBillable = 0
+                    totalNonBillable = 0
                     subTotal = 0
                     billingAmount = 0
                     nonBillingAmount = 0
@@ -897,9 +902,10 @@ def NonBillableReportGen(start = None, end = None):
                     worksheet.write(row,8, '', textFormat)
                     worksheet.write(row,9, '', textFormat)
                     worksheet.merge_range(row,10,row, 11 ,'', textFormat)
+                    # worksheet.merge_range(row,0,row,3, '', textFormat)
                     row += 1
+                else: 
                     worksheet.merge_range(row,0,row,3, '', textFormat)
-                else: worksheet.merge_range(row,0,row,3, '', textFormat)
                 worksheet.write(row, 4, rowData[2], textFormat)
                 worksheet.merge_range(row,5, row, 7, rowData[3], textFormat)
                 worksheet.write(row, 8, rowData[4], textFormat)
@@ -916,11 +922,22 @@ def NonBillableReportGen(start = None, end = None):
                 grandNonBill +=float(rowData[5])
                 row+= 1
             
-            if subTotal!= 0 :
-                worksheet.merge_range(row,0,row,8, 'SUB TOTAL', subTotalFormat)
-                worksheet.write(row,9,subTotal,subTotalFormat)
+            if billingAmount != 0 or nonBillingAmount != 0:
+                worksheet.merge_range(row,0,row,7, 'SUB TOTAL', subTotalFormat)
+                worksheet.write(row,8,totalBillable,subTotalFormatNum)
+                worksheet.write(row,9,totalNonBillable,subTotalFormatNum)
                 worksheet.merge_range(row,10,row, 11, '', textFormat)
+                row += 1
                 
+            if subTotal!= 0 :
+                worksheet.merge_range(row,0,row,7, 'PERCENTAGE', subTotalFormat)
+                worksheet.write(row,8,f'%{round((totalBillable/subTotal)*100, 2)}',subTotalFormatNum)
+                worksheet.write(row,9,f'%{round((totalNonBillable/subTotal)*100, 2)}',subTotalFormatNum)
+                worksheet.merge_range(row,10,row, 11, '', textFormat)
+                row += 1
+                worksheet.merge_range(row,0,row,7, 'GRAND TOTAL', subTotalFormat)
+                worksheet.merge_range(row,8,row,9, subTotal,subTotalFormatNum)
+                worksheet.merge_range(row,10,row, 11, '', textFormat)
                 row += 1
 
             worksheet.merge_range(row,5,row,7, 'GRAND TOTAL', columnNameFormat)
@@ -929,7 +946,7 @@ def NonBillableReportGen(start = None, end = None):
             worksheet.write(row+1,9,(grandBill+ grandNonBill),columnNameFormat)
             writer.close()
 
-        convertXlsxPdf(folder_path, file_path)
+        # convertXlsxPdf(folder_path, file_path)
         return folder_path
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')

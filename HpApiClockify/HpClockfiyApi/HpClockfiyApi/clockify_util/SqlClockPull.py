@@ -3,6 +3,7 @@ from . import ClockifyPushV3
 from ..Loggers import setup_background_logger
 import time
 from .hpUtil import reverseForOutput
+from requests import patch
 
 def getUsrBallances(conn, cursor):
     logger = setup_background_logger('DEBUG')
@@ -81,6 +82,59 @@ def updateUsrBalances(updateBalances, polID):
     else:
         logger.info('Updated Banked Time')
 
+
+
+def updateSalaryVacation(userId, cursor):
+    
+    query = f'''
+        with cte as (
+        Select 
+            eu.id,
+            eu.name,
+            Case when DATEPART(year,eu.start_date ) = '2024' then 
+            DATEDIFF(week, eu.start_date, GETDATE()) * 3.08
+            else DATEDIFF(week, '2024-01-01', GETDATE()) * 3.08
+            end as Accrual,
+            Sum(tr.paidTimeOff) as Used,
+            eu.[status]
+
+        From EmployeeUser eu 
+        LEFT join TimeOffRequests tr on tr.eID = eu.id
+        Left join TimeOffPolicies tp on tp.id = tr.pID and tp.policy_name like '%Vacation - S%'
+        where eu.hourly = 0 
+        group by 
+        eu.id,
+        eu.name,
+        eu.start_date,
+        eu.[status]
+    )
+    Select c.Accrual- Coalesce(c.Used, 0) from cte c
+        where c.id = {userId}
+        order by c.[status], c.name 
+    '''
+    cursor.execute(balance)
+    balance = cursor.fetchone()
+    headers = {
+            'X-Api-Key': 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3',
+            'Content-Type': 'application/json'
+        }
+    url = f'https://pto.api.clockify.me/v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65dcba39a37a682370014ad8'
+
+    payload = {
+        "note": "Adding Accrued time for this week.",
+        "userIds": [
+            userId
+        ],
+        "value": 3.08 + float(balance[0])
+    }
+    result = patch(url=url, headers= headers, json=payload)
+    if result.status_code == 204:
+        return True
+    else: 
+        logger = setup_background_logger()
+        logger.error(result.reason)
+        return False
+
 def main():
     logger = setup_background_logger('DEBUG')
     while True:
@@ -98,6 +152,8 @@ def main():
         page += 1
         updateBalances= checkBalanceUpdate(usrBalances, polID, page)
     logger.info("SqlClockPull: Banked Time")
+
+    
 
 if __name__ == "__main__":
     main()

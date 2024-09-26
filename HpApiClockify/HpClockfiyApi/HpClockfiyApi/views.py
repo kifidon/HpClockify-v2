@@ -245,6 +245,17 @@ def bankedHrs(request: ASGIRequest):
         logger.error(f'{str(e)}')
         return Response(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_406_NOT_ACCEPTABLE)
 
+@csrf_exempt
+async def accuralVacationSalary(request: ASGIRequest):
+    logger.info(f'{request.method}: Vacation Accrual')
+    inputData = loads(request.body)
+    cursor, conn = sqlConnect()
+    if inputData['status']['state'] != 'APPROVED':
+        return JsonResponse(data='No Content', status= status.HTTP_204_NO_CONTENT, safe=False)
+    if(SqlClockPull.updateSalaryVacation(inputData['owner']['userId'], cursor)):
+        return JsonResponse(data=f'Updated time off balance for {inputData['owner']['userName']}.', status = status.HTTP_200_OK, safe= False)
+    return JsonResponse(data='Failed Opperation. Review Logs and resend request.', status=status.HTTP_417_EXPECTATION_FAILED, safe=False)
+
 @api_view(['GET'])
 def billableNonBillable(reqiest:ASGIRequest, start_date = None, end_date = None):
     logger = setup_server_logger()
