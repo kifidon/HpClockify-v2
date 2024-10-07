@@ -1879,7 +1879,7 @@ def lemTimesheet(projectId, startDate,endDate ):
         logger.debug(row)
         row += 1
         logger.debug(row)
-        worksheet.insert_image("G3",
+        worksheet.insert_image("J3",
             # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
             # {'x_scale': 0.04, 'y_scale': 0.04}
             r"C:\Users\Script\Desktop\unnamed.png",
@@ -1910,7 +1910,7 @@ def lemTimesheet(projectId, startDate,endDate ):
                 else:
                     worksheet.merge_range(row, column,row+1, column, data, textFormat )
                     column +=1
-            if row in range(46, 4800,46):
+            if row in range(48, 4800,48):
                 row += 4 #page break
             else: row += 2
             column = 0
@@ -1938,7 +1938,7 @@ def lemTimesheet(projectId, startDate,endDate ):
                 else:
                     worksheet.merge_range(row, column,row+1, column, data, textFormat )
                     column +=1
-            if row in range(46, 4800,48):
+            if row in range(48, 4800,48):
                 row += 4 #page break
             else: row += 2
             column = left
