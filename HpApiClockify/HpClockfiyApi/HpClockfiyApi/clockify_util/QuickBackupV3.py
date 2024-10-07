@@ -240,7 +240,10 @@ def GenerateLem(projectCode,lemId):
     logger.info(f" {file_path}")
     return file_path
     
-
+def GenerateTimeSheetLem(projectId, startDate, endDate):
+    file_path = lemTimesheet(projectId, startDate,endDate )
+    logger.info(f" {file_path}")
+    return file_path
 
 if __name__ == "__main__":
     main()

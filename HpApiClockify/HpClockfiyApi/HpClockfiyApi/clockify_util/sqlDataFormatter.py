@@ -1737,8 +1737,218 @@ def lemGenerator( projectCode: str, lemId: str):
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
         return None
 
+def lemTimesheet(projectId, startDate,endDate ):
+    cursor, conn = sqlConnect()
+    query = f'''
+        select ls.lem_sheet_date as "Date", lw.name as Role, r.name as "Role", 
+            le.[work] as "Work", 
+            le.Calc, 
+            le.travel as 'Travel', 
+            le.Meals,
+            le.Hotel
+        from LemEntry le 
+        inner join LemSheet ls on ls.id = le.lemId
+        Inner Join LemWorker lw on lw._id = le.workerId
+        inner Join Role r on r.id = lw.roleId
+        inner join Project p on p.id = ls.projectId
+        where p.id = '{projectId}' and
+        ls.lem_sheet_date between '{startDate}' and '{endDate}'
+        order by ls.lem_sheet_date ;
+    '''
+    logger.debug(query)
+    cursor.execute(query)
+    workEntry = cursor.fetchall()
+    workerColumns = [desc[0] for desc in cursor.description]
+    query = f'''
+        select ls.lem_sheet_date as 'Date', eu.name as 'Equipment', 
+            ee.qty as "QTY",
+            Case when ee.isUnitRate = 0 then 'Day'
+            else 'Unit'
+            end as 'Rate Type'
+        from LemSheet ls 
+        inner join EquipEntry ee on ee.lemId = ls.id
+        Inner join Equipment eu on eu.id = ee.equipId 
+        inner join Project p on p.id = ls.projectId
+        where p.id = '{projectId}' and
+        ls.lem_sheet_date between '{startDate}' and '{endDate}'
+        order by ls.lem_sheet_date ;
+    '''
+    logger.debug(query)
+    cursor.execute(query)
+    equipEntry = cursor.fetchall()
+    equipColumns = [desc[0] for desc in cursor.description]
 
+    cursor.execute(f'''
+                Select code from Project where id = '{projectId}'
+                   ''')
+    projectCode = cursor.fetchone()
+    assert projectCode is not None  
+    
 
+    equipEntry = [['' if val is None else val for val in row] for row in equipEntry]
+    workEntry  = [['' if val is None else val for val in row] for row in  workEntry]
+
+    # Generate Folder for spreadsheets
+    current_dir = settings.BASE_DIR
+    reports = 'Reports'
+    lemSheet = 'LemSheets'
+    payrollDir = 'Timesheets'
+    folder_name = f"{projectCode[0]}"
+    folder_path = os.path.join(current_dir,reports,lemSheet, payrollDir,  folder_name)
+    logger.debug(f'Created Folder at {folder_path}')
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path )
+    file_path = os.path.join(folder_path, f"{startDate} to {endDate}.xlsx")
+
+    
+
+    with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
+        #Generate file and initilize writers and formats 
+        workbook = writer.book
+        worksheet = workbook.add_worksheet("Hill Plain - LEM")
+        writer.sheets['Hill Plain - Payroll'] = worksheet 
+        
+        row = 0 #initilize row pointer 
+        
+    #formats 
+        titleFormat = workbook.add_format({'bold': True, 'align': 'center'})
+        titleFormat.set_font_size(20)
+        titleFormat.set_bg_color('#D9D9D9')
+        #file Heaaders
+        headerFormat = workbook.add_format({'bold': True, "italic": True, "align": 'right', 'valign': 'vcenter'})
+        headerValueFormat = workbook.add_format({'italic': True,'align': 'left', 'text_wrap': True, 'valign':'vcenter',  'num_format': 'yyyy-mm-dd'})
+        #columnNameFormat 
+        columnNameFormat = workbook.add_format({'bold': True, 'num_format': 'yyyy-mm-dd', 'align': 'center'})
+        columnNameFormat.set_border(1)
+        columnNameFormat.set_bg_color('#808080')
+        columnNameFormat.set_font_color('#ffffff')
+        # Text Data Format 
+        textFormat = workbook.add_format({'text_wrap': True, "align": 'center', 'valign': 'vcenter'})
+        textFormat.set_border(1)
+        # red text format  
+        redTextFormat = workbook.add_format()
+        redTextFormat.set_border(1)
+        redTextFormat.set_bg_color('#ff0000')
+        #missing info format = 
+        missingFormat = workbook.add_format()
+        missingFormat.set_border(1)
+        missingFormat.set_bg_color('#ffff00')
+        # missing date Format 
+        missingDateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+        missingDateFormat.set_border(1)
+        missingDateFormat.set_bg_color('#ffff00')
+        # Highlight  Data Format 
+        highlightFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+        highlightFormat.set_border(1)
+        highlightFormat.set_bg_color('#FFCCCB')
+        #highlight Green format 
+        hlGreenFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+        hlGreenFormat.set_border(1)
+        hlGreenFormat.set_bg_color('#92d050')
+        # date Data Format 
+        dateFormat = workbook.add_format({'num_format': 'yyyy-mm-dd', "align": 'center', 'valign': 'vcenter'})
+        dateFormat.set_border(1)
+        dateFormat.set_border(1)
+        # staff name title format 
+        nameFormat = workbook.add_format({'align': 'center', 'bold': True, 'italic': True})
+        nameFormat.set_border(1)
+        nameFormat.set_bg_color('#dce6f1')
+        #manager Format
+        managerFormat = workbook.add_format({'bold': True, "italic": True, 'align':'center'})
+        managerFormat.set_border(1)
+
+        #totals
+        totalFormat = workbook.add_format({"bold": True, 'italic': True, 'align': 'center'})
+        totalFormat.set_border(1)
+        totalFormat.set_bg_color('#D9D9D9')
+        logger.info('Writing data')
+
+    #write data 
+        worksheet.merge_range(row,0,row+1,10 , 'BiWeekly Report - Clockify - Payroll', titleFormat)
+        row += 2
+        headers = {
+                'Generated on:': get_current_time(),
+                'Date Range Start:': startDate,
+                'Date Range End:': endDate
+            }
+        for key, value in headers.items():
+            worksheet.merge_range(row,0,row+1, 1, key, headerFormat)
+            worksheet.merge_range(row,2,row+1,4, value, headerValueFormat)
+            row += 2
+
+        logger.debug(row)
+        row += 1
+        logger.debug(row)
+        worksheet.insert_image("G3",
+            # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+            # {'x_scale': 0.04, 'y_scale': 0.04}
+            r"C:\Users\Script\Desktop\unnamed.png",
+            {'x_scale': 0.5, 'y_scale': 0.5}
+        )
+    #columns 
+        column = 0
+        right = 0
+        for i  , value in enumerate(workerColumns):
+            if column > right: right = column
+            if i in (0,1,2): #name or Role 
+                worksheet.merge_range(row,column, row, column +1, value, columnNameFormat)
+                column += 2
+            else: 
+                worksheet.write(row,column, value , columnNameFormat)
+                column += 1
+        row += 1
+        column = 0
+        for rowData in workEntry:
+            
+            for i, data in enumerate(rowData):
+                if i in (1,2):
+                    worksheet.merge_range(row,column, row+1, column +1, data, textFormat)
+                    column += 2
+                elif i == 0:
+                    worksheet.merge_range(row, column,row+1, column + 1, data, dateFormat )
+                    column +=2
+                else:
+                    worksheet.merge_range(row, column,row+1, column, data, textFormat )
+                    column +=1
+            if row in range(46, 4800,46):
+                row += 4 #page break
+            else: row += 2
+            column = 0
+
+        left = int((right - 6)/2)
+        column = left
+        row +=1
+        for i  , value in enumerate(equipColumns):
+            if i in (0,1): #name 
+                worksheet.merge_range(row,column, row, column +1, value, columnNameFormat)
+                column += 2
+            else: 
+                worksheet.write(row,column, value , columnNameFormat)
+                column += 1
+        row += 1
+        column = left
+        for rowData in equipEntry:
+            for i, data in enumerate(rowData):
+                if i ==1:
+                    worksheet.merge_range(row,column, row+1, column +1, data, textFormat)
+                    column += 2
+                elif i == 0:
+                    worksheet.merge_range(row, column,row+1, column + 1, data, dateFormat )
+                    column +=2
+                else:
+                    worksheet.merge_range(row, column,row+1, column, data, textFormat )
+                    column +=1
+            if row in range(46, 4800,48):
+                row += 4 #page break
+            else: row += 2
+            column = left
+
+        
+
+        writer.close()
+    
+    convertXlsxPdf(folder_path, file_path)
+    return folder_path
 
 
 

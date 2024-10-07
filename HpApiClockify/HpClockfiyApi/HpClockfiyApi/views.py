@@ -271,6 +271,11 @@ def GenerateLemView(reqiest:ASGIRequest, projectCode = None, lemId = None):
     folder_path = GenerateLem(projectCode, lemId )
     return download_text_file(folder_path)
 
+def lemTimesheetsView(request: ASGIRequest, projectId, startMonth, startDay,startYear, endMonth, endDay, endYear):
+    startDate = str(startYear) + '-' + str(startMonth).zfill(2) +'-' + str(startDay).zfill(2)
+    endDate = str(endYear) + '-' + str(endMonth).zfill(2) +'-' + str(endDay).zfill(2)
+    folder_path = GenerateTimeSheetLem(projectId, startDate, endDate)
+    return download_text_file(folder_path)
 ###########################################################################################################################################################################################################
 
 def aunthenticateRequst(request: ASGIRequest, secret: str): 
