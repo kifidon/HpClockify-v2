@@ -1864,7 +1864,7 @@ def lemTimesheet(projectId, startDate,endDate ):
         logger.info('Writing data')
 
     #write data 
-        worksheet.merge_range(row,0,row+1,10 , f'LEM Timesheet - {projectCode}', titleFormat)
+        worksheet.merge_range(row,0,row+1,10 , f'LEM Timesheet - {projectCode[0]}', titleFormat)
         row += 2
         headers = {
                 'Generated on:': get_current_time(),
