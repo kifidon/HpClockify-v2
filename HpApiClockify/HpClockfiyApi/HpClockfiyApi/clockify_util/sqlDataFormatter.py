@@ -1942,7 +1942,7 @@ def lemTimesheet(projectId, startDate,endDate ):
             #     row += 4 #page break
             # else: row += 2
             row += 2
-            column = left
+            column = 0
 
         
 
