@@ -1916,9 +1916,8 @@ def lemTimesheet(projectId, startDate,endDate ):
             row += 2
             column = 0
 
-        left = int((right - 6)/2)
-        column = left
-        row +=1
+        column = 0
+        row +=2
         for i  , value in enumerate(equipColumns):
             if i in (0,1): #name 
                 worksheet.merge_range(row,column, row, column +1, value, columnNameFormat)
@@ -1927,7 +1926,7 @@ def lemTimesheet(projectId, startDate,endDate ):
                 worksheet.write(row,column, value , columnNameFormat)
                 column += 1
         row += 1
-        column = left
+        column = 0
         for rowData in equipEntry:
             for i, data in enumerate(rowData):
                 if i ==1:
