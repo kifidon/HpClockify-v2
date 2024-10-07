@@ -1910,9 +1910,10 @@ def lemTimesheet(projectId, startDate,endDate ):
                 else:
                     worksheet.merge_range(row, column,row+1, column, data, textFormat )
                     column +=1
-            if row in range(48, 4800,48):
-                row += 4 #page break
-            else: row += 2
+            # if row in range(48, 4800,48):
+            #     row += 4 #page break
+            # else: row += 2
+            row += 2
             column = 0
 
         left = int((right - 6)/2)
@@ -1938,9 +1939,10 @@ def lemTimesheet(projectId, startDate,endDate ):
                 else:
                     worksheet.merge_range(row, column,row+1, column, data, textFormat )
                     column +=1
-            if row in range(48, 4800,48):
-                row += 4 #page break
-            else: row += 2
+            # if row in range(48, 4800,48):
+            #     row += 4 #page break
+            # else: row += 2
+            row += 2
             column = left
 
         
