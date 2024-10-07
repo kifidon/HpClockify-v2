@@ -1785,8 +1785,8 @@ def lemTimesheet(projectId, startDate,endDate ):
     assert projectCode is not None  
     
 
-    equipEntry = [['' if val is None else val for val in row] for row in equipEntry]
-    workEntry  = [['' if val is None else val for val in row] for row in  workEntry]
+    equipEntry = [['---' if val is None else val for val in row] for row in equipEntry]
+    workEntry  = [['---' if val is None else val for val in row] for row in  workEntry]
 
     # Generate Folder for spreadsheets
     current_dir = settings.BASE_DIR
