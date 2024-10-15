@@ -127,8 +127,9 @@ def weeklyPayrollReport(request, start_date=None, end_date= None):
     '''
     logger = setup_server_logger()
     logger.info(f'Weekly Payroll Report Called')
-    folder_path = weeklyPayroll(start_date, end_date )
-    return download_text_file(folder_path)
+    return JsonResponse(data= 'Service disabled for maitenance.', status = status.HTTP_204_NO_CONTENT, safe=False)
+    # folder_path = weeklyPayroll(start_date, end_date )
+    # return download_text_file(folder_path)
 
 @api_view(['GET'])
 def TimeStatusEvent(request, start_date=None, end_date= None):
