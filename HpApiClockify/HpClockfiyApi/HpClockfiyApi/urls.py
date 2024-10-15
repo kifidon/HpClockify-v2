@@ -30,6 +30,8 @@ urlpatterns = [
     path('billing', views.billableReport),
     path('billing/<str:month>/<str:year>/', views.billableReport),
     path('billing/<str:month>/<str:year>/<str:pCode>', views.billableReport),
+    path('billingDateSpecific/<str:start>/<str:end>/<str:pCode>', views.billableReportCustom),
+
     path('billingSummary', views.billableNonBillable),
     path('billingSummary/<str:start_date>/<str:end_date>/', views.billableNonBillable),
     path('payroll', views.weeklyPayrollReport),

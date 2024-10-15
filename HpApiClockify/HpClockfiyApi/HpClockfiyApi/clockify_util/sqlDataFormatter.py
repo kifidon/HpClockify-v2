@@ -644,38 +644,9 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
         
-async def BillableReportGenerate(month = None, year = None, pCode = None):
+async def BillableReportGenerate(startDate = None| str, endDate = None | str, pCode = None):
     logger = setup_background_logger()
     try: 
-        #obtain date range for this month 
-        if month is None or year is None:
-            month, year = getMonthYear()
-        else:
-            month = getAbbreviation(month, reverse=True)
-        logger.info(f'Biling Report Generating for - {month}-{year}')
-
-        if int(month) -1 == 0: 
-            previousMonth = '12'
-            previousYear = str(int(year) - 1).rjust(2, '0')
-        else: 
-            previousMonth = str(int(month) -1 ).rjust(2, '0')
-            previousYear = year
-
-    #format date strings
-        endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
-        startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
-        # Calculate the most recent previous Saturday
-        if(endDateObj.weekday() != 5):
-            endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')
-        else: endDate = f'20{year}-{month}-25'
-        if(startDateObj.weekday() != 6):
-            startDate = (startDateObj - timedelta(days=(startDateObj.weekday()+ 1) %7)).strftime('%Y-%m-%d')
-        else: startDate = f'20{previousYear}-{previousMonth}-25'
-        logger.debug(f'Date Range: {startDate}-{endDate}')
-        # startDate = month
-        # endDate = year
-
-        
         cursor, conn = sqlConnect()
     #Get Relavant projects 
         if pCode: 
@@ -705,6 +676,8 @@ async def BillableReportGenerate(month = None, year = None, pCode = None):
         cursor.execute(query)
         pIds = cursor.fetchall()
         logger.debug(f'{len(pIds)} Projects')
+        year = startDate.split("-")[0][-2:]
+        month = endDate.split("-")[1]
         cleanUp(conn, cursor)
         # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
