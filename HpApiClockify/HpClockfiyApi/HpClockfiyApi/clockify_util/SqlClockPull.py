@@ -101,7 +101,7 @@ def updateSalaryVacation(userId, cursor):
         From EmployeeUser eu 
         LEFT join TimeOffRequests tr on tr.eID = eu.id
         Left join TimeOffPolicies tp on tp.id = tr.pID and tp.policy_name like '%Vacation - S%'
-        where eu.hourly = 0 
+        where eu.hourly = 0 and tr.status = 'APPROVED'
         group by 
         eu.id,
         eu.name,
