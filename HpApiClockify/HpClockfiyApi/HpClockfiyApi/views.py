@@ -47,44 +47,6 @@ saveTaskResult = sync_to_async(taskResult, thread_sensitive=True)
 
 ###########################################################################################################################################################################################################
 
-#depreciated
-@api_view(['GET'])
-def monthlyBillableReport(request, month = None, year= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called')
-    folder_path = monthlyBillable(month, year )
-    return download_text_file(folder_path)
-#depreciated
-@api_view(['GET'])
-def monthlyBillableReportEquipment(request, month = None, year= None):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
-
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('BillableReport Called for Equipment')
-    folder_path = monthlyBillableEqp(month, year )
-    return download_text_file(folder_path)
 
 async def billableReport(request, month= None, year = None, pCode= None):
     logger = setup_server_logger(loggerLevel)
@@ -98,24 +60,7 @@ async def billableReportCustom(request, start= None, end = None, pCode= None):
     folder_path = await billingReport(start= start, end= end, pCode = pCode)
     return download_text_file(folder_path)
 
-@api_view(['GET'])
-def dailyTimeEntry(request):
-    '''
-    Function Description: 
-       Calls format function to build the billing report based on the information in the database. Default values when no start and end date is given 
-       are taken as the current month. Otherwise start_date and end_date are specified in the URL in the YYYY-MM-DD format.
 
-       In future versions create a form web submission where the start date and end date can be passed as input and not part of the endpoint url 
-    Param: 
-        request(ASGIRequest): Request sent to endpoint from client 
-    
-    Returns: 
-        response(Response): contains Billable Report File to be directly uploaded into ACC
-    '''
-    logger = setup_server_logger(loggerLevel)
-    logger.info('Daily Entry Report Called')
-    folder_path = dailyEntries( )
-    return download_text_file(folder_path)
 
 @api_view(['GET'])
 def weeklyPayrollReport(request, start_date=None, end_date= None):

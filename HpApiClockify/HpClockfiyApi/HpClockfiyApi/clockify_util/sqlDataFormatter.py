@@ -90,249 +90,12 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
     finally:
         pythoncom.CoUninitialize()  # Uninitialize COM for the current thread
 
-def MonthylyProjReport(month = None, year = None):
-    if month is None or year is None:
-        month, year = getMonthYear()
-    else:
-        month = getAbbreviation(month, reverse=True)
-
-    if int(month) -1 == 0: 
-        previousMonth = '12'
-        previousYear = str(int(year) - 1).rjust(2, '0')
-    else: 
-        previousMonth = str(int(month) -1 ).rjust(2, '0')
-        previousYear = year
-    startDate = f"20{previousYear}-{previousMonth}-25"
-    endDate = f"20{year}-{month}-25" # non inclusive 
-    
-    cursor, conn = sqlConnect()
-    try:
-        cursor.execute(
-            f'''
-            select Distinct p.id,  p.code  from Project p 
-            inner join Entry en on en.project_id = p.id
-            inner join TimeSheet ts on ts.id = en.time_sheet_id
-            where ts.status = 'APPROVED' 
-            and en.start_time between '{startDate}' and '{endDate}'
-            '''
-        )
-        pIds = cursor.fetchall()
-        for pId in pIds:
-            current_dir = settings.BASE_DIR
-           # current_dir = r"C:\Users\TimmyIfidon\Desktop"
-            folder_name = f"HP-IND-{year}-{month}"
-            folder_path = os.path.join(current_dir, folder_name)
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
-            file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
-            df = []
-            cursor.execute(
-                '''
-                DECLARE @ProjID VARCHAR(100)= ?;
-                SELECT 
-                    [Number],
-                    case 
-                        when mb.Number is null then 
-                            FORMAT(ROW_NUMBER() OVER ( PARTITION BY mb.project_id ORDER BY mb.project_id)-1, '0000') 
-                        else Null
-                    end as [Row],
-                    [Name],
-                    [Supplier],
-                    SUM([QTY]),
-                    [Unit],
-                    [Unit Cost],
-                    Sum(Amount) as Amount
-                FROM MonthlyBillable mb
-                WHERE 
-                    Cast(mb.start_time as Date ) >= ? AND
-                    Cast(mb.start_time as Date ) < ? AND
-                    mb.project_id = @ProjID 
-                GROUP BY 
-                    [Number],
-                    mb.project_id,
-                    [Name],
-                    [Supplier],
-                    [Unit],
-                    [Unit Cost]
-                ORDER BY [Number] DESC;
-                ''', (pId[0], startDate, endDate)
-            )
-            outputRows = cursor.fetchall()
-            outputRows = [['' if val is None else val for val in row] for row in outputRows]
-            df = pd.DataFrame(outputRows, columns = ['Number', 'Row', 'Name', 'Supplier', 'Qty', 'Unit', 'Unit Cost', 'Amount'] )
-            if not (df.empty):
-                df.iloc[0,0] = f"HP-IND-{year}-{month}-{df.iloc[0,0]}" 
-                df.iloc[0, 2] =f"{getAbbreviation(month, year)} Indirect: {df.iloc[0,2]}" 
-
-                df.to_excel(file_path, index = False)
-            # Combine the directory path with the file name
-        cleanUp(conn, cursor) 
-        if len(pIds) != 0:
-            return folder_path
-        else: 
-            return None     
-    except pyodbc.Error as e:
-        logging.error( f"SQL Error: {str(e)}")
-        return None
-    except FileNotFoundError as e:
-        logging.error(f"Error: {str(e)}")
-        return None
-    except PermissionError as e:
-        logging.error(f"Error: {str(e)}")
-        return None
-
-def MonthylyProjReportEqp(month = None, year = None):
-    logger = setup_background_logger()
-    try:
-        if month is None or year is None:
-            month, year = getMonthYear()
-        else:
-            month = getAbbreviation(month, reverse=True)
-
-        if int(month) -1 == 0: 
-            previousMonth = '12'
-            previousYear = str(int(year) - 1).rjust(2, '0')
-        else: 
-            previousMonth = str(int(month) -1 ).rjust(2, '0')
-            previousYear = year
-        startDate = f"20{previousYear}-{previousMonth}-25"
-        endDate = f"20{year}-{month}-25" # non inclusive 
-        
-        cursor, conn = sqlConnect()
-    
-        cursor.execute(
-            f'''
-            select Distinct p.id, p.code  from Project p 
-            inner join Entry en on en.project_id = p.id
-            inner join TimeSheet ts on ts.id = en.time_sheet_id
-            inner join EmployeeUser eu on eu.id = ts.emp_id
-            where eu.hasTruck = 1 and ts.status = 'APPROVED' and en.start_time between '{startDate}' and '{endDate}'
-            '''
-        )
-        pIds = cursor.fetchall()
-        if pIds is None:
-            return None
-        for pId in pIds:
-            current_dir = settings.BASE_DIR
-           # current_dir = r"C:\Users\TimmyIfidon\Desktop"
-            folder_name = f"HP-IND-EQP-{year}-{month}"
-            folder_path = os.path.join(current_dir, folder_name)
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path )
-            file_path = os.path.join(folder_path, f"{folder_name}-{pId[1]}.xlsx")
-            df = []
-            logger.info(f"{startDate}  {endDate}")
-            cursor.execute(
-                '''
-                DECLARE @ProjID VARCHAR(100)= ?;
-                SELECT 
-                    [Number],
-                    case 
-                        when mb.Number is null then 
-                            FORMAT(ROW_NUMBER() OVER ( PARTITION BY mb.project_id ORDER BY mb.project_id)-1, '0000') 
-                        else Null
-                    end as [Row],
-                    [Name],
-                    [Supplier],
-                    SUM([QTY]),
-                    [Unit],
-                    [Unit Cost],
-                    Sum(Amount) as Amount
-                FROM MonthlyBillableEqp mb
-                WHERE 
-                    Cast(mb.start_time as Date ) >= ? AND
-                    Cast(mb.start_time as Date ) < ? AND
-                    mb.project_id = @ProjID 
-                GROUP BY 
-                    [Number],
-                    mb.project_id,
-                    [Name],
-                    [Supplier],
-                    [Unit],
-                    [Unit Cost]
-                ORDER BY [Number] DESC;
-                ''', (pId[0], startDate, endDate)
-            )
-            outputRows = cursor.fetchall()
-            logger.info(outputRows)
-            outputRows = [['' if val is None else val for val in row] for row in outputRows]
-            df = pd.DataFrame(outputRows, columns = ['Number', 'Row', 'Name', 'Supplier', 'Qty', 'Unit', 'Unit Cost', 'Amount'] )
-            
-            if not (df.empty):
-                df.iloc[0,0] = f"HP-IND-EQP-{year}-{month}-{df.iloc[0,0]}"
-                df.iloc[0, 2] =f"{getAbbreviation(month, year)} Indirect: {df.iloc[0,2]}" 
-
-                df.to_excel(file_path, index = False)
-            # Combine the directory path with the file name
-        cleanUp(conn, cursor) 
-        if len(pIds) != 0:
-            return folder_path
-        else: 
-            return None     
-    except pyodbc.Error as e:
-        logging.error( f"SQL Error: {str(e)}")
-        return None
-    except FileNotFoundError as e:
-        logging.error(f"Error: {str(e)}")
-        return None
-    except PermissionError as e:
-        logging.error(f"Error: {str(e)}")
-        return None
-    except Exception as e:
-        logging.error(f"Error: {str(e)}")
-        return None
-
-def DailyTimeEntryReport():
-    try:
-        logger = setup_background_logger()
-        logger.info("Generating daily time entry report...")
-        today = datetime.now().strftime("%Y-%m-%d")
-        current_dir = settings.BASE_DIR
-        folder_name = f"TimeEntryReport-{today}"
-        folder_path = os.path.join(current_dir, folder_name)
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        file_path = os.path.join(folder_path, f"HillPlainClockifyTime.xlsx")
-        data=  getDetailedEntryReport("65c249bfedeea53ae19d7dad") #HP clockify workspace id
-        logger.debug(dumps(data, indent=4))
-        df = pd.DataFrame(columns=["Employee", "Start", "End","Duration", "Rate", "Amount", "Project", "Client", "Description"])
-        for entry in data['timeentries']:
-            summary = {
-                "Employee": entry['userName'],
-                "Start": 
-                    datetime.strftime( #format date time 
-                        datetime.strptime(entry['timeInterval']['start'], "%Y-%m-%dT%H:%M:%S-06:00"),
-                        "%H:%M:%S - %Y/%m/%d"    
-                    ),
-                "End":
-                    datetime.strftime( #format date time 
-                        datetime.strptime(entry['timeInterval']['end'],"%Y-%m-%dT%H:%M:%S-06:00"),
-                        "%H:%M:%S - %Y/%m/%d"    
-                    ),
-                "Duration": round(float(entry['timeInterval']['duration'])/3600, 2),
-                "Rate": round(float(entry["rate"])/100, 2),
-                "Amount": round(float(entry["amount"])/100, 2),
-                "Project": entry["projectName"],
-                "Client": entry["clientName"],
-                "Description": entry["description"]
-            }
-            df.loc[len(df)] = summary
-        
-        logger.debug(df)
-        if not (df.empty):
-            df.to_excel(file_path, index = False)
-
-        return folder_path
-    except Exception as e:
-        logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}") 
-        pass
-        
 def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
     try:
         cursor, conn = sqlConnect()
     #Get billing Data 
         logger.debug('Getting Labor Data')
-        #labour data 
+    #labour data 
         cursor.execute(
             f'''
             Select 
@@ -358,7 +121,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
         labourData = cursor.fetchall()
         logger.debug('Aquired Labor Data')
         logger.debug('Getting Equipment Data')
-        #Equipment Data 
+    #Equipment Data 
         cursor.execute(
             f'''
             Select 
@@ -382,7 +145,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             ''')
         equipmentData = cursor.fetchall()
         logger.debug('Aquired Equipment Data')
-        #labour Totals
+    #labour Totals
         cursor.execute(
             f'''
             Select 
@@ -397,7 +160,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             '''
         )
         labourTotal = cursor.fetchone()
-        # equipment totals
+    # equipment totals
         cursor.execute(
             f'''
             Select 
@@ -413,7 +176,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             '''
         )
         equipmentTotal = cursor.fetchone()
-        #entries data 
+    #entries data 
         query =f'''
                 Select 
                     Coalesce(eu.name, 'Missing name info'),
@@ -432,43 +195,43 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
         cursor.execute(query)
         descriptionData = cursor.fetchall()
         
-        #format results for opperations 
+    #Remove Nulls 
         labourData = [['' if val is None else val for val in data] for data in labourData]
         equipmentData = [['' if val is None else val for val in data] for data in equipmentData]
-        if equipmentTotal[0] is not None:
-            grandTotal = labourTotal[0] + equipmentTotal[0]
-            equipmentTotal = float(equipmentTotal[0])
-        else: 
-            grandTotal = labourTotal[0]
-        if labourTotal[0] is not None:
-            labourTotal = float(labourTotal[0])
+    
+        labourTotal = float(labourTotal[0]) if labourTotal[0] is not None else 0
+        equipmentTotal = float(equipmentTotal[0]) if equipmentTotal[0] is not None else 0
+        grandTotal = labourTotal + equipmentTotal
         logger.debug(f'Totals: {labourTotal} {type(labourTotal)}')
-        grandTotal = float(grandTotal)
         
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
             #Generate file and initilize writers and formats 
             workbook = writer.book
             worksheet = workbook.add_worksheet("Hill Plain - Monthly LEM")
             writer.sheets['Hill Plain - Monthly LEM'] = worksheet        
+            
             # Merged cells Title Format
-            mergeCells = workbook.add_format({'align': 'center', 'bold': True})
-            mergeCells.set_center_across()
-            mergeCells.set_bg_color('#FCD5B4') 
-            mergeCells.set_font_size(24)
-            mergeCells.set_border(2)
-            worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
-
+            TITLE = workbook.add_format({'align': 'center', 'bold': True, 'bg_color': '#FCD5B4', 'font_size': 24, 'border': 2}).set_center_across()
+            worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", TITLE)
             #subTotals Format
-            subTotals = workbook.add_format({'align': 'left', 'bold': True}) 
-            subTotals.set_bg_color('#FFFF99')              
-            subTotals.set_font_size(14)              
-            subTotals.set_italic()              
+            subTotals = workbook.add_format({'align': 'left', 'bold': True, 'bg_color': '#FFFF99', 'font_size': 14, 'italic': True})
             #GrandTotal Format
-            grandTotalFormat = workbook.add_format({'align': 'left', 'bold': True}) 
-            grandTotalFormat.set_bg_color('#FCD5B4')              
-            grandTotalFormat.set_font_size(14)              
-            grandTotalFormat.set_italic()              
-            # worksheet.set_column('E:E', 15)  # Width for column B
+            grandTotalFormat = workbook.add_format({'align': 'left', 'bold': True, 'bg_color': '#FCD5B4', 'font_size': 14, 'italic': True})
+            #table headers Formater 
+            headersFormat = workbook.add_format({'align': 'center', 'bold': True, 'bg_color': '#F2F2F2', 'font_size': 16, 'border': 1}).set_center_across()
+            #dollar value formats 
+            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00', 'border': 1})
+            #dollar bold value formats 
+            boldNum = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00', 'font_size': 14, 'bg_color': '#FFFF99'})
+            #bold Text format 
+            bold_format = workbook.add_format({'bold': True, 'text_wrap': True, 'italic': True})
+            #Grand total value formats 
+            grandTotalFormat = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00', 'font_size': 14, 'bg_color': '#FCD5B4'})
+            # table data format
+            dataFormat = workbook.add_format({'border': 1})
+            #table column format 
+            columnFormat = workbook.add_format({'align': 'center', 'bold': True, 'border': 1})
+           
             #File headers info 
             headers = {
                 "Project Name:": pId[2],
@@ -480,9 +243,6 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             }
             logger.info(reverseForOutput(headers))
 
-            #bold Text format 
-            bold_format = workbook.add_format({'bold':True, 'text_wrap': True})
-            bold_format.set_italic()
             row = 2
             #write file headers
             for key, value in headers.items():
@@ -490,40 +250,14 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 worksheet.write(row, 2, value)
                 row += 1
                 logger.debug(f'Writing to row {row}')
-            row += 1
-            
+            row += 1 
             #insert image 
-            worksheet.insert_image("J4",
-                                    # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
-                                    r"C:\Users\Script\Desktop\unnamed.png",
-                                    {'x_scale': 0.4, 'y_scale': 0.4})
-
-            #table headers Formater 
-
-            headersFormat = workbook.add_format({'align': 'center', 'bold': True})
-            headersFormat.set_center_across()
-            headersFormat.set_bg_color('#F2F2F2')
-            headersFormat.set_font_size(16)
-            headersFormat.set_border(1)
-            #dollar value formats 
-            numFormat = workbook.add_format({'align': 'center', 'num_format': '$#,##0.00'})
-            numFormat.set_border(1)
-            #dollar bold value formats 
-            boldNum = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
-            boldNum.set_num_format(7)
-            boldNum.set_font_size(14)
-            boldNum.set_bg_color('#FFFF99')
-            #Grand total value formats 
-            gt = workbook.add_format({'align': 'center', 'bold': True, 'num_format': '$#,##0.00'})
-            gt.set_num_format(7)
-            gt.set_font_size(14)
-            gt.set_bg_color('#FCD5B4')
-            # table data format
-            dataFormat = workbook.add_format()
-            dataFormat.set_border(1)
-            #table column format 
-            columnFormat = workbook. add_format({'align': 'center', 'bold': True})
-            columnFormat.set_border(1)
+            worksheet.insert_image(
+                "J4",
+                # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png", # For Testing on Timm's machine 
+                r"C:\Users\Script\Desktop\unnamed.png", # Path to image on scripting machine
+                {'x_scale': 0.4, 'y_scale': 0.4} # scale down for testing on local machine 
+            )
 
         # Table  Data 
             worksheet.merge_range(row,0,row,11, 'LABOUR', headersFormat)
@@ -552,7 +286,7 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
             worksheet.merge_range(row,10,row,11, labourTotal, boldNum)
             row += 1
         # equipment Table 
-            if type(equipmentTotal) is float:
+            if equipmentTotal > 0:
                 row += 1
                 worksheet.merge_range(row,0,row,11, 'EQUIPMENT', headersFormat)
                 row += 1
@@ -577,28 +311,27 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 worksheet.merge_range(row,8,row,9,'SUB TOTAL', subTotals)
                 worksheet.merge_range(row,10,row,11, equipmentTotal, boldNum)
                 row += 1
+
             worksheet.merge_range(row,8,row,9, "GRAND TOTAL", grandTotalFormat)
-            worksheet.merge_range(row,10,row,11, grandTotal, gt)
+            worksheet.merge_range(row,10,row,11, grandTotal, grandTotalFormat)
 
             
 
         # Description of work data 
-            dateDataFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'num_format': 'yyyy-mm-dd'})
-            dateDataFormat.set_border(1)
-            textFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'text_wrap': True})
-            textFormat.set_border(1)
-            textFormat.set_font(8)
+            dateDataFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'num_format': 'yyyy-mm-dd', 'border': 1})
+            textFormat = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'text_wrap': True, 'border': 1, 'font_size': 8})
             previousEmp = None 
+
             for description in descriptionData:
                 if description[0] != previousEmp:
-                    columnsPerPage = 0
+                    rowsPerPage = 0
                     # logger.debug(f'Writing to Headers - {row}')
-                    logger.debug(pId)
-                    row = 2
+                    # logger.debug(pId)
+                    row = 2 #print title after Columns are known 
                     previousEmp = description[0]
                     worksheet = workbook.add_worksheet(f"{previousEmp}")
                     writer.sheets[f"{previousEmp}"] = worksheet   
-                    worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", mergeCells)
+                    worksheet.merge_range(0,0,1,11, "Hill Plain - Monthly LEM (Indirects)", TITLE)
                     # worksheet.print_area('A1:K100')
                     for key, value in headers.items():
                         worksheet.merge_range(row, 0,row,1, key, bold_format)
@@ -607,11 +340,13 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                     row += 1
                     
                     #insert image 
-                    worksheet.insert_image("J4",
-                                            # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
-                                            # {'x_scale': 0.04, 'y_scale': 0.04})
-                                            r"C:\Users\Script\Desktop\unnamed.png",
-                                            {'x_scale': 0.4, 'y_scale': 0.4})
+                    worksheet.insert_image(
+                        "J4",
+                        # r"C:\Users\TimmyIfidon\Desktop\Docs and Projects\Hill Plain Logo New (May2023)\PNG\Hill Plain Logo - NEW (colour).png",
+                        # {'x_scale': 0.04, 'y_scale': 0.04})
+                        r"C:\Users\Script\Desktop\unnamed.png",
+                        {'x_scale': 0.4, 'y_scale': 0.4}
+                        )
                     
                     worksheet.merge_range(row,0,row,11, description[0], headersFormat)
                     row +=1
@@ -625,15 +360,14 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                 worksheet.merge_range(row, 3, row + 4, 11, description[3].replace('\n', ' // '), textFormat)
                 # row += 3
                 if  row == 51 : # first page break with headers 
-                    columnsPerPage = 0
-                    pageBreak = True
-                    
+                    rowsPerPage = 0
+                    pageBreak = True     
                 else: 
-                    columnsPerPage += 1 # counts rows per page therafter 
+                    rowsPerPage += 1 # counts rows per page therafter 
                     pageBreak = False 
-                if pageBreak or columnsPerPage == 11: 
+                if pageBreak or rowsPerPage == 11: 
                     logger.info(f'Page Break Occured at row {row} for {description[0]}')
-                    columnsPerPage = 0
+                    rowsPerPage = 0
                     row += 8
                 else: row += 5                   
                     

@@ -41,10 +41,6 @@ urlpatterns = [
     
     path('lemsheet/<str:projectCode>/<str:lemId>/', views.GenerateLemView),
     path('lemsheet/<str:projectId>/<int:startMonth>/<int:startDay>/<int:startYear>/<int:endMonth>/<int:endDay>/<int:endYear>/', views.lemTimesheetsView),
-    #depreciated
-    path('billableReport', views.monthlyBillableReport),
-    path('billableReport/<str:month>/<str:year>/', views.monthlyBillableReport),
-    path('billableReport/<str:month>/<str:year>/<str:pCode>', views.monthlyBillableReport),
 
     path('billableReportEqp', views.monthlyBillableReportEquipment),
     path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),

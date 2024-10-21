@@ -188,17 +188,6 @@ async def eventSelect(event = None):
 ######################################################################################################################################################################
 
 
-def CreateTextFile():
-    timezone = pytz.timezone('America/Denver')
-    currentDateTimeObject = datetime.datetime.now(timezone)
-    currentDateTime = currentDateTimeObject.strftime("%Y-%m-%d_T%H_%M_%S")
-    filePath = f"C:/Users/TimmyIfidon/OneDrive - Hill Plain Construction Services LP/Event Logs/ClockifyPullLog-{currentDateTime}.txt"
-    with open(filePath, "w") as file:
-        file.write(f"Clockify to Sql Data Push Log - {currentDateTime}\n")
-        file.write("--------------------------------------------------------------------\n")
-    file.close()
-    logger.info(filePath, end="")
-
 async def billingReport(month= None, year = None, pCode = None, start=None, end = None):
     #obtain date range for this month 
     if((month is not None or year is not None) and (start is not None or end is not None)):
@@ -238,26 +227,11 @@ async def billingReport(month= None, year = None, pCode = None, start=None, end 
     logger.info(f"{file_path}")
     return file_path 
 
-#depreciated         
-def monthlyBillable(month = None, year = None):
-    file_path = (MonthylyProjReport(month, year ))
-    logger.info(f" {file_path}")
-    return file_path
-#depreciated
-def monthlyBillableEqp(month = None, year = None):
-    file_path = (MonthylyProjReportEqp(month, year))
-    logger.info(f" {file_path}")
-    return file_path
-
 def NonBillableReport(start = None, end = None):
     file_path = NonBillableReportGen(start, end)
     logger.info(f" {file_path}")
     return file_path
 
-def dailyEntries():
-    file_path = DailyTimeEntryReport()
-    logger.info(f" {file_path}")
-    return file_path
     
 def weeklyPayroll(start_date = None, end_date = None):
     file_path = Payroll(start_date, end_date)
