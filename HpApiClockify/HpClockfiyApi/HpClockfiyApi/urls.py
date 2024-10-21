@@ -42,11 +42,6 @@ urlpatterns = [
     path('lemsheet/<str:projectCode>/<str:lemId>/', views.GenerateLemView),
     path('lemsheet/<str:projectId>/<int:startMonth>/<int:startDay>/<int:startYear>/<int:endMonth>/<int:endDay>/<int:endYear>/', views.lemTimesheetsView),
 
-    path('billableReportEqp', views.monthlyBillableReportEquipment),
-    path('billableReportEqp/<str:month>/<str:year>/', views.monthlyBillableReportEquipment),
-    
-    path('getTime', views.dailyTimeEntry),
-    
     path('timeSheets', views.timesheets),
     
     path('HpClockifyApi/bankedHours', views.bankedHrs),
