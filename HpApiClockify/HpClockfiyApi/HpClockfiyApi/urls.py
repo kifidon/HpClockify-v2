@@ -46,6 +46,7 @@ urlpatterns = [
     
     path('HpClockifyApi/bankedHours', views.bankedHrs),
     path('HpClockifyApi/updateSalaryVacation', views.accuralVacationSalary),
+    
     path('HpClockifyApi/newTimeSheets', views.newTimeSheets),
     path('HpClockifyApi/updateTimeSheets', views.updateTimesheets),
     path('HpClockifyApi/getClients', views.getClients),

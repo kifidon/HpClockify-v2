@@ -21,6 +21,11 @@ import pythoncom
 from concurrent.futures import ThreadPoolExecutor
 import shutil
 
+'''
+Functions can be condensed for better readability like what has been don for generateBilling 
+and BillableReportGenerate functions
+'''
+
 logger = setup_background_logger()
 def convertXlsxPdf(folder_path, file_path, retry = 0):
     try:
@@ -1657,11 +1662,6 @@ def lemTimesheet(projectId, startDate,endDate ):
     
     convertXlsxPdf(folder_path, file_path)
     return folder_path
-
-
-
-
-
 
 
 

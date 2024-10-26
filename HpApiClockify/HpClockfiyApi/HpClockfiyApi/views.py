@@ -11,12 +11,13 @@ a flag so infinite loops do not occur.
 
 csrf_exempt on async functions is not secure. Should be implimented in a future version and decorated using @api_view as for sycnchronous methods.
 The secondary server rouritng system is feture complemete but should be switched out instead to use celery with raddis or rabbitmq message brokers 
-for better logging and completion of background tasks. 
+for better logging and completion of background tasks as well as scheduling of QuickBackup Functions.
 
 ASGI server deployment needs to be optimized for scaling. I noticed when 10+ requests are sent to specifically the approvalUpdate function at once
 (User pressed the Approval All button on clockify) some data may get lost or transient errors arrise.
 
-Clockify sends all requests as POST thus seprate views are used to handle different methods
+Clockify sends all requests as POST thus seprate views are used to handle different methods.
+
 '''
 
 from django.http import JsonResponse, HttpResponse
@@ -59,7 +60,6 @@ async def billableReportCustom(request, start= None, end = None, pCode= None):
     logger.info(f'BillableReport Called for {start}-{end}')
     folder_path = await billingReport(start= start, end= end, pCode = pCode)
     return download_text_file(folder_path)
-
 
 
 @api_view(['GET'])
@@ -177,7 +177,6 @@ def printSql(request):
         return HttpResponse('logger file not found', status=404)
 
 
-
 @api_view(['GET', 'POST'])
 def bankedHrs(request: ASGIRequest):
     '''
@@ -202,10 +201,9 @@ async def accuralVacationSalary(request: ASGIRequest):
     logger.info(f'{request.method}: Vacation Accrual')
     inputData = loads(request.body)
     cursor, conn = sqlConnect()
-    if inputData['status']['state'] != 'APPROVED':
-        return JsonResponse(data='No Content', status= status.HTTP_204_NO_CONTENT, safe=False)
-    if(SqlClockPull.updateSalaryVacation(inputData['owner']['userId'], cursor)):
-        return JsonResponse(data=f'Updated time off balance for {inputData['owner']['userName']}.', status = status.HTTP_200_OK, safe= False)
+
+    if(SqlClockPull.updateSalaryVacation(inputData['userId'], cursor)):
+        return JsonResponse(data=f'Updated time off balance.', status = status.HTTP_200_OK, safe= False)
     return JsonResponse(data='Failed Opperation. Review Logs and resend request.', status=status.HTTP_417_EXPECTATION_FAILED, safe=False)
 
 @api_view(['GET'])
@@ -416,8 +414,6 @@ async def newTimeSheets(request: ASGIRequest):
         return response
 
    
-        
-
 #depreciated 
 @csrf_exempt
 async def quickBackup(request: ASGIRequest = None, event = None):

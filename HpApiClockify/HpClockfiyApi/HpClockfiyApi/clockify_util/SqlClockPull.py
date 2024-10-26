@@ -87,32 +87,62 @@ def updateUsrBalances(updateBalances, polID):
 def updateSalaryVacation(userId, cursor):
     
     query = f'''
-        with cte as (
-        Select 
-            eu.id,
-            eu.name,
-            Case when DATEPART(year,eu.start_date ) = '2024' then 
-            DATEDIFF(week, eu.start_date, GETDATE()) * 3.08
-            else DATEDIFF(week, '2024-01-01', GETDATE()) * 3.08
-            end as Accrual,
-            Sum(tr.paidTimeOff) as Used,
-            eu.[status]
-
-        From EmployeeUser eu 
-        LEFT join TimeOffRequests tr on tr.eID = eu.id
-        Left join TimeOffPolicies tp on tp.id = tr.pID and tp.policy_name like '%Vacation - S%'
-        where eu.hourly = 0 and tr.status = 'APPROVED'
-        group by 
+SET DATEFIRST 7;
+with TotalAcrued as (
+    Select 
         eu.id,
         eu.name,
         eu.start_date,
-        eu.[status]
-    )
-    Select c.Accrual- Coalesce(c.Used, 0) from cte c
-        where c.id = {userId}
-        order by c.[status], c.name 
+        DATEDIFF(
+                    DAY, eu.start_date, DATEADD(
+                        DAY, -1 * (DATEPART(WEEKDAY, GETDATE()) ) % 7, GETDATE()
+                    )
+                ) 
+        AS [Days Employeed],
+        Case when DATEPART(year,eu.start_date ) = '2024' then 
+            Convert(Real,
+                DATEDIFF(
+                    DAY, eu.start_date, DATEADD(
+                        DAY, -1 * (DATEPART(WEEKDAY, GETDATE()) ) % 7, GETDATE()
+                    )
+                ) 
+            )* 0.44
+        else 
+            Convert(REAL,
+                DATEDIFF(
+                    day, Concat(Convert(VARCHAR, YEAR(GETDATE())), '-01-01'), DATEADD(
+                        DAY, -1 * (DATEPART(WEEKDAY, GETDATE()) ) % 7, GETDATE()
+                    )
+                )
+            ) * 0.44
+        end as Accrual
+    from EmployeeUser eu
+    where eu.hourly = 0 and eu.status = 'ACTIVE'
+),
+totalVacationSalary as (
+    Select 
+        eu.id,
+        eu.name,
+        Sum(tr.paidTimeOff) as Used,
+        tp.policy_name
+    From TimeOffRequests tr 
+    inner join TimeOffPolicies tp on tp.id = tr.pID
+    inner join EmployeeUser eu on eu.id = tr.eID
+    where tp.policy_name = 'Vacation - Salary' and eu.[status] = 'ACTIVE'
+    and tr.[status] = 'APPROVED'
+    group by eu.name, tp.policy_name, eu.id
+)
+SELECT 
+    ta.Accrual - Coalesce(tv.Used, 0) as Balance,
+    ta.id,
+    ta.name, 
+    tv.Used, 
+    ta.Accrual
+From TotalAcrued ta 
+Left join totalVacationSalary as tv on tv.id= ta.id 
+    where ta.id = '{userId}'
     '''
-    cursor.execute(balance)
+    cursor.execute(query)
     balance = cursor.fetchone()
     headers = {
             'X-Api-Key': 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3',
