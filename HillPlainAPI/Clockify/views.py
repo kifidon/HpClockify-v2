@@ -11,13 +11,12 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response 
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
-import os
-from ..Utilities import *
+from .serializers import *
+from ..Utilities.views import *
+from ..Utilities.clockify_util.QuickBackupV3 import ClientEvent, PolicyEvent, eventSelect
 from ..HillPlainAPI.Loggers import setup_server_logger
-from ..HillPlainAPI import settings
 import asyncio
 import httpx
-from django.shortcuts import redirect
 
 loggerLevel = 'DEBUG'
 logger = setup_server_logger()

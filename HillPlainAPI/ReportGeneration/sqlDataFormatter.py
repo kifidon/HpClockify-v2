@@ -1,24 +1,15 @@
-from .hpUtil import sqlConnect, cleanUp, get_current_time, getMonthYear, getAbbreviation, getCurrentPaycycle, reverseForOutput
-from .ClockifyPushV3 import getWID, pushTimeOff
-from .ClockifyPullV3 import getDetailedEntryReport
-from decimal import Decimal
-import pyodbc
+from ..Utilities.views import sqlConnect, cleanUp, get_current_time, getAbbreviation, reverseForOutput
 import os
 import pandas as pd
-from json import loads, dumps
 from datetime import datetime, timedelta
-from .. import settings 
-import logging
-from ..Loggers import setup_background_logger
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from ..HillPlainAPI import settings 
+from ..HillPlainAPI.Loggers import setup_background_logger
 import win32com.client as win32
 import asyncio
 import time
 import random 
 from asgiref.sync import sync_to_async
 import pythoncom
-from concurrent.futures import ThreadPoolExecutor
 import shutil
 
 '''

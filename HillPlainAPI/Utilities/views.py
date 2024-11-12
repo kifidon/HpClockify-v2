@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+
 from ..HillPlainAPI.Loggers import setup_background_logger, setup_sql_logger
 import asyncio
 from json import dumps, dump, loads, JSONDecodeError
@@ -9,27 +9,15 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs
 import ast
 from .models import BackGroundTaskResult
+from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse, HttpResponse
 import os 
 import shutil
 import hashlib
 import random
-from django.db import connection
-# Create your views here.
-
-
-
-# Execute the query and log it
-def log_sql_queries():
-    logger = setup_sql_logger()
-    logger.info('Logging sql')
-    queries = connection
-    if len(queries) < 1:
-        logger.info('Currently no querries')
-    for query in queries:
-        logger.info(query['sql'])
-
-
+from django.views.decorators.csrf import csrf_exempt
+from .clockify_util.QuickBackupV3 import *
+from rest_framework import status
 
 
 retrySem = asyncio.Semaphore(1)
