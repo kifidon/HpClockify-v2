@@ -1,5 +1,5 @@
 from django.db import models
-
+from asgiref.sync import sync_to_async
 class Workspace(models.Model):
     id = models.CharField(primary_key=True, max_length=50)
     name = models.CharField(max_length=50, blank=True, null=True)
@@ -57,6 +57,15 @@ class Employeeuser(models.Model):
 
     def __str__(self):
         return self.name or ""
+    
+    async def asave(self):
+        """
+        Custom method to asynchronously save a model instance using a serializer.
+        """
+        if self.instance:  # If it's an existing instance (update)
+            await sync_to_async(self.instance.save)()
+        else:  # If it's a new instance (insert)
+            await sync_to_async(self.save)()
     
 class Timesheet(models.Model):
     id = models.CharField(max_length=50, primary_key=True)

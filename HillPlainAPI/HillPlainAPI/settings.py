@@ -11,9 +11,60 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+
+LOG_LEVEL = 'INFO' ## Flag
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'ServerLog.log'),
+            'formatter': 'standard'
+        },
+        'background_file': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'BackgroundTasksLog.log'),
+            'formatter': 'standard',  # Use the 'standard' formatter
+        },
+        'sqlFile': {
+            'level': LOG_LEVEL,
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'SqlLog.log'),
+            'formatter': 'standard',  # Use the 'standard' formatter
+        },
+    },
+    'loggers': {
+        'server': {
+            'handlers': ['file'],
+            'level': LOG_LEVEL,
+            'propagate': True,
+        },
+        'background_tasks': {  # Create a logger for background tasks
+            'handlers': ['background_file'],  # Use the 'background_file' handler
+            'level': LOG_LEVEL,  # Set the logging level for background tasks
+            'propagate': True,
+        },
+        'sqlLogger': {  # Create a logger for background tasks
+            'handlers': ['sqlFile'],  # Use the 'background_file' handler
+            'level': LOG_LEVEL,  # Set the logging level for background tasks
+            'propagate': True,
+        },
+    },
+}
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,6 +82,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'BackgroundTasks', #Celery?
+    'Clockify',
+    'LemApplication',
+    'ReportGeneration',
+    'Utilities',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,16 +123,21 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'HillPlainAPI.wsgi.application'
+# WSGI_APPLICATION = 'HillPlainAPI.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+ASGI_APPLICATION = 'HillPlainAPI.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': 'hpdb',
+        'USER': 'hpUser',
+        'PASSWORD': '0153HP!!',
+        'HOST': 'hpcs.database.windows.net',  # e.g., 'localhost' or IP address
+        'PORT': 1433,  # Default is usually '1433'
+        'OPTIONS': {
+            'driver':'ODBC Driver 18 for SQL Server',  # Change to your ODBC driver version
+        }       
     }
 }
 
@@ -105,7 +166,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Denver'
 
 USE_I18N = True
 

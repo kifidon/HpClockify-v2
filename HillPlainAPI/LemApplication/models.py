@@ -1,5 +1,5 @@
 from django.db import models
-from ..Clockify.models import Project, Employeeuser, Client, Workspace
+from HillPlainAPI.Clockify.models import Project, Employeeuser, Client, Workspace
 
 class LemSheet(models.Model):
     id = models.CharField(max_length = 50, primary_key=True) #  date, and project

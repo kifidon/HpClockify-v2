@@ -18,14 +18,16 @@ from django.contrib import admin
 from django.urls import path
 from LemApplication.views import *
 from ReportGeneration.views import *
-
+from Clockify.views import * 
+from Clockify import tasks
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('sql', views.printSql),
 
-    # path('quickBackup', views.quickBackup),
-    # path('quickBackup/<str:event>', views.quickBackup),
+# Clockified Scheduled tasks
+    path('quickBackup', QuickBackup),
+    path('quickBackup/<str:event>', QuickBackup),
 
 # ReportGenerator App
     path('', ViewServerLog),
@@ -49,20 +51,21 @@ urlpatterns = [
     
     # path('HpClockifyApi/bankedHours', views.bankedHrs),
     # path('HpClockifyApi/updateSalaryVacation', views.accuralVacationSalary),
-    
-    # path('HpClockifyApi/newTimeSheets', views.newTimeSheets),
-    # path('HpClockifyApi/updateTimeSheets', views.updateTimesheets),
-    # path('HpClockifyApi/getClients', views.getClients),
-    # path('HpClockifyApi/getUsers', views.getEmployeeUsers),
-    # path('HpClockifyApi/getTimeOffPolicies', views.getTimeOffPolicies),
-    # path('HpClockifyApi/getTimeOffRequests', views.getTimeOffRequests),
-    # path('HpClockifyApi/removeTimeOffRequests', views.removeTimeOffRequests),
-    # path('HpClockifyApi/getProjects', views.getProjects),
-    # path('HpClockifyApi/newEntry', views.newEntry),
+
+#Hill Plain internal Clockify API
+    path('HpClockifyApi/TimeSheets', TimesheetsView),
+    path('HpClockifyApi/Clients', ClientsView),
+    path('HpClockifyApi/Users', EmployeeUsersView),
+    path('HpClockifyApi/TimeOff', TimeOffRequestsView),
+    path('HpClockifyApi/Policies', TimeOffPoliciesView),
+    path('HpClockifyApi/Projects', ProjectsView),
+    path('HpClockifyApi/Entry', EntryView),
     # path('HpClockifyApi/newExpense', views.newExpense),
     # path('HpClockifyApi/deleteExpense', views.deleteExpense),
-    # path('HpClockifyApi/deleteEntry', views.deleteEntry),
     # path('HpClockifyApi/requestFiles', views.requestFilesForExpense),
+
+    path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
+    path('HpClockifyApi/task/Entry', tasks.approvedEntries),
 
 # LemApplication
     path('HpClockifyApi/lemSheet', lemSheet),
@@ -71,10 +74,8 @@ urlpatterns = [
     path('HpClockifyApi/recordName', insertRoleOrEquipment),
     path('HpClockifyApi/rateSheet', rateSheets, name = 'ratesheets'),
     
-    # path('HpClockifyApi/task/lemEntry', tasks.lemEntrytTask),
     
     # path('HpClockifyApi/task/retryExpense', tasks.retryExpenses),
-    # path('HpClockifyApi/task/Entry', tasks.approvedEntries),
     # path('HpClockifyApi/task/Expense', tasks.approvedExpenses),
 
 ]

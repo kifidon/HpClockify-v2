@@ -153,7 +153,7 @@ async def UserGroupEvent(wkSpaceName = 'Hill Plain'):
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
-async def main(): # Move the sql connection to the thread to increase performance by running async 
+async def main():
     result = await asyncio.gather(
     (ClientEvent()),
     (ProjectEvent()),
@@ -164,6 +164,27 @@ async def main(): # Move the sql connection to the thread to increase performanc
     ,return_exceptions= True)
     return result
 
+'''
+Asynchronously selects and executes an event based on the specified input event type.
+
+Args:
+    event (str, optional): The type of event to execute. Options include:
+        'user', 'client', 'project', 'policy', 'timesheet', 'timeoff', 
+        'holiday', and 'userGroup'. Defaults to None, which calls `main()`.
+
+Process:
+    - Initializes specific event classes for each event type with a workspace 
+      name of "Hill Plain".
+    - Uses `asyncio.gather` to run the selected event asynchronously.
+    - Logs results and the data type of the output.
+
+Returns:
+    list: A list containing the result of the specified event, or an exception 
+    if any occurred during execution.
+
+Raises:
+    Logs an error with traceback details if an exception occurs, then re-raises it.
+'''
 async def eventSelect(event = None):
     try:
         events = {
