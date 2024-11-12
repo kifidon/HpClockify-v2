@@ -11,6 +11,7 @@ import random
 from asgiref.sync import sync_to_async
 import pythoncom
 import shutil
+import traceback
 
 '''
 Functions can be condensed for better readability like what has been don for generateBilling 
@@ -18,6 +19,28 @@ and BillableReportGenerate functions
 '''
 
 logger = setup_background_logger()
+"""
+Converts an Excel (.xlsx) file to a PDF file, applying page setup formatting and handling retries on failure.
+
+Parameters:
+    folder_path (str): The path to the folder where the PDF file will be saved.
+    file_path (str): The path to the Excel (.xlsx) file to convert.
+    retry (int, optional): The current retry count. Defaults to 0.
+
+Returns:
+    None
+
+Description:
+    This function uses the COM interface to automate Excel and convert a specified .xlsx file to PDF format.
+    It applies page setup properties for optimal PDF formatting, including setting the page to fit the width
+    of one page, enabling headers and footers, and centering horizontally. If the conversion fails, the function
+    retries up to two times, with randomized delays between attempts. If the maximum retry count is reached,
+    a warning is logged, and the process terminates. COM resources are initialized and released appropriately
+    to prevent resource locking.
+    
+    Error handling includes logging the error and retrying if needed. Additionally, the function performs cleanup
+    by closing Excel and uninitializing COM resources.
+"""
 def convertXlsxPdf(folder_path, file_path, retry = 0):
     try:
         while retry < 2:
@@ -86,7 +109,37 @@ def convertXlsxPdf(folder_path, file_path, retry = 0):
     finally:
         pythoncom.CoUninitialize()  # Uninitialize COM for the current thread
 
-def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
+"""
+The `generateBilling` function is designed to create a detailed billing report for a specified project within 
+a specified date range, writing the output to an Excel file.
+
+Parameters:
+- `file_path`: The file path where the generated Excel report will be saved.
+- `pId`: Project ID tuple containing relevant identifiers and project name.
+- `startDate` and `endDate`: The date range for which billing data should be fetched.
+- `logger`: A logger instance for debugging and information messages.
+- `month` and `year`: Specifies the month and year for the billing period.
+
+Process:
+1. Database Connection: Establishes a SQL database connection and creates a cursor.
+2. Data Retrieval: Executes SQL queries to retrieve labor and equipment data for the specified project and date range:
+    - `labourData`: Contains labor-related information, including employee name, role, hours, and billing rates.
+    - `equipmentData`: Contains equipment-related information, including equipment type, hours, and rates.
+    - `labourTotal` and `equipmentTotal`: Calculated totals for labor and equipment.
+3. Excel Report Generation:
+    - Initializes an Excel writer and workbook, then creates a sheet named "Hill Plain - Monthly LEM."
+    - Styles and formatting for the report are set, including title, subtotal, and grand total styles.
+    - Writes project-specific headers and inserts a logo image.
+    - Writes labor and equipment data in tables, with columns for staff member, position/equipment type, quantity, unit cost, rate, and total amount.
+    - Adds subtotal and grand total rows.
+4. Description Data: For each employee, creates a separate sheet with a detailed description of entries, 
+ including the date, duration, and description of work performed.
+
+Notes:
+- Handles null values in data and formats them appropriately in the output.
+- Logs key steps and data points for debugging purposes.
+"""
+def GenerateBilling(file_path, pId, startDate, endDate, logger, month, year):
     try:
         cursor, conn = sqlConnect()
     #Get billing Data 
@@ -369,11 +422,40 @@ def generateBilling(file_path, pId, startDate, endDate, logger, month, year):
                     
 
             writer.close()
-            
-        cleanUp(conn, cursor)
     except Exception as e:
         logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
-        
+    finally:
+        cleanUp(conn, cursor)
+
+"""
+The `BillableReportGenerate` asynchronous function generates a billable report for approved, billable entries within a specified date range for a given project code.
+
+Parameters:
+- `startDate` (str, optional): The start date of the period to include in the report.
+- `endDate` (str, optional): The end date of the period to include in the report.
+- `pCode` (str, optional): The project code to filter the report by a specific project.
+
+Process:
+1. **Logger Setup**: Initializes a logger for tracking process details and errors.
+2. **SQL Connection**: Establishes a connection to the SQL database and retrieves a cursor for executing queries.
+3. **Project Retrieval**: Queries the database for projects with approved, billable entries in the specified date range:
+   - If `pCode` is provided, retrieves only that project.
+   - Otherwise, retrieves all projects with billable entries in the date range.
+4. **Report Directory Creation**: 
+   - Constructs a folder path based on the current directory, date, and report details.
+   - Clears any existing folder and creates a new one to store the report files.
+5. **Billing Report Generation**:
+   - Iterates through each project and generates an individual billing report using `GenerateBilling`.
+   - Each report is saved as an Excel file with a unique file path.
+6. **PDF Conversion**:
+   - Converts each generated Excel report into a PDF using `convertXlsxPdf`.
+   - This task is also executed asynchronously to enhance performance.
+7. **Return Path**: Returns the path to the folder containing all generated billing reports.
+
+Notes:
+- **Error Handling**: Logs critical errors with details about their location.
+- **Async Execution**: Uses `asyncio.gather` to concurrently generate billing reports and convert them to PDFs, improving the function’s efficiency.
+"""
 async def BillableReportGenerate(startDate = None| str, endDate = None | str, pCode = None):
     logger = setup_background_logger()
     try: 
@@ -408,7 +490,6 @@ async def BillableReportGenerate(startDate = None| str, endDate = None | str, pC
         logger.debug(f'{len(pIds)} Projects')
         year = startDate.split("-")[0][-2:]
         month = endDate.split("-")[1]
-        cleanUp(conn, cursor)
         # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
         reports = 'Reports'
@@ -427,7 +508,7 @@ async def BillableReportGenerate(startDate = None| str, endDate = None | str, pC
         for pId in pIds:
             file_path = os.path.join(folder_path, f"{getAbbreviation(month)}-{pId[1]}.xlsx")
             filePaths.append(file_path[:-5])
-            agenerateBilling = sync_to_async(generateBilling, thread_sensitive= False)
+            agenerateBilling = sync_to_async(GenerateBilling, thread_sensitive= False)
             tasks.append(agenerateBilling(file_path, pId, startDate, endDate, logger, month, year))
         await asyncio.gather(*tasks)
         
@@ -436,26 +517,41 @@ async def BillableReportGenerate(startDate = None| str, endDate = None | str, pC
         for file in filePaths:    
             tasks.append(convertAsync(folder_path, file))
         await asyncio.gather(*tasks)
-        
         return folder_path        
 
     except Exception as e: 
         logger.critical(f'{e.__traceback__.tb_lineno} - {str(e)}')
-        
+    finally: 
+        cleanUp(conn, cursor)
+
+"""
+Generates a weekly report summarizing billable vs non-billable hours for active employees during a specified date range.
+
+Parameters:
+    start (str, optional): The start date of the report range in 'YYYY-MM-DD' format. If None, the default value will be used.
+    end (str, optional): The end date of the report range in 'YYYY-MM-DD' format. If None, the default value will be used.
+
+Process:
+ 1. Initializes a logger for background logging.
+ 2. Establishes a database connection and retrieves the relevant data using an SQL query.
+ 3. Generates a folder structure and creates directories for storing the generated report.
+ 4. Writes the fetched data into an Excel file, with special formatting for headers, sub-totals, percentages, and grand totals.
+ 5. Each employee's name, manager, project details, and billable/non-billable hours are included in the report.
+ 6. Calculates and displays subtotals and percentages for billable and non-billable hours.
+ 7. Finally, the report is converted to a PDF and saved in the specified directory.
+
+If an error occurs during execution, an exception is logged with detailed trace information.
+
+The function returns the folder path where the report is stored.
+"""
 def NonBillableReportGen(start = None, end = None):
     logger = setup_background_logger()
     try: 
-        #obtain date range for this month 
-        if start is None or end is None:
-            start = (datetime.now() - timedelta(days = (7 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
-            end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
-        logger.info(f'Biling Report Generating for - {start}-{end}')
 
         cursor, conn = sqlConnect()
 
         #obtain relavant data 
-        cursor.execute(
-            f'''
+        query = f'''
             Select
                 eu.name, 
                 eu.manager,
@@ -476,11 +572,12 @@ def NonBillableReportGen(start = None, end = None):
                 p.title
             order by eu.name
             '''
-            )
+        logger.debug(query)
+        cursor.execute(query)
         data = cursor.fetchall()
         data = [['' if val is None else val for val in row] for row in data]
     
-         # Generate Folder for spreadsheets
+        # Generate Folder for spreadsheets
         current_dir = settings.BASE_DIR
         reports = 'Reports'
         directory = 'BillableVsNonBillable'
@@ -489,7 +586,7 @@ def NonBillableReportGen(start = None, end = None):
         logger.debug(f'Created Folder at {folder_path}')
         if not os.path.exists(folder_path):
             logger.info('Making Dir')
-            os.makedirs(folder_path )
+            os.makedirs(folder_path, exist_ok=True)
         file_path = os.path.join(folder_path, f"data.xlsx")
 
         with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
@@ -574,7 +671,6 @@ def NonBillableReportGen(start = None, end = None):
             grandNonBill = 0
             for rowData in data:
                 current = rowData[0]
-                
                 if (current is not None or previous is not None) and current != previous:
                     if billingAmount != 0 or nonBillingAmount != 0:
                         worksheet.merge_range(row,0,row,7, 'SUB TOTAL', subTotalFormat)
@@ -648,20 +744,43 @@ def NonBillableReportGen(start = None, end = None):
             worksheet.write(row,9,grandNonBill,columnNameFormat)
             worksheet.write(row+1,9,(grandBill+ grandNonBill),columnNameFormat)
             writer.close()
-
-        # convertXlsxPdf(folder_path, file_path)
+        convertXlsxPdf(folder_path, file_path)
         return folder_path
     except Exception as e: 
-        logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+        logger.error(f'Error occurred at line {e.__traceback__.tb_lineno}: {traceback.format_exc()}')
+    finally: 
+        cleanUp(cursor=cursor, conn=conn)
 
-def Payroll(start = None, end = None): 
+'''
+The `NonBillableReportGen` asynchronous function generates a weekly report summarizing billable vs. non-billable hours for 
+active employees, formatting the data in an Excel file with specific styles for easy readability.
+
+Parameters:
+- `startDate` (str, optional): The start date of the period to include in the report.
+- `endDate` (str, optional): The end date of the period to include in the report.
+
+Process:
+1. **Logger Setup**: Initializes a logger to track the process and any encountered errors during the report generation.
+2. **SQL Connection**: Establishes a connection to the SQL database to retrieve the required data and execute queries.
+3. **Employee Data Retrieval**: Queries the database for active employees who have billable and non-billable hours within the specified date range:
+   - Retrieves data for the specified period and calculates the total hours, differentiating between billable and non-billable hours.
+4. **Report Directory Creation**: 
+   - Constructs a directory path to store the generated Excel file, ensuring the path follows the folder structure defined in the Django settings.
+   - Clears any existing directory and creates a new folder to store the current report.
+5. **Report Generation**:
+   - Iterates through each employee's data and formats it according to predefined styles in the Excel template.
+   - Ensures that specific formatting is applied, including titles, headers, subtotals, percentages, and grand totals.
+6. **Excel File Creation**:
+   - Uses the `xlsxwriter` library to create an Excel file with the formatted data, adding multiple sheets as necessary to organize the report.
+7. **Return Path**: Returns the path to the folder where the generated report is stored.
+
+Notes:
+- **Error Handling**: Logs errors with detailed information to help with debugging.
+- **Async Execution**: Uses asynchronous tasks to allow for concurrent report generation and processing, improving performance.
+'''
+def PayrollGenerator(start = None, end = None): 
     logger = setup_background_logger()
     try:
-        if start is None or end is None:
-            start = (datetime.now() - timedelta(days = (14 + datetime.now().weekday() + 1))).strftime('%Y-%m-%d') # find sunday start time 
-            end =   (datetime.now() - timedelta(days = (2 + datetime.now().weekday()))).strftime('%Y-%m-%d') #find saturday 
-        logger.info(f'Biling Report Generating for - {start}-{end}')
-
         cursor, conn = sqlConnect()
         types = ['Salary', 'Hourly']
         for type in types:
@@ -887,12 +1006,41 @@ def Payroll(start = None, end = None):
             # convertXlsxPdf(folder_path, file_path[:-5])
 
         return folder_path
-            
-
     except Exception as e:
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
+    finally:
+        cleanUp(conn, cursor)
 
-def TimeStatus(start = None, end = None):
+'''
+The `TimeStatusGenerator` asynchronous function generates a weekly report of employees' time entry statuses, categorizing them by approval status and formatting the data in an Excel file for easy reference.
+
+Parameters:
+- `start` (str, optional): The start date of the report period. Defaults to one week before the current week.
+- `end` (str, optional): The end date of the report period. Defaults to the previous week.
+
+Process:
+1. **Logger Setup**: Initializes a logger to track the report generation process and record any errors.
+2. **Date Range Calculation**: Determines the date range for each week within the specified period.
+   - If `start` and `end` are not provided, it defaults to the previous week's Sunday-Saturday range.
+3. **SQL Query Execution**: 
+   - Connects to the SQL database and retrieves employee time statuses based on approval categories (`APPROVED`, `PENDING`, `NO TIME`, `NOT APPLICABLE`, `UNKNOWN STATUS`).
+   - Groups data by each employee and their manager, focusing on active employees only.
+4. **Report Directory Creation**:
+   - Creates a directory path for storing the generated Excel files.
+   - Clears any existing folder and generates a new folder for storing the weekly reports.
+5. **Excel File Generation**:
+   - Iterates over each weekly data set and creates a formatted Excel file using `xlsxwriter`.
+   - Applies specific formatting styles for different sections: title, headers, and status legend.
+   - Writes data to the worksheet, categorizing each employee's time entry status and adding explanatory notes.
+6. **PDF Conversion**:
+   - Converts each generated Excel report into a PDF using `convertXlsxPdf` for better sharing and readability.
+7. **Return Path**: Returns the path to the folder containing the generated reports.
+
+Notes:
+- **Error Handling**: Logs errors with line number and exception details for easy troubleshooting.
+- **Async Execution**: Uses asynchronous processes to manage data retrieval, report generation, and PDF conversion, ensuring efficiency in execution.
+'''
+def TimeStatusGenerator(start = None, end = None):
     logger = setup_background_logger()
     try: 
         #obtain date range for this month 
@@ -1061,12 +1209,48 @@ def TimeStatus(start = None, end = None):
     except Exception as e: 
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
 
-def lemGenerator( projectCode: str, lemId: str):
+"""
+Generates a LEM (Labor, Equipment, Material) spreadsheet in Excel format 
+for a specified project and LEM ID. This function retrieves and organizes 
+relevant data from SQL tables, formats the data into different sections, 
+and saves the spreadsheet in a specified directory.
+
+Parameters:
+    projectCode (str): The code for the project associated with the LEM.
+    lemId (str): The unique identifier for the LEM entry in the database.
+
+Process:
+    - Connects to a SQL database to retrieve LEM information, worker entries, 
+        and equipment entries based on the given LEM ID.
+    - Formats retrieved data, replacing null values as needed, and organizes 
+        it into specific sections of the spreadsheet.
+    - Creates a project directory if it does not exist and saves the Excel 
+        file with a structured layout and formatted tables.
+
+Sections:
+    - Header Information: Includes client name, client representative, 
+        project manager, date, and task description.
+    - Worker Entries: Displays details of employees’ roles, hours worked, 
+        travel hours, and other metrics.
+    - Equipment Entries: Lists equipment used, quantities, rates, and costs.
+    - Work Description: Describes work performed for the project.
+
+Output:
+    The generated Excel file is saved in a nested directory structure under 
+    'Reports/LemSheets/{projectCode}/{lemId}', with the file name format 
+    '{projectCode}-{lemId}.xlsx'.
+    
+Notes:
+    - Logging is implemented to track query executions, folder creation, 
+        and data writing progress.
+    - Special formats are applied to header sections, column headers, text, 
+        numeric cells, and date fields for readability.
+"""
+def LemGenerator( projectCode: str, lemId: str):
     logger = setup_background_logger()
     try:
         cursor, conn = sqlConnect()
 
-        #get Summary Data
         query = f''' 
             
             -- For generating lem spreadsheet
@@ -1440,7 +1624,45 @@ def lemGenerator( projectCode: str, lemId: str):
         logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
         return None
 
-def lemTimesheet(projectId, startDate,endDate ):
+"""
+Generates a timesheet in Excel format for a specified project and date range, 
+detailing work and equipment entries for each day within the range.
+
+Parameters:
+    projectId (str): The unique identifier of the project.
+    startDate (str): The start date of the timesheet period in 'YYYY-MM-DD' format.
+    endDate (str): The end date of the timesheet period in 'YYYY-MM-DD' format.
+
+Process:
+    - Connects to a SQL database and queries work entries and equipment entries 
+    for the specified project within the date range.
+    - Cleans data by replacing null values as needed, then organizes it into 
+    work and equipment sections in the timesheet.
+    - Generates an Excel file with distinct formatting for headers, columns, 
+    dates, and values, as well as missing information highlights.
+
+Sections:
+    - Work Entries: Lists the date, role, work details, travel hours, meals, 
+    and hotel entries associated with each worker.
+    - Equipment Entries: Displays the equipment used, quantity, and rate type 
+    for each day within the date range.
+
+File Structure:
+    - Creates a directory at 'Reports/LemSheets/Timesheets/{projectCode}' 
+    if it doesn't exist.
+    - Saves the generated Excel file with the format '{startDate} to {endDate}.xlsx'.
+
+Output:
+    - The file is saved in the designated directory, and its path is returned.
+    - Additionally, the Excel file may be converted to a PDF for reporting purposes.
+
+Notes:
+    - Formats are applied to ensure readability, with distinct styles for 
+    headers, missing data, and specific column types (e.g., dates, totals).
+    - Data for each row is dynamically written, allowing multi-column merging 
+    for select fields.
+"""
+def LemTimesheetGenerator(projectId, startDate,endDate ):
     cursor, conn = sqlConnect()
     query = f'''
         select ls.lem_sheet_date as "Date", lw.name as Role, r.name as "Role", 
@@ -1656,10 +1878,10 @@ def lemTimesheet(projectId, startDate,endDate ):
 
 
 
-def main():
-    BillableReportGenerate('07','24')
-    # MonthylyProjReport('2024-02-25', '2024-03-24')
+# def main():
+#     BillableReportGenerate('07','24')
+#     # MonthylyProjReport('2024-02-25', '2024-03-24')
    
 
-if __name__ == "__main__": 
-    main()
+# if __name__ == "__main__": 
+#     main()

@@ -23,6 +23,9 @@ class LemWorkerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class LemEntrySerializer(serializers.ModelSerializer):
+    '''
+    
+    '''
     class Meta:
         model = LemEntry
         fields = '__all__'

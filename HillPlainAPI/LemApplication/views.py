@@ -12,12 +12,30 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import *
 from ..Utilities.views import *
-from ..Utilities.clockify_util.QuickBackupV3 import GenerateLem, GenerateTimeSheetLem
 from time import time
 from ..HillPlainAPI.Loggers import setup_server_logger
 import httpx
 
 
+"""
+Handles the creation of a new LemSheet entry or updating an existing entry in the database. This function accepts data
+ related to a specific client's project, generates a unique ID and an incremented LemSheet number, validates the data, 
+ and saves it to the database if valid.
+
+Parameters:
+    inputData (dict): Dictionary containing data fields for creating a LemSheet entry, including 'clientId' and 'projectId'.
+
+Process:
+    1. Generates a unique ID for the LemSheet entry based on the client's ID, project ID, and current timestamp.
+    2. Finds existing LemSheet entries for the given client and project, then calculates the next lemNumber in sequence.
+    3. Uses a serializer to validate and save the LemSheet data. Logs a success message if the operation is successful.
+    4. If validation fails, logs the errors and raises a `ValidationError`.
+    5. Catches database integrity errors (e.g., primary key conflicts) and logs appropriate error messages.
+    6. Catches and logs any other exceptions, including traceback information, for debugging purposes.
+
+Returns:
+    bool: `True` if the LemSheet entry is successfully created; `False` if a validation or integrity error occurs.
+"""
 # @api_view(["PUT", "POST", "GET"])
 def postThreadLemSheet(inputData):
     try:
@@ -56,6 +74,34 @@ def postThreadLemSheet(inputData):
         logger.error(f'Traceback {e.__traceback__.tb_lineno}: {type(e)} - {str(e)}')
         raise e
 
+"""
+Handles asynchronous HTTP requests for creating, updating, and deleting `LemSheet` records.
+
+Parameters:
+    request (ASGIRequest): The incoming HTTP request with a JSON body containing details for the `LemSheet` entry, including `clientId` and `projectId`.
+
+Process:
+    1. Parses the request body as JSON and logs the HTTP method and input data for debugging.
+    
+    POST (Create `LemSheet`):
+        - Calls `postThreadLemSheet` asynchronously to generate a unique ID and save the `LemSheet` data if valid.
+        - Returns a `201 Created` response with the generated `id` if successful, or a `400 Bad Request` response if validation fails.
+        - Handles integrity errors, such as conflicts with existing records, with a `409 Conflict` response.
+    
+    DELETE (Archive `LemSheet`):
+        - Retrieves the specified `LemSheet` record by `id`, marks it as archived, and saves the update.
+        - Returns a `204 No Content` response if archiving is successful.
+        - If the `LemSheet` record is not found, returns a `404 Not Found` response.
+    
+    Other HTTP Methods:
+        - Returns a `510 Not Extended` response for unsupported methods.
+
+    General Exception Handling:
+        - Catches any unexpected errors, logs traceback details, and returns a `501 Not Implemented` response with error information.
+
+Returns:
+    JsonResponse: The response status and data, with specific messages for each scenario (e.g., success, conflict, not found, or errors).
+"""
 @csrf_exempt
 async def lemSheet(request:ASGIRequest):
     logger = setup_server_logger()
@@ -95,8 +141,31 @@ async def lemSheet(request:ASGIRequest):
         logger.error(response.content)
         return response
 
-# @api_view(['PUT', 'POST', 'GET'])
 
+"""
+Finds or creates a `LemWorker` record based on the provided employee ID and role ID.
+
+Parameters:
+    inputData (dict): Dictionary containing information for the `LemWorker` entry, including `empId` (employee ID) and `roleId`.
+
+Process:
+    1. Logs the attempt to find an existing `LemWorker` record that matches the provided `empId` and `roleId`.
+    2. If a matching `LemWorker` is found, logs the success and returns `True`, indicating no new record is needed.
+    3. If the record is not found:
+        - Logs the creation of a new `LemWorker` record.
+        - Generates a unique `_id` for the new record based on `empId` and `roleId`.
+        - Uses a serializer (`LemWorkerSerializer`) to validate and save the new `LemWorker` entry.
+        - If validation is successful, logs a success message and returns `True`.
+        - If validation fails, logs each error detail and raises a `ValidationError`.
+    4. Catches any unexpected errors, logs the error message with traceback details, and raises the exception.
+
+Returns:
+    bool: `True` if a matching record is found or a new record is successfully created.
+    
+Raises:
+    ValidationError: If the input data fails serializer validation.
+    Exception: For any other unexpected errors.
+"""
 def postThreadLemWorker(inputData: dict):
     logger = setup_server_logger()
     try:
@@ -127,7 +196,36 @@ def postThreadLemWorker(inputData: dict):
             logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
             raise e
         
+"""
+Handles asynchronous HTTP requests to create or manage `LemWorker` entries. 
 
+Parameters:
+    request (ASGIRequest): The incoming HTTP request with a JSON body containing details for the `LemWorker` entry, including `empId` and `roleId`.
+
+Process:
+    1. Parses the JSON request body, logs the HTTP method, and logs input data for debugging purposes.
+    
+    POST (Create or Find `LemWorker`):
+        - Calls `postThreadLemWorker` asynchronously to check if the `LemWorker` entry exists. If not, it creates a new one.
+        - Sends a POST request to an external API at `'http://localhost:5000/HpClockifyApi/task/lemEntry'` with the `LemWorker` data.
+        - Returns a `201 Created` response with the `LemWorker` data if the external API call is successful.
+        - If the external API call fails, returns a `400 Bad Request` response with an error message.
+        
+    Other HTTP Methods:
+        - Returns a `510 Not Extended` response for unsupported methods.
+
+    Exception Handling:
+        - Catches `ValidationError` and returns a `400 Bad Request` response with a message for invalid input data.
+        - Catches `IntegrityError`, logs duplicate record details if related to primary key constraint, and raises an error message.
+        - Catches any other unexpected exceptions, logs traceback information, and returns a `501 Not Implemented` response with the error details.
+
+Returns:
+    JsonResponse: The response status and data, with specific messages for each scenario (e.g., success, conflict, not implemented, or errors).
+    
+Raises:
+    ValidationError: For input data failing validation.
+    IntegrityError: For primary key conflicts or duplicate records.
+"""
 @csrf_exempt
 async def LemWorkerEntry(request:ASGIRequest):
     logger = setup_server_logger()
@@ -162,7 +260,27 @@ async def LemWorkerEntry(request:ASGIRequest):
         logger.error(response.content)
         return response
 
+"""
+Creates a new `EquipEntry` record based on the provided input data.
 
+Parameters:
+    inputData (dict): Dictionary containing details for the `EquipEntry`, including `lemId` and `equipId`.
+
+Process:
+    1. Generates a unique `_id` for the entry using `lemId`, `equipId`, and the current timestamp.
+    2. Logs the input data for debugging purposes.
+    3. Uses `EquipEntrySerializer` to validate the `EquipEntry` data.
+        - If the data is valid, saves the `EquipEntry` and logs a success message, returning `True`.
+        - If validation fails, logs each error detail and raises a `ValidationError` with the initial data.
+    4. Catches any unexpected errors, logs the input data and error details (including traceback), and raises the exception.
+
+Returns:
+    bool: `True` if the `EquipEntry` record is successfully saved.
+
+Raises:
+    ValidationError: If the input data fails serializer validation.
+    Exception: For any other unexpected errors.
+"""
 def postThreadEquipEntry(inputData: dict):
     logger = setup_server_logger()
     try:
@@ -183,7 +301,36 @@ def postThreadEquipEntry(inputData: dict):
         logger.error(f"{type(e)} ({e.__traceback__.tb_lineno}) - {str(e)} ")
         raise e
         
+"""
+Handles asynchronous HTTP requests for managing `EquipEntry` records.
 
+Parameters:
+    request (ASGIRequest): The incoming HTTP request containing JSON data with details for the `EquipEntry`, such as `lemId` and `equipId`.
+
+Process:
+    1. Parses the JSON request body and logs the input data and HTTP method for debugging purposes.
+
+    POST (Create `EquipEntry`):
+        - Calls `postThreadEquipEntry` asynchronously to create a new `EquipEntry` record.
+        - If the entry is successfully created, returns a `201 Created` response with the `EquipEntry` data.
+        - If creation fails, returns a `400 Bad Request` response with the input data.
+
+    Other HTTP Methods:
+        - Returns a `510 Not Extended` response for unsupported methods.
+
+    Exception Handling:
+        - Catches `ValidationError` and returns a `400 Bad Request` response with a message indicating invalid data.
+        - Catches `IntegrityError`, logs a message if there's a primary key conflict, and returns a `409 Conflict` response.
+        - Catches any other unexpected exceptions, logs traceback information, and returns a `501 Not Implemented` response with error details.
+
+Returns:
+    JsonResponse: A response with a specific status code and message based on the outcome (e.g., success, conflict, error).
+
+Raises:
+    ValidationError: For invalid input data.
+    IntegrityError: For primary key conflicts.
+    Exception: For any other unexpected errors.
+"""
 @csrf_exempt
 async def equipmentEntries(request: ASGIRequest):
     logger = setup_server_logger()
@@ -211,7 +358,8 @@ async def equipmentEntries(request: ASGIRequest):
         response = JsonResponse(data=f'A problem occured while handling your request. If error continues, contact admin | ({e.__traceback__.tb_lineno}): {str(e)}', status=status.HTTP_501_NOT_IMPLEMENTED, safe = False)
         logger.error(response.content)
         return response
-    
+
+
 @api_view(["POST"])
 def insertRoleOrEquipment(request:ASGIRequest):
     logger = setup_server_logger()
@@ -265,7 +413,38 @@ def insertRoleOrEquipment(request:ASGIRequest):
         logger.error(f"({e.__traceback__.tb_lineno}) - {str(e)}")
         return response
 
+"""
+Handles HTTP POST requests to create a new record in either the `Role` or `Equipment` table.
 
+Parameters:
+    request (ASGIRequest): The incoming HTTP request containing JSON data with attributes for either a `Role` or `Equipment`.
+
+Process:
+    1. Parses the JSON request body, creates a unique hash ID for the new record, and logs input data and request method.
+
+    POST (Insert `Role` or `Equipment`):
+        - If `isRole` is `True` in `inputData`, configures a serializer for `Role` with relevant fields (`roleId`, `workRate`, etc.).
+        - If `isRole` is `False`, configures a serializer for `Equipment` with relevant fields (`equipId`, `dayRate`, etc.).
+        - Validates the serializer. If valid, saves the record and stores input data in the session.
+        - Returns a `201 Created` response with the `rateSheet` URL and `inputData`.
+        - If the serializer is invalid, logs validation errors, and raises `ValidationError` or `IntegrityError` for duplicate records.
+
+    Other HTTP Methods:
+        - Returns a `405 Method Not Allowed` response for unsupported methods.
+
+    Exception Handling:
+        - Catches `IntegrityError`, logs a primary key conflict message if applicable, and returns a `409 Conflict` response.
+        - Catches `ValidationError` and returns a `400 Bad Request` response with an error message for invalid requests.
+        - Catches any other unexpected exceptions, logs traceback details, and returns a `501 Not Implemented` response with error information.
+
+Returns:
+    JsonResponse: A response with a specific status code and message based on the outcome (e.g., success, conflict, error).
+
+Raises:
+    ValidationError: For invalid input data.
+    IntegrityError: For primary key conflicts.
+    Exception: For any other unexpected errors.
+"""
 @api_view(["POST", "GET"])
 def rateSheets(request: ASGIRequest = None): #maybe make async later 
     logger = setup_server_logger()
