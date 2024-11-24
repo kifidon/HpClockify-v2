@@ -6,3 +6,4 @@ Tasks to complete
 5. Scheduled tasks 
 6. perminant deployment 
 7. test programs 
+8. Test Deadlock on Backup function when error is raised on Entry 
