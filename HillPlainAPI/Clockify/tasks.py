@@ -10,12 +10,12 @@ from rest_framework import status
 from asgiref.sync import sync_to_async
 
 from json import dumps
-from ..HillPlainAPI.Loggers import setup_background_logger
-from ..Utilities.clockify_util.ClockifyPullV3 import getCategories
-from ..Utilities.clockify_util import ClockifyPullV3
-from ..Utilities.views import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, pauseOnDeadlock
-from ..LemApplication.models import *
-from ..LemApplication.serializers import *
+from HillPlainAPI.Loggers import setup_background_logger
+from Utilities.clockify_util.ClockifyPullV3 import getCategories
+from Utilities.clockify_util import ClockifyPullV3
+from Utilities.views import taskResult, hash50, bytes_to_dict, check_category_for_deletion, reverseForOutput, pauseOnDeadlock
+from LemApplication.models import *
+from LemApplication.serializers import *
 import requests
 import asyncio
 

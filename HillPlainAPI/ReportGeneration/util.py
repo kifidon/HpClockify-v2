@@ -1,5 +1,5 @@
-from sqlDataFormatter import *
-from ..Utilities.views import getMonthYear
+from .sqlDataFormatter import *
+from Utilities.views import getMonthYear
 
 """
 Function: BillingReportCaller

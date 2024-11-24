@@ -1,11 +1,10 @@
 '''Combine all the report generator caller functions into one function that selectrs the report generator. This should simplify the code and internal dependancies'''
-from ..views import sqlConnect, cleanUp, get_current_time
 from . import ClockifyPushV3
-from ...ReportGeneration.sqlDataFormatter import *
+from ReportGeneration.sqlDataFormatter import *
 import asyncio
 import datetime
 from asgiref.sync import sync_to_async
-from ...HillPlainAPI.Loggers import setup_server_logger
+from HillPlainAPI.Loggers import setup_server_logger
 logger = setup_server_logger('DEBUG')
 
 async def UserEvent(wkSpaceName = 'Hill Plain'):
@@ -80,26 +79,27 @@ async def PolicyEvent(wkSpaceName = 'Hill Plain'):
     cleanUp(conn=conn, cursor=cursor)
     return result
 
-async def TimesheetEvent(wkSpaceName = 'Hill Plain', status = ['APPROVED', 'PENDING', 'WITHDRAWN_APPROVAL']):
+async def TimesheetEvent(wkSpaceName = 'Hill Plain'):# , status = ['APPROVED', 'PENDING', 'WITHDRAWN_APPROVAL']):
     logger.info('Timesheet Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
-    cursor , conn = sqlConnect()
+    # cursor , conn = sqlConnect()
     attempts = 0
-    while cursor is None and conn is None and attempts < 10:
-        attempts += 1
-        logger.info(f" Retrying.....Connecting to server")
-        cursor , conn = sqlConnect()
-    if cursor is None and conn is None:
-        logger.error('cannot connect to server')
-        return 0
-    output = []
-    for stat in status: 
-        logger.info(f'Updating {stat}')
-        result = await ClockifyPushV3.pushTimesheet(wid, conn, cursor, stat)
-        logger.info(result)
-        output.append(result)
-    cleanUp(conn=conn, cursor=cursor)
-    return output 
+    # while cursor is None and conn is None and attempts < 10:
+    #     attempts += 1
+    #     logger.info(f" Retrying.....Connecting to server")
+    #     cursor , conn = sqlConnect()
+    # if cursor is None and conn is None:
+    #     logger.error('cannot connect to server')
+    #     return 0
+    # output = []
+    # for stat in status: 
+    # logger.info(f'Updating {stat}')
+    result = await ClockifyPushV3.pushTimesheets(wid, 1)
+    logger.debug(f"pushTimesheets Result: {result}")
+    logger.info(result)
+    # output.append(result)
+    # cleanUp(conn=conn, cursor=cursor)
+    return result 
 
 async def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     logger.info('Timeoff Event Called')

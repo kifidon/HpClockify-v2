@@ -22,7 +22,7 @@ from Clockify.views import *
 from Clockify import tasks
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls), impliment later 
     # path('sql', views.printSql),
 
 # Clockified Scheduled tasks
@@ -49,7 +49,7 @@ urlpatterns = [
 
     # path('timeSheets', views.timesheets),
     
-    # path('HpClockifyApi/bankedHours', views.bankedHrs),
+    path('HpClockifyApi/bankedHours', BankedHrs),
     # path('HpClockifyApi/updateSalaryVacation', views.accuralVacationSalary),
 
 #Hill Plain internal Clockify API

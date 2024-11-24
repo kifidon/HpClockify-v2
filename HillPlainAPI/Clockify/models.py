@@ -104,6 +104,7 @@ class Entry(models.Model):
     timesheetId = models.ForeignKey('Timesheet', models.DO_NOTHING, to_field='id', db_column='time_sheet_id', blank=True, null=True)
     duration = models.FloatField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    task = models.CharField(max_length=200, blank=True, null=True)
     billable = models.BooleanField(blank=True, null=True)
     project = models.ForeignKey('Project', models.CASCADE, to_field='id', blank=True, null=True, db_column='project_id')
     # type = models.CharField(max_length=20, blank=True, null=True)

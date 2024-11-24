@@ -12,9 +12,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import *
-from ..Utilities.views import *
-from ..Utilities.clockify_util.QuickBackupV3 import ClientEvent, PolicyEvent, eventSelect
-from ..HillPlainAPI.Loggers import setup_server_logger
+from Utilities.views import *
+from Utilities.clockify_util.QuickBackupV3 import ClientEvent, PolicyEvent, eventSelect
+from Utilities.clockify_util.ClockifyScheduledTasks import BankedTime
+from HillPlainAPI.Loggers import setup_server_logger
 import asyncio
 import httpx
 
@@ -873,3 +874,23 @@ async def QuickBackup(request: ASGIRequest = None, event = None):
         response = JsonResponse(data = str(e), status=status.HTTP_207_MULTI_STATUS, safe=False)
     finally: 
         return response or JsonResponse(data = 'An Error Occured', status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+@api_view(['GET', 'POST'])
+# @csrf_exempt
+def BankedHrs(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls pull request functions from the databse to update the banked hours ballance in clockify. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger.info(f'{request.method}: bankedHours ')
+    try:
+        BankedTime()
+        return JsonResponse(data='Operation Completed', status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        logger.error(f'{str(e)}')
+        return JsonResponse(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_503_SERVICE_UNAVAILABLE, safe=False)

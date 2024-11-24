@@ -1,6 +1,7 @@
 from . import ClockifyPullV3
 from . import ClockifyPushV3
-from ...HillPlainAPI.Loggers import setup_background_logger
+from HillPlainAPI.Loggers import setup_background_logger
+from Utilities.views import sqlConnect
 import time
 from ..views import reverseForOutput
 from requests import patch
@@ -254,10 +255,10 @@ Raises:
     Logs warnings if unable to initialize database connection and logs info 
     on successful completion of the banked time update process.
 '''
-def updateBankedTime():
+def BankedTime():
     logger = setup_background_logger('DEBUG')
     while True:
-        cursor, conn =ClockifyPullV3.sqlConnect()
+        cursor, conn = sqlConnect()
         if cursor is None or conn is None:
             logger.warning(f' Failed to initilize cursor and connection in Banked Time')
             time.sleep(2)

@@ -1,10 +1,11 @@
 from django.shortcuts import render
-from ..HillPlainAPI.Loggers import setup_server_logger
-from ..Utilities.views import download_text_file
+from HillPlainAPI.Loggers import setup_server_logger
+from Utilities.views import download_text_file
 from .util import *
 from django.http import  HttpResponse
 from rest_framework.decorators import api_view
 from django.core.handlers.asgi import ASGIRequest
+from HillPlainAPI.settings import LOGS_DIR
 
 """
 Function: billableReport
@@ -160,7 +161,7 @@ Returns:
 """
 @api_view(['GET'])
 def ViewServerLog(request):
-    log_file_path = os.path.join(settings.LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
+    log_file_path = os.path.join(LOGS_DIR, 'ServerLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
             # Read all lines from the file
@@ -205,7 +206,7 @@ Returns:
 """
 @api_view(['GET'])
 def ViewTaskLog(request):
-    log_file_path = os.path.join(settings.LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
+    log_file_path = os.path.join(LOGS_DIR, 'BackgroundTasksLog.log')  # Update with the path to your logger file
     if os.path.exists(log_file_path):
         with open(log_file_path, 'r') as file:
             # Read all lines from the file

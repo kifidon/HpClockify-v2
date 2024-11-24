@@ -1,15 +1,303 @@
-import pyodbc
+import pyodbc #depreciated. Replase with django.db
+from django import db
+from django.db import transaction
 import copy
 import json
 import asyncio
-from .. models import *
+from Clockify.models import *
 # import logging
-from .. Loggers import setup_background_logger, setup_server_logger
+from HillPlainAPI.Loggers import setup_background_logger, setup_server_logger
 from .ClockifyPullV3 import getApiKey, getWorkspaces,getWorkspaceUsers, getProjects, getApprovedRequests, getHolidays, getClients, getPolocies, getTimeOff, getUserGroups
-from .hpUtil import sqlConnect, cleanUp, pytz, datetime, timedelta, timeZoneConvert, timeDuration, count_working_days
-import concurrent.futures
+from ..views import sqlConnect, cleanUp, pytz, datetime, timedelta, toMST, timeDuration, count_working_days
+import threading
+from Clockify.models import *
 
 logger = setup_server_logger('DEBUG')
+
+
+class ThreadPrimitives:
+    def __init__(self):
+        # Initialize the threading primitives
+        self.lock = threading.Lock()
+        self.rollback = threading.Event()
+        self.atomic = 0  # tracks the number of active threads
+        self.commit = threading.Condition()
+
+    def increment_atomic(self):
+        """Safely increment the atomic counter within the lock."""
+        with self.lock:
+            self.atomic += 1
+            logger.info(f"Atomic count incremented to: {self.atomic}")
+
+    def decrement_atomic(self):
+        """Safely decrement the atomic counter within the lock."""
+        with self.lock:
+            self.atomic -= 1
+            try:
+                assert self.atomic >= 0, "Assertion failed: self.atomic must be non-negative"
+            except AssertionError as a:
+                logger.error((str(a)))
+                
+            logger.info(f"Atomic count decremented to: {self.atomic}")
+        return self.atomic
+    def get_atomic(self):
+        """Safely read the value of the atomic counter within the lock."""
+        with self.lock:
+            return self.atomic
+        
+    def wait_for_commit(self):
+        """Wait until the commit condition is met."""
+        with self.commit:
+            self.commit.wait()
+            logger.info("Commit condition met, resuming operation.")
+
+    def notify_commit(self):
+        """Notify all threads waiting on the commit condition."""
+        with self.commit:
+            self.commit.notify_all()
+            logger.info("Notified all threads on commit condition.")
+
+    def set_rollback(self):
+        """Set the rollback event to trigger a rollback."""
+        self.rollback.set()
+        logger.info("Rollback event set.")
+
+    def clear_rollback(self):
+        """Clear the rollback event."""
+        self.rollback.clear()
+        logger.info("Rollback event cleared.")
+
+    def check_rollback(self):
+        """Check if rollback event is set."""
+        return self.rollback.is_set()
+    
+primitives = ThreadPrimitives()
+
+def pushTags(inputData, wkspace, entry):
+    id = inputData['id']
+    name = inputData['name']
+    try:
+        tags, created = Tagsfor.objects.update_or_create(
+            id = id,
+            entryId = entry, 
+            workspaceId = wkspace,
+            name = name
+        )
+        if created is True:
+            logger.info("\t\tCreated new tag")
+        else:
+            logger.info("\t\tUpdated old tag")
+
+    except pyodbc.IntegrityError as e: 
+        logger.error(f'\t\tProblem inserting tag on entry. Rolling back changes...')
+        primitives.set_rollback()
+    except Exception as e:
+        primitives.set_rollback()
+        logger.info(f'{str(e)}- {e.__traceback__.tb_lineno}')
+    finally:
+        if primitives.set_rollback():
+            tags.delete()
+        
+    return
+
+def pushEntries(inputData, timesheet, wkspace):
+    # conn = connections.acquire_connection()
+    # cursor = conn.cursor()
+
+    id = inputData['id']
+    timesheetID = inputData['approvalRequestId'] or None
+    # logger.debug(f"TimesheetID:{timesheetID}")
+    description = inputData['description']
+    taskName = inputData['task']['name'] or None
+    billable = inputData['billable']
+    project_id = inputData['project']['id']
+    project, created = Project.objects.get_or_create(id = project_id,
+        defaults={
+            'clientId': Client.objects.get(id='0000000000'), 
+            'workspaceId': wkspace})
+    if created is True: 
+        logger.warning(f"Created Empty Project with id {project_id}. Run ProjectEvent and try again.")
+        logger.warning("Proceeding with operation")
+    if inputData.get('hourlyRate') is not None:
+        rate = inputData.get('hourlyRate')['amount']/100
+    else:
+        rate = 0
+    
+    duration = timeDuration(inputData['timeInterval']['duration'])
+    startO = datetime.strptime(inputData['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ')
+    endO = datetime.strptime(inputData['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ')
+    startStr = toMST(startO, True)
+    endStr = toMST(endO, True)   
+
+    try:
+        created = False
+        try: 
+            entry = Entry.objects.get(id = id, workspaceId= wkspace)
+            entry.timesheetId = timesheet
+            entry.duration = duration
+            entry.description = description
+            entry.billable = billable
+            entry.project = project
+            entry.hourlyRate = rate
+            entry.start = startStr
+            entry.end = endStr 
+            entry.task = taskName
+
+            logger.debug(f"Entry Time: {str(entry.start)}")
+
+        except Entry.DoesNotExist:
+            created = True
+            entry = Entry.objects.create( # use created flag to log updates or creations 
+                id = id,
+                timesheetId = timesheet,
+                duration = duration,
+                description = description,
+                billable = billable,
+                project = project,
+                hourlyRate = rate,
+                start = startStr,
+                end = endStr,
+                workspaceId = wkspace,
+                task = taskName
+            )
+        if len(inputData['tags']) != 0:
+            task = []
+            for tag in inputData['tags']:
+                # task.append(asyncio.create_task(pushTags(inputData, wkspace, cursor)))
+                pushTags(wkspace, tag, entry)
+    except db.IntegrityError as e:
+        logger.critical('An Integrity occured on thread while trying to update an entry')   
+        logger.critical(str(e))
+        primitives.set_rollback() 
+        primitives.notify_commit()
+    except Exception as e:
+        logger.critical(f'{str(e)} - {e.__traceback__.tb_lineno}')
+        primitives.set_rollback()
+        primitives.notify_commit()
+    finally:
+        atomic = primitives.decrement_atomic()
+        if atomic != 0 :
+            primitives.wait_for_commit()
+            if primitives.check_rollback():
+                logger.warning("***There was a problem saving record on an alternative thread. Rolling back changes")
+            else:
+                primitives.lock.acquire()
+                if(not created):
+                    logger.info("\tCommiting Updates to Entry...") #simulation
+                    logger.debug(f"[ID: {id}]-[START: {startStr}]")
+                    logger.debug(f"Entry Record Time before save: {entry.start}")
+                else: 
+                    logger.warning("\tCommiting New Entry on backup...")
+                entry.save()
+                newEntry = Entry.objects.get(id=id, workspaceId= wkspace)
+                logger.debug(f"New Entry Start time after save: {newEntry.start}")
+                primitives.lock.release()
+        elif atomic == 0 and not primitives.check_rollback():
+            primitives.notify_commit()
+            primitives.lock.acquire()
+            entry.save()
+            logger.info("\tCommiting Entry...") #simulation
+            primitives.lock.release()
+        else:
+            entry.delete()
+            raise Exception("***There was a problem saving record on an alternative thread. Rolling back changes")
+        
+
+    return
+
+async def pushTimesheets(wkSpaceID, offset = 1, status = 'APPROVED'):
+    """
+    Pushes attendance data from Clockify to the database. Attendance is the hours worked (regula, overtime, total, Paid Time Off)
+    for all Users with active time entries. 
+
+    Args:
+    - wkSpaceID: The workspace ID.
+    - conn: The connection to the database.
+    - cursor: The cursor for executing SQL commands.
+    - startDate (optional): The start date for fetching attendance data. Default is "2024-02-11T00:00:00Z".
+    - endDate (optional): The end date for fetching attendance data. Default is "2024-02-17T23:59:59.999Z".
+    - page (optional): The page number for pagination. Default is 1.
+
+    Returns:
+    - str: A message indicating the operation's completion status.
+    """
+    page = 1 * offset
+    startPage = page
+    try: 
+        logger.info('Pulling Data from Application Server')
+        attendance = await getApprovedRequests(wkSpaceID, 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy', page, status)
+        logger.info('Data aquired')
+        length = 0
+        wkspace = await Workspace.objects.aget(id = wkSpaceID)
+        # while len(attendance) != 0 and page < page + 1:
+        while len(attendance) != 0 and page < startPage:
+            logger.info(f"Page: {page}")
+            page +=1 
+            intermediate = asyncio.create_task(getApprovedRequests(wkSpaceID, 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy', page, status))
+            length += len(attendance)
+            logger.info(f"Inserting Page: {page-1}. ({length} entries)")
+            # conn = connections.acquire_connection()
+            # cursor = conn.cursor()
+            for timesheetData in attendance: 
+                primitives.clear_rollback()
+                id = timesheetData['approvalRequest']['id']
+                emp_id = timesheetData['approvalRequest']['owner']['userId']
+                emp = await Employeeuser.objects.aget(id = emp_id)
+                start_timeO = datetime.strptime(timesheetData['approvalRequest']['dateRange']['start'], '%Y-%m-%dT%H:%M:%SZ')
+                end_timeO = datetime.strptime(timesheetData['approvalRequest']['dateRange']['end'], '%Y-%m-%dT%H:%M:%SZ')
+                start = toMST(start_timeO)
+                end = toMST(end_timeO)
+                status = timesheetData['approvalRequest']['status']['state']
+                try:
+                    
+                    try:
+                        timesheet = await Timesheet.objects.aget(id=id, workspace = wkspace, emp = emp)
+                        timesheet.start_time = start
+                        timesheet.end_time = end
+                        timesheet.status = status
+                        logger.info("Updating Timesheet")
+                    except Timesheet.DoesNotExist:
+                        logger.info("Creating new Timesheet")
+                        timesheet= await Timesheet.objects.acreate(
+                            id = id,
+                            emp = emp,
+                            start_time = start,
+                            end_time = end, 
+                            workspace = wkspace,
+                            status = status
+                        )
+                    # Create a batch of up to 15 tasks
+                    i = 0
+                    while i < len(timesheetData['entries']):
+                        tasks = []    
+                        for entry in timesheetData['entries'][i:i+15]:
+                            task = asyncio.to_thread(pushEntries, entry, timesheet, wkspace)
+                            primitives.increment_atomic()
+                            tasks.append(task)
+                    # Increment by 10 for the next batch
+                        await asyncio.gather(*tasks,return_exceptions=False)
+                        i += 15
+                    if primitives.check_rollback():
+                        Exception("An exception occured when trying on one of the threads. Rolling back changes")
+                except db.IntegrityError as e:
+                    logger.error("Exception occured when trying to insert entry")
+                    logger.error(str(e))
+                except Exception as ex:
+                    logger.error(f'{str(ex)} - {ex.__traceback__.tb_lineno}')
+                finally:
+                    if primitives.check_rollback():
+                        logger.warning("Could not save timesheet data, rolling back changes")
+                    else:
+                        await timesheet.asave()
+
+            logger.info("Waiting for next Timesheet")
+            attendance = await intermediate
+    except Exception as ex:
+        logger.error(f'{str(ex)} - {ex.__traceback__.tb_lineno}')
+        raise ex
+
+
+
 
 def pushWorkspaces(conn, cursor):
     """
@@ -878,8 +1166,8 @@ def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", w
                 startFromatString = '%Y-%m-%dT%H:%M:%SZ' if len(startDate) == 20 else '%Y-%m-%dT%H:%M:%S.%fZ'
                 endDate = requests["timeOffPeriod"]["period"]["end"]
                 endFromatString = '%Y-%m-%dT%H:%M:%SZ' if len(endDate) == 20 else '%Y-%m-%dT%H:%M:%S.%fZ'
-                startDate = timeZoneConvert(startDate , startFromatString)
-                endDate = timeZoneConvert(endDate, endFromatString)
+                startDate = toMST(startDate , startFromatString)
+                endDate = toMST(endDate, endFromatString)
                 duration = count_working_days(startDate.date(), endDate.date() , conn, cursor)
                 
                 paidTimeOff = requests["balanceDiff"]
@@ -1185,8 +1473,8 @@ async def processEntry(entryData, conn, cursor, wkspaceId, fkc, aId = None):
         description = entryData['description']
         billable = entryData['billable']
         projectID = entryData['project']['id']
-        startTime = timeZoneConvert(entryData['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
-        endTime = timeZoneConvert(entryData['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
+        startTime = toMST(entryData['timeInterval']['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
+        endTime = toMST(entryData['timeInterval']['end'], '%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%dT%H:%M:%S')
         rate = entryData['hourlyRate']['amount'] if entryData['hourlyRate'] is not None else 0
         tags = []
         tags = entryData['tags']
@@ -1261,8 +1549,8 @@ async def processApproval(approve, wkspaceId, conn, cursor, fkc):
         userID = approve['approvalRequest']['owner']['userId']
         status = approve['approvalRequest']['status']['state']
         
-        startDate = timeZoneConvert(approve['approvalRequest']['dateRange']['start']).strftime('%Y-%m-%d')
-        endDate = timeZoneConvert(approve['approvalRequest']['dateRange']['end']).strftime('%Y-%m-%d')
+        startDate = toMST(approve['approvalRequest']['dateRange']['start']).strftime('%Y-%m-%d')
+        endDate = toMST(approve['approvalRequest']['dateRange']['end']).strftime('%Y-%m-%d')
 
 
         try: #FK constraints 

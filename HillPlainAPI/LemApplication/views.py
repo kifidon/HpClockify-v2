@@ -11,9 +11,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import *
-from ..Utilities.views import *
+from Utilities.views import *
 from time import time
-from ..HillPlainAPI.Loggers import setup_server_logger
+from HillPlainAPI.Loggers import setup_server_logger
 import httpx
 
 

@@ -7,9 +7,9 @@ import time
 from json import loads
 from datetime import datetime, timedelta
 from httpcore import ConnectTimeout
-
-from ..views import get_current_time , dumps, sqlConnect, cleanUp
-from ...HillPlainAPI.Loggers import setup_background_logger
+from json import dumps
+# from ..views import  dumps, sqlConnect, cleanUp
+from HillPlainAPI.Loggers import setup_background_logger
 
 logger = setup_background_logger()
 
@@ -21,6 +21,133 @@ def getApiKey():
     # API_KEY = 'MmRiYWE2NmMtOTM3My00MjFlLWEwOTItNWEzZTY2Y2YxNDQx' # Shawn Applejohn 
     # API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
     return API_KEY
+
+async def getTimesheets(workspaceId, key, page = 1, status = 'APPROVED'):
+    
+    """
+    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
+
+    Args:
+        workspaceId (str): The ID of the workspace.
+        key (str): The API key for accessing the Clockify API.
+
+    Returns:
+        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
+    """
+    try: 
+        output = []  # Initialize an empty list
+        headers = {
+            'X-Api-Key': key
+        }
+        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=10&sort-column=UPDATED_AT"    
+        response = requests.get(url, headers=headers)
+        # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
+        #     pass
+        if response.status_code == 200:
+            return response.json()  # Append JSON data to the list
+        else:
+            print(f"Error: {response.status_code}, {response.text}")
+            return []
+    except Exception as e:
+       print(f"Error: {response.status_code}, {response.text}")(f'({e.__traceback__.tb_lineno}) - {str(e)}')
+
+async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
+    while page < 10:
+        if entry and expense:
+            logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
+            return []
+        logger.info(f'FindTimesheet called for {timeId} on page {page} ')
+        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
+        async with httpx.AsyncClient(timeout=300) as client:
+            response = await client.get(url, headers={'X-Api-Key': key})
+            if response.status_code == 200:
+                for timesheet in response.json():
+                    if timesheet['approvalRequest']['id'] == timeId:
+                        logger.info(f'Timesheet found on page {page}')
+                        if entry:
+                            logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['entries']
+                        elif expense:
+                            logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
+                            logger.debug(f'FindTimesheet executed {page}')
+                            return timesheet['expenses']
+                        else:
+                            return []
+                # Not found on this page, try next page
+                logger.info(f'FindTimesheet executed - Not Found in range {page}')
+                page += 1
+            else:
+                raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
+    return []
+
+async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
+    """
+    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
+
+    Args:
+        workspaceId (str): The ID of the workspace.
+        key (str): The API key for accessing the Clockify API.
+
+    Returns:
+        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
+    """    
+    retries= 0
+
+    async def delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay): #que requests 
+        await asyncio.sleep(delay)
+        return await FindTimesheet(workspaceId, key, timeId, status, page_number, entryFlag , expenseFlag )
+
+    tasks = []
+    delay_between_tasks = 1
+    while retries < MAX_RETRIES:
+        try:
+            tasks = []
+            # for page_number in range(1, 7):  # Iterate from page 1 to page 6 asynchronously
+            for page_number in range(1, 2):  # First page of recent changes 
+                # findTimesheetAsync = sync_to_async(FindTimesheet)   
+                tasks.append(
+                    asyncio.create_task(delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay_between_tasks * page_number))
+                )
+            dataAll = await asyncio.gather(*tasks)
+            
+            if dataAll != 0:
+                output = []
+                for data in dataAll:
+                    logger.info('Temp store Entry data in dict() object')
+                    if data is not None:
+                        output.extend(data)           
+                return output 
+            else:
+                raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))
+        except ConnectTimeout as e:
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logger.info(f' Sleeping for {DELAY + retries}s')
+            retries += 1
+        except httpx.ReadTimeout as e:
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logger.info(f' Sleeping for {DELAY + retries}s')
+            retries += 1
+        except httpx.TimeoutException as e:
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logger.info(f' Sleeping for {DELAY + retries}s')
+            retries += 1
+        except TimeoutError as e:
+            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
+            time.sleep(DELAY+ retries)
+            logger.info(f' Sleeping for {DELAY + retries}s')
+            retries += 1
+        except Exception as e:
+            logger.error(f' {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
+            raise e
+    logger.error(f' Max Retries reached')
+    raise ConnectTimeout
+
+
+
 
 def getWorkspaces(key):
     """
@@ -90,100 +217,6 @@ def getProjects(workspaceId, key, page =1):
     else:
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
-
-async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
-    while page < 10:
-        if entry and expense:
-            logger.error("AssertionError('Bad Method. Call for expense and entry data seperatly')")
-            return []
-        logger.info(f'FindTimesheet called for {timeId} on page {page} ')
-        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=20&sort-column=UPDATED_AT"
-        async with httpx.AsyncClient(timeout=300) as client:
-            response = await client.get(url, headers={'X-Api-Key': key})
-            if response.status_code == 200:
-                for timesheet in response.json():
-                    if timesheet['approvalRequest']['id'] == timeId:
-                        logger.info(f'Timesheet found on page {page}')
-                        if entry:
-                            logger.debug(f'Data found:\n{dumps(timesheet['entries'], indent = 4)}')
-                            logger.debug(f'FindTimesheet executed {page}')
-                            return timesheet['entries']
-                        elif expense:
-                            logger.debug(f'Data found: \n{dumps(timesheet['expenses'], indent = 4)}')
-                            logger.debug(f'FindTimesheet executed {page}')
-                            return timesheet['expenses']
-                        else:
-                            return []
-                # Not found on this page, try next page
-                logger.info(f'FindTimesheet executed - Not Found in range {page}')
-                page += 1
-            else:
-                raise Exception(f"Failed to pull Data From Clockify: {response.status_code} {response.text}")
-    return []
-async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryFlag = False, expenseFlag = False):
-    """
-    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
-
-    Args:
-        workspaceId (str): The ID of the workspace.
-        key (str): The API key for accessing the Clockify API.
-
-    Returns:
-        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
-    """    
-    retries= 0
-
-    async def delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay): #que requests 
-        await asyncio.sleep(delay)
-        return await FindTimesheet(workspaceId, key, timeId, status, page_number, entryFlag , expenseFlag )
-
-    tasks = []
-    delay_between_tasks = 1
-    while retries < MAX_RETRIES:
-        try:
-            tasks = []
-            # for page_number in range(1, 7):  # Iterate from page 1 to page 6 asynchronously
-            for page_number in range(1, 2):  # First page of recent changes 
-                # findTimesheetAsync = sync_to_async(FindTimesheet)   
-                tasks.append(
-                    asyncio.create_task(delayed_find_timesheet(workspaceId, key, timeId, status, page_number, delay_between_tasks * page_number))
-                )
-            dataAll = await asyncio.gather(*tasks)
-            
-            if dataAll != 0:
-                output = []
-                for data in dataAll:
-                    logger.info('Temp store Entry data in dict() object')
-                    if data is not None:
-                        output.extend(data)           
-                return output 
-            else:
-                raise(pyodbc.DatabaseError(f"Failed to pull Data From Clockify: TimeSheet not found/pulled"))
-        except ConnectTimeout as e:
-            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
-            time.sleep(DELAY+ retries)
-            logger.info(f' Sleeping for {DELAY + retries}s')
-            retries += 1
-        except httpx.ReadTimeout as e:
-            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
-            time.sleep(DELAY+ retries)
-            logger.info(f' Sleeping for {DELAY + retries}s')
-            retries += 1
-        except httpx.TimeoutException as e:
-            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
-            time.sleep(DELAY+ retries)
-            logger.info(f' Sleeping for {DELAY + retries}s')
-            retries += 1
-        except TimeoutError as e:
-            logger.warning(f' Request timed out...Retrying {retries}/{MAX_RETRIES}')
-            time.sleep(DELAY+ retries)
-            logger.info(f' Sleeping for {DELAY + retries}s')
-            retries += 1
-        except Exception as e:
-            logger.error(f' {str(e)} at line {e.__traceback__.tb_lineno} in \n\t{e.__traceback__.tb_frame}')
-            raise e
-    logger.error(f' Max Retries reached')
-    raise ConnectTimeout
 
 def getClients(workspaceId, key): 
     """
@@ -256,10 +289,10 @@ def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", windo
         'X-Api-Key': key
     }
     
-    cursor, conn = sqlConnect()
-    cursor.execute('select id from EmployeeUser')
-    users = cursor.fetchall()
-    cleanUp(conn=conn , cursor= cursor)
+    # cursor, conn = sqlConnect()
+    # cursor.execute('select id from EmployeeUser')
+    # users = cursor.fetchall()
+    # cleanUp(conn=conn , cursor= cursor)
     request_body = {
         "end": endDateFormated,
         "page": page,
@@ -267,7 +300,7 @@ def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", windo
         "start": startDateFormated,
         "statuses": ["ALL"],
         "userGroups": [],
-        "users": [user[0] for user in users]
+        "users": []
     }
     url = f'https://pto.api.clockify.me/v1/workspaces/{workspaceId}/requests'
     response = requests.post(url=url, json=request_body, headers=headers)

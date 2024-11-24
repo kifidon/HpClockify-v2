@@ -1,9 +1,9 @@
-from ..Utilities.views import sqlConnect, cleanUp, get_current_time, getAbbreviation, reverseForOutput
+from Utilities.views import sqlConnect, cleanUp, getAbbreviation, reverseForOutput
 import os
 import pandas as pd
 from datetime import datetime, timedelta
-from ..HillPlainAPI import settings 
-from ..HillPlainAPI.Loggers import setup_background_logger
+from HillPlainAPI.settings import BASE_DIR  
+from HillPlainAPI.Loggers import setup_background_logger
 import win32com.client as win32
 import asyncio
 import time
@@ -491,7 +491,7 @@ async def BillableReportGenerate(startDate = None| str, endDate = None | str, pC
         year = startDate.split("-")[0][-2:]
         month = endDate.split("-")[1]
         # Generate Folder for spreadsheets
-        current_dir = settings.BASE_DIR
+        current_dir = BASE_DIR
         reports = 'Reports'
         directory = 'Billing'
         folder_name = f"HP-IND-{year}-{month}"
@@ -578,7 +578,7 @@ def NonBillableReportGen(start = None, end = None):
         data = [['' if val is None else val for val in row] for row in data]
     
         # Generate Folder for spreadsheets
-        current_dir = settings.BASE_DIR
+        current_dir = BASE_DIR
         reports = 'Reports'
         directory = 'BillableVsNonBillable'
         folder_name = f"Weekly Report- Billable vs Non Billable - {start} - {end}"
@@ -830,7 +830,7 @@ def PayrollGenerator(start = None, end = None):
             totalsData = [['' if val is None else val for val in row] for row in totalsData]
 
             # Generate Folder for spreadsheets
-            current_dir = settings.BASE_DIR
+            current_dir = BASE_DIR
             reports = 'Reports'
             payrollDir = 'Payroll'
             folder_name = f"Weekly Report-Payroll-{start}-{end}"
@@ -1099,7 +1099,7 @@ def TimeStatusGenerator(start = None, end = None):
             data = [['' if val is None else val for val in row] for row in data]
         
             # Generate Folder for spreadsheets
-            current_dir = settings.BASE_DIR
+            current_dir = BASE_DIR
             reports = 'Reports'
             timeStatusDir = 'TimeStatus'
             folder_name = f"Weekly Report-Weekly Time Status-{startRange}-{endRange}"
@@ -1341,7 +1341,7 @@ def LemGenerator( projectCode: str, lemId: str):
         equipmentEntries = [['' if val is None else val for val in row] for row in equipmentEntries]
 
         # Generate Folder for spreadsheets
-        current_dir = settings.BASE_DIR
+        current_dir = BASE_DIR
         reports = 'Reports'
         lemDir = f"LemSheets"
         projDir = projectCode
@@ -1714,7 +1714,7 @@ def LemTimesheetGenerator(projectId, startDate,endDate ):
     workEntry  = [['---' if val is None else val for val in row] for row in  workEntry]
 
     # Generate Folder for spreadsheets
-    current_dir = settings.BASE_DIR
+    current_dir = BASE_DIR
     reports = 'Reports'
     lemSheet = 'LemSheets'
     payrollDir = 'Timesheets'
@@ -1792,7 +1792,7 @@ def LemTimesheetGenerator(projectId, startDate,endDate ):
         worksheet.merge_range(row,0,row+1,10 , f'LEM Timesheet - {projectCode[0]}', titleFormat)
         row += 2
         headers = {
-                'Generated on:': get_current_time(),
+                'Generated on:': time.now(),
                 'Date Range Start:': startDate,
                 'Date Range End:': endDate
             }

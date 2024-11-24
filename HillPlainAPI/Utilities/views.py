@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from ..HillPlainAPI.Loggers import setup_background_logger, setup_sql_logger
+from HillPlainAPI.Loggers import setup_background_logger, setup_sql_logger
 import asyncio
 from json import dumps, dump, loads, JSONDecodeError
 import pytz
@@ -15,8 +15,8 @@ import os
 import shutil
 import hashlib
 import random
+import time 
 from django.views.decorators.csrf import csrf_exempt
-from .clockify_util.QuickBackupV3 import *
 from rest_framework import status
 
 
@@ -172,7 +172,7 @@ def taskResult(response: JsonResponse, inputData, caller: str):
         message = response.content.decode() or None,
         data = inputData,
         caller = caller,
-        time = get_current_time()
+        time = time.now()
     )
 
 '''
@@ -413,17 +413,20 @@ Steps:
     - The datetime is first localized to UTC and then converted to the local timezone.
     - The timezone information is removed from the output before returning the converted datetime.
 '''
-def timeZoneConvert(dateTime, format='%Y-%m-%dT%H:%M:%SZ'):
-    utcTimezone = pytz.utc
-    localTimeZone = pytz.timezone('America/Denver')
-    if isinstance(dateTime, str):
-        dateTime = datetime.strptime(dateTime, format)
-    output = utcTimezone.localize(dateTime).astimezone(localTimeZone)
-    output =  output.replace(tzinfo=None)
+def toMST(date_obj: datetime, time = False):
+    if date_obj.tzinfo is None:
+        date_obj = date_obj.replace(tzinfo=pytz.UTC)
+    else:
+        date_obj = date_obj.astimezone(pytz.UTC)
     
-    logger.debug(f'TimeZone Convert - {output.strftime('%Y-%m-%d T %H:%M')}')
-    return output
-
+    # Convert to Mountain Standard Time (MST)
+    mst = pytz.timezone('America/Denver')  # MST is 'America/Denver' in pytz
+    
+    mst_date_obj = date_obj.astimezone(mst)
+    if not time:
+        return mst_date_obj.strftime('%Y-%m-%d')
+    else: 
+        return mst_date_obj.strftime('%Y-%m-%dT%H:%M:%S')
 '''
 Converts an ISO 8601 duration string to a rounded duration in hours.
 
@@ -504,7 +507,6 @@ Steps:
 '''
 def sqlConnect():
     try:
-        logger = setup_background_logger()
         #server info 
         server = 'hpcs.database.windows.net'
         database = 'hpdb'
@@ -516,6 +518,7 @@ def sqlConnect():
         conn = pyodbc.connect(conn_str)
         # Create a cursor object to interact with the database
         cursor = conn.cursor()
+        conn.autocommit = False
         return cursor, conn
     except pyodbc.Error as e:
         logger.critical(f"Error: {e}")

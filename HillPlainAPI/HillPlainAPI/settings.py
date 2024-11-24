@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
-LOG_LEVEL = 'INFO' ## Flag
+LOG_LEVEL = 'DEBUG' ## Flag
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -82,6 +82,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'HillPlainAPI',
     'BackgroundTasks', #Celery?
     'Clockify',
     'LemApplication',
@@ -170,7 +171,7 @@ TIME_ZONE = 'America/Denver'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

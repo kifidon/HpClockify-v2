@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from ..HillPlainAPI.Loggers import setup_background_logger
+from HillPlainAPI.Loggers import setup_background_logger
 from .models import *
 from rest_framework.exceptions import ValidationError
-from ..Utilities.views import count_working_daysV2, timeZoneConvert, timeDuration, get_current_time
+from Utilities.views import count_working_daysV2, toMST, timeDuration
 from json import dumps
 from datetime import date, datetime, timedelta
 
@@ -280,6 +280,7 @@ class EntrySerializer(serializers.Serializer):
     timeInterval = serializers.DictField()
     workspaceId = serializers.CharField()
     tags = serializers.ListField()
+    task = serializers.DictField()
 
     def create(self, validated_data):
         logger = setup_background_logger('DEBUG')
@@ -307,9 +308,10 @@ class EntrySerializer(serializers.Serializer):
                 billable = validated_data['billable'] ,
                 project = Project.objects.get(id=validated_data.get('project').get('id')),
                 hourlyRate = Rate,
-                start = timeZoneConvert(validated_data.get('timeInterval').get('start')),
-                end = timeZoneConvert(validated_data.get('timeInterval').get('end')),
+                start = toMST(validated_data.get('timeInterval').get('start'),True),
+                end = toMST(validated_data.get('timeInterval').get('end'),True),
                 workspaceId = Workspace.objects.get(id=validated_data.get('workspaceId')) ,
+                task = validated_data.get('task').get('name') or None
             )
             return entry
         except Exception as e:
@@ -338,9 +340,9 @@ class EntrySerializer(serializers.Serializer):
                 raise Exception('Billable entry is missing Rate')
             elif validated_data.get('hourlyRate') is not None: instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
             else: instance.hourlyRate = 0
-
-            instance.start = timeZoneConvert(validated_data.get('timeInterval').get('start')) or instance.start
-            instance.end = timeZoneConvert(validated_data.get('timeInterval').get('end')) or instance.end
+            instance.task = validated_data.get('task').get('name') or None
+            instance.start = toMST(validated_data.get('timeInterval').get('start'),True) or instance.start
+            instance.end = toMST(validated_data.get('timeInterval').get('end'),True) or instance.end
             # instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
             instance.save(force_update=True)
             return instance
@@ -497,8 +499,8 @@ class TimeOffSerializer(serializers.ModelSerializer):
             
     def create(self, validated_data):
         logger = setup_background_logger()
-        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('start'))
-        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('end'))
+        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'),True)
+        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'),True)
         status = self.initial_data.get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
@@ -515,8 +517,8 @@ class TimeOffSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data): 
         logger = setup_background_logger()
-        start = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('start'))
-        end = timeZoneConvert(self.initial_data.get('timeOffPeriod').get('period').get('end'))
+        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'),True)
+        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'),True)
         status = self.initial_data.get('status').get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
