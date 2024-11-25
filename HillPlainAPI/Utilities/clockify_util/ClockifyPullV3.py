@@ -263,7 +263,7 @@ def getPolocies(workspaceId, key):
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
 
-def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", window = -1):
+async def getTimeOff(workspaceId: str, startDate:str , endDate: str):
     """
     Retrieves time off requests for a specific workspace within a given window.
 
@@ -275,15 +275,8 @@ def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", windo
         dict or dict(): A dictionary containing time off request details, or dict() if an error occurs.
     """
     key = getApiKey()
-    if window != -1 or (startDate == "None" and endDate == "None"): 
-        # mst_timezone = pytz.timezone('US/Mountain')
-        # endDate = datetime.now(mst_timezone) 
-        endDateFormated =   '2024-12-31T23:59:59.999999Z'
-        # endDateFormated = endDate.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        startDateFormated = '2024-01-01T00:00:00.000000Z'
-    else: 
-        startDateFormated = startDate + "T00:00:00.000000Z" 
-        endDateFormated   = endDate   + "T23:59:59.599999Z" 
+    startDateFormated = startDate + "T00:00:00.000000Z" 
+    endDateFormated   = endDate   + "T23:59:59.599999Z" 
     headers = {
         'Content-Type': 'application/json',
         'X-Api-Key': key
@@ -295,8 +288,8 @@ def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", windo
     # cleanUp(conn=conn , cursor= cursor)
     request_body = {
         "end": endDateFormated,
-        "page": page,
-        "page-size": 30,
+        "page": 1,
+        "page-size": 100,
         "start": startDateFormated,
         "statuses": ["ALL"],
         "userGroups": [],
@@ -307,7 +300,7 @@ def getTimeOff(workspaceId, page =1, startDate = "None", endDate = "None", windo
     if response.status_code == 200:
         return response.json()
     else: 
-        print(f"Error: {response.status_code}, {response.reason}")
+        logger.error(f"Error: {response.status_code}, {response.reason}")
         return dict()
     
 def getHolidays(workspaceId ):

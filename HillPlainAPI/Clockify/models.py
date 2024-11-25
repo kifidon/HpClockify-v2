@@ -198,7 +198,16 @@ class FilesForExpense(models.Model):
         db_table = 'FilesForExpense'
         unique_together= (('expenseId', 'workspaceId'))
 
-
+class Holidays(models.Model):
+    id = models.CharField(max_length=50, primary_key= True)
+    date = models.DateField(blank=True, null=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    class Meta: 
+        managed = False
+        db_table = 'Holidays'
+    def __str__(self):
+        return self.name + ":" + f" {self.date.isoformat()}" or ""
+    
 class BackGroundTaskResult(models.Model):
     status_code = models.IntegerField(default=404)
     message = models.TextField(blank=True, null= True)

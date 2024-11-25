@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs
 import ast
 from .models import BackGroundTaskResult
+from Clockify.models import Holidays
 from django.core.handlers.asgi import ASGIRequest
 from django.http import JsonResponse, HttpResponse
 import os 
@@ -265,7 +266,7 @@ Args:
 Returns:
     int: The number of working days between start_date and end_date.
 """
-def count_working_days(start_date, end_date, conn, cursor ):
+def count_working_days(start_date: datetime, end_date: datetime ):
     # Define a list of weekdays (Monday = 0, Sunday = 6)
     weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
     
@@ -273,14 +274,11 @@ def count_working_days(start_date, end_date, conn, cursor ):
     working_days = 0
     
     # Iterate through each date between start_date and end_date
+    holidays = Holidays.objects.all()
     current_date = start_date
-    cursor.execute('''
-                    SELECT date From Holidays
-                    ''')
-    holidays = cursor.fetchall()
     while current_date <= end_date:
         # Check if the current date is a weekday
-        if current_date.weekday() in weekdays and current_date not in [holiday[0] for holiday in holidays]:
+        if current_date.weekday() in weekdays and current_date not in [holiday.date for holiday in holidays]:
             working_days += 1
         # Move to the next day
         current_date += timedelta(days=1)
