@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
-LOG_LEVEL = 'DEBUG' ## Flag
+LOG_LEVEL = 'INFO' ## Flag
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
