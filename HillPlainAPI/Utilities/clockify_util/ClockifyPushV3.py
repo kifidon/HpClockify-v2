@@ -230,7 +230,7 @@ async def pushTimesheets(wkSpaceID, offset = 1, status = 'APPROVED'):
         length = 0
         wkspace = await Workspace.objects.aget(id = wkSpaceID)
         # while len(attendance) != 0 and page < page + 1:
-        while len(attendance) != 0 and page < startPage:
+        while len(attendance) != 0 and page < startPage+10:
             logger.info(f"Page: {page}")
             page +=1 
             intermediate = asyncio.create_task(getApprovedRequests(wkSpaceID, 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy', page, status))
@@ -292,6 +292,7 @@ async def pushTimesheets(wkSpaceID, offset = 1, status = 'APPROVED'):
 
             logger.info("Waiting for next Timesheet")
             attendance = await intermediate
+        logger.info("Exiting...")
     except Exception as ex:
         logger.error(f'{str(ex)} - {ex.__traceback__.tb_lineno}')
         raise ex
