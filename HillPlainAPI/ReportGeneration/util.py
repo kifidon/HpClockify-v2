@@ -58,8 +58,8 @@ async def BillingReportCaller(month= None, year = None, pCode = None, start=None
             previousYear = year
 
     #format date strings
-        endDateObj = datetime.datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
-        startDateObj = datetime.datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
+        endDateObj = datetime.strptime(f'20{year}-{month}-25', '%Y-%m-%d')
+        startDateObj = datetime.strptime(f'20{previousYear}-{previousMonth}-25', '%Y-%m-%d')
         # Calculate the most recent previous Saturday
         if(endDateObj.weekday() != 5):
             endDate = (endDateObj - timedelta(days=(endDateObj.weekday() + 2) % 7)).strftime('%Y-%m-%d')

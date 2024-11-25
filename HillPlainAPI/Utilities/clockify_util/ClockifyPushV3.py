@@ -119,7 +119,7 @@ def pushEntries(inputData, timesheet, wkspace):
         logger.warning(f"Created Empty Project with id {project_id}. Run ProjectEvent and try again.")
         logger.warning("Proceeding with operation")
     if inputData.get('hourlyRate') is not None:
-        rate = inputData.get('hourlyRate')['amount']/100
+        rate = inputData.get('hourlyRate')['amount']
     else:
         rate = 0
     
