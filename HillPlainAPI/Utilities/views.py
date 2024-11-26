@@ -173,7 +173,7 @@ def taskResult(response: JsonResponse, inputData, caller: str):
         message = response.content.decode() or None,
         data = inputData,
         caller = caller,
-        time = time.now()
+        time = time.time()
     )
 
 '''
