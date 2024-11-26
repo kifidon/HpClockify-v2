@@ -5,7 +5,7 @@ import asyncio
 from json import dumps, dump, loads, JSONDecodeError
 import pytz
 import pyodbc
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from urllib.parse import parse_qs
 import ast
 from .models import BackGroundTaskResult
@@ -266,23 +266,27 @@ Args:
 Returns:
     int: The number of working days between start_date and end_date.
 """
-def count_working_days(start_date: datetime, end_date: datetime ):
+def count_working_days(start_date: date, end_date: date ):
     # Define a list of weekdays (Monday = 0, Sunday = 6)
-    weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
-    
-    # Initialize a counter for working days
-    working_days = 0
-    
-    # Iterate through each date between start_date and end_date
-    holidays = Holidays.objects.all()
-    current_date = start_date
-    while current_date <= end_date:
-        # Check if the current date is a weekday
-        if current_date.weekday() in weekdays and current_date not in [holiday.date for holiday in holidays]:
-            working_days += 1
-        # Move to the next day
-        current_date += timedelta(days=1)
-    return working_days
+    try:
+        weekdays = [0, 1, 2, 3, 4]  # Monday to Friday
+        
+        # Initialize a counter for working days
+        working_days = 0
+        
+        # Iterate through each date between start_date and end_date
+        holidays = list(Holidays.objects.filter(date__range=(start_date, end_date)))
+        current_date = start_date
+        while current_date <= end_date:
+            # Check if the current date is a weekday
+            if (current_date.weekday() in weekdays) and (current_date not in [holiday.date for holiday in holidays]):
+                working_days += 1
+            # Move to the next day
+            current_date += timedelta(days=1)
+        return working_days
+    except Exception as e:
+        logger.error(f"{str(e)} - {e.__traceback__.tb_lineno}")
+        raise e
 
 '''
 Calculates the current pay cycle range based on the most recent and upcoming weekends.

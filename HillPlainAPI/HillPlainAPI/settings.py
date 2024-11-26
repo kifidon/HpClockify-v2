@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 
-LOG_LEVEL = 'INFO' ## Flag
+LOG_LEVEL = 'DEBUG' ## Flag
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -76,7 +76,7 @@ SECRET_KEY = 'django-insecure-#yuv5_-_2w!a8^km2am*tcwm90($wvgj_)!q*g5^2*4(ibs6cu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 
 # Application definition

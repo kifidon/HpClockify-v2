@@ -15,6 +15,7 @@ from Utilities.views import *
 from time import time
 from HillPlainAPI.Loggers import setup_server_logger
 import httpx
+from datetime import datetime
 
 
 """
@@ -39,7 +40,7 @@ Returns:
 # @api_view(["PUT", "POST", "GET"])
 def postThreadLemSheet(inputData):
     try:
-        inputData["id"] = hash50(inputData['clientId'], datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S'), inputData['projectId'])
+        inputData["id"] = hash50(inputData['clientId'], datetime.now().strftime('%Y-%m-%dT%H-%M-%S'), inputData['projectId'])
         #gen LemNumber
         lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
         # logger.debug(type(lems))

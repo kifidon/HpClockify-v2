@@ -10,6 +10,8 @@ from httpcore import ConnectTimeout
 from json import dumps
 # from ..views import  dumps, sqlConnect, cleanUp
 from HillPlainAPI.Loggers import setup_background_logger
+from Clockify.models import Employeeuser  
+from asgiref.sync import sync_to_async
 
 logger = setup_background_logger()
 
@@ -274,34 +276,37 @@ async def getTimeOff(workspaceId: str, startDate:str , endDate: str):
     Returns:
         dict or dict(): A dictionary containing time off request details, or dict() if an error occurs.
     """
-    key = getApiKey()
-    startDateFormated = startDate + "T00:00:00.000000Z" 
-    endDateFormated   = endDate   + "T23:59:59.599999Z" 
-    headers = {
-        'Content-Type': 'application/json',
-        'X-Api-Key': key
-    }
-    
-    # cursor, conn = sqlConnect()
-    # cursor.execute('select id from EmployeeUser')
-    # users = cursor.fetchall()
-    # cleanUp(conn=conn , cursor= cursor)
-    request_body = {
-        "end": endDateFormated,
-        "page": 1,
-        "page-size": 100,
-        "start": startDateFormated,
-        "statuses": ["ALL"],
-        "userGroups": [],
-        "users": []
-    }
-    url = f'https://pto.api.clockify.me/v1/workspaces/{workspaceId}/requests'
-    response = requests.post(url=url, json=request_body, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-    else: 
-        logger.error(f"Error: {response.status_code}, {response.reason}")
-        return dict()
+    try:  
+        key = getApiKey()
+        startDateFormated = startDate + "T00:00:00.000000Z" 
+        endDateFormated   = endDate   + "T23:59:59.599999Z" 
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Api-Key': key
+        }
+        emp = await sync_to_async(list)(Employeeuser.objects.all())
+
+        request_body = {
+            "end": endDateFormated,
+            "page": 1,
+            "page-size": 50,
+            "start": startDateFormated,
+            "statuses": ["ALL"],
+            
+            "users": [e.id for e in emp]
+        }
+        logger.debug(dumps(request_body))
+        url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/time-off/requests'
+        response = requests.post(url=url, json=request_body, headers=headers)
+        logger.debug(f"StatusCode: {response.text}")
+        if response.status_code == 200:
+            return response.json()
+        else: 
+            logger.error(f"Error: {response.status_code}, {response.reason}")
+            return dict()
+    except Exception as e: 
+        logger.critical(f'{str(e)} - ({e.__traceback__.tb_lineno})')
+        raise e
     
 def getHolidays(workspaceId ):
     key = getApiKey()

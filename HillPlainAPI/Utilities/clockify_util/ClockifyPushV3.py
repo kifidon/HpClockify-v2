@@ -330,7 +330,7 @@ def pushHolidays(wkSpaceID, conn, cursor):
         logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
         logger.critical(f"Operation failed. Changes rolled back. Contact administer of problem persists")
 
-async def pushTimeOff(wkSpaceID, offset = 1, status = 'APPROVED'):
+async def pushTimeOff(wkSpaceID):
     """
     Pushes time off requests retrieved from Clockify API to the database.
 
@@ -345,62 +345,77 @@ async def pushTimeOff(wkSpaceID, offset = 1, status = 'APPROVED'):
         - pushPolicies(wkSpaceID, conn, cursor): Pushes policies to the database.
         - pushUsers(wkSpaceID, conn, cursor): Pushes users to the database.
     """
-    # logger.info(pushHolidays(wkSpaceID, conn, cursor))
-    page = 1
-    mst = pytz.timezone('America/Denver')
-    currentDate = datetime.now(mst)
-    end= datetime(currentDate.year,12,31)
-    start= end - timedelta(weeks=5)
-    failed = False
-    timeOffrequest = await getTimeOff(wkSpaceID, page, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-    while end.year == currentDate.year:
-        end = start
-        intermediate = getTimeOff(wkSpaceID, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-        logger.info(f"Inserting From: of Time Off Requests {toMST(start)} to {toMST(end)})")
-        for requests in timeOffrequest["requests"]:
-            userID = requests["userId"]
-            policyID = requests["policyId"]
-            requestID = requests["id"] 
-            status = requests['status']['statusType']
-            start = datetime.strptime(requests["timeOffPeriod"]["period"]["start"], '%Y-%m-%dT%H:%M:%SZ')
-            end   = datetime.strptime(requests["timeOffPeriod"]["period"]["end"], '%Y-%m-%dT%H:%M:%SZ') 
-            startDate = toMST(start , True)
-            endDate   = toMST(end, True)
+    try:
+        logger.info("Pushing Time off data ")
+        # logger.info(pushHolidays(wkSpaceID, conn, cursor))
+        page = 1
+        mst = pytz.timezone('America/Denver')
+        currentDate = datetime.now(mst)
+        end= datetime(currentDate.year,12,31)
+        start= end - timedelta(weeks=5)
+        logger.debug(f"Gathering: Time Off Requests {toMST(start)} to {toMST(end)}")
+        failed = False
+        timeOffrequest = await getTimeOff(wkSpaceID, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+        logger.debug("Data Collected ")
+        while end.year == currentDate.year:
+            end = start
+            start= end - timedelta(weeks=5)
+            intermediate = getTimeOff(wkSpaceID, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+            logger.info(f"Inserting From: of Time Off Requests {toMST(start)} to {toMST(end)})")
+            logger.debug(f'{len(timeOffrequest["requests"])}')
+            for requests in timeOffrequest["requests"]:
+                userID = requests["userId"]
+                policyID = requests["policyId"]
+                requestID = requests["id"] 
+                status = requests['status']['statusType']
+                start = datetime.strptime(requests["timeOffPeriod"]["period"]["start"], '%Y-%m-%dT%H:%M:%SZ')
+                end   = datetime.strptime(requests["timeOffPeriod"]["period"]["end"], '%Y-%m-%dT%H:%M:%SZ') 
+                startDate = toMST(start , True)
+                endDate   = toMST(end, True)
+                duration = await sync_to_async(count_working_days)(start.date(), end.date())
+                logger.debug("Counted Days")
+                paidTimeOff = requests["balanceDiff"]
+                balance = requests['balance']
 
-            duration = count_working_days(start, end)
-            paidTimeOff = requests["balanceDiff"]
-            balance = requests['balance']
+                workspace = await Workspace.objects.aget(id=wkSpaceID)
+                try:
 
-            try:
-                timeOff = TimeOffRequests.objects.get(id=requestID, workspaceId= Workspace.objects.get(id=wkSpaceID))                   
-                timeOff.userId= userID
-                timeOff.policyId = TimeOffPolicy.policyID
-                timeOff.start = startDate
-                timeOff.end = endDate
-                timeOff.duration = duration
-                timeOff.status=status
-                timeOff.balanceDiff = paidTimeOff
-                logger.debug(f"Updating TimeOffRecord")
-            except TimeOffRequests.DoesNotExist:
-                timeOff = TimeOffRequests.objects.create(
-                    id = requestID,
-                    userId= userID,
-                    policyId = policyID,
-                    start = startDate,
-                    end = endDate,
-                    duration = duration,
-                    status=status,
-                    balanceDiff = paidTimeOff,
-                    workspaceId = Workspace.objects.get(id=wkSpaceID)
-                )
-            except Exception as ex:
-                failed = True 
-                logger.error(f'{str(ex)} - {ex.__traceback__.tb_lineno}')
-            finally:
-                if not failed:
-                    timeOff.save()
-        timeOffrequest = await intermediate
-    return(f"Operation Completed: TimeOffRequest table")
+                    timeOff = await TimeOffRequests.objects.aget(id=requestID, workspaceId=workspace)                   
+                    timeOff.userId= userID
+                    timeOff.policyId = policyID
+                    timeOff.start = startDate
+                    timeOff.end = endDate
+                    timeOff.duration = duration
+                    timeOff.status=status
+                    timeOff.balanceDiff = paidTimeOff
+                    logger.debug(f"Updating TimeOffRecord")
+                except TimeOffRequests.DoesNotExist:
+                    timeOff = await TimeOffRequests.objects.acreate(
+                        id=requestID,
+                        userId=userID,
+                        policyId=policyID,
+                        start=startDate,
+                        end=endDate,
+                        duration=duration,
+                        status=status,
+                        balanceDiff=paidTimeOff,
+                        workspaceId=workspace
+                    )
+
+                except Exception as ex:
+                    failed = True 
+                    logger.error(f'{str(ex)} - {ex.__traceback__.tb_lineno}')
+                    raise e
+                finally:
+                    logger.debug("Saving")
+                    if not failed:
+                       await timeOff.asave()
+            logger.info("Loading Next Page")
+            timeOffrequest = await intermediate
+        logger.info("Operation Completed: TimeOffRequest table")
+    except Exception as e: 
+        logger.critical(f'{str(e) - {e.__traceback__.tb_lineno}}')
+        raise e
 
 
 
@@ -1225,154 +1240,7 @@ def deleteTimeOff(wkSpaceID, conn , cursor , timeOff):
         # Commit changes in timesheet function if no exceptions occurred  
         conn.commit() # saving deletions              
         return(deleted)
-
-def pushTimeOff(wkSpaceID, conn, cursor, startRange= "None", endRange ="None", window= -1):
-    """
-    Pushes time off requests retrieved from Clockify API to the database.
-
-    Args:
-        wkSpaceID (str): The ID of the Clockify workspace.
-        conn: Connection object for the database.
-        cursor: Cursor object for executing SQL queries.
-        startFilter (str): Start date filter for time off requests. Defaults to "None".
-        endFilter (str): End date filter for time off requests. Defaults to "None".
-        window (int): Size of the window for paginated retrieval. Defaults to -1.
-
-    Returns:
-        str: Message indicating the operation status.
-
-    Calls:
-        - pushHolidays(wkSpaceID, conn, cursor): Pushes holidays to the database.
-        - count_working_days(start_date, end_date, conn, cursor): Counts the number of working days between two dates.
-        - pushPolicies(wkSpaceID, conn, cursor): Pushes policies to the database.
-        - pushUsers(wkSpaceID, conn, cursor): Pushes users to the database.
-    """
-    logger.info(pushHolidays(wkSpaceID, conn, cursor))
-    page = 1
-    gCount = 0
-    gUpdate = 0
-    gExists = 0
-    count = 0
-    update = 0
-    exists = 0
-    newRequests = [] # for deletions (ID's)
-    timeOff = getTimeOff(wkSpaceID, page, startRange, endRange)
-    try:
-        while len(timeOff['requests']) != 0 and page <= 3:
-            
-            logger.info(f"Inserting From Page: {page} of Time Off Requests ({len(timeOff['requests'])} records)")
-            for requests in timeOff["requests"]:
-                userID = requests["userId"]
-                policyID = requests["policyId"]
-                requestID = requests["id"] ; newRequests.append(requestID)
-                status = requests['status']['statusType']
-                
-                startDate = requests["timeOffPeriod"]["period"]["start"]
-                startFromatString = '%Y-%m-%dT%H:%M:%SZ' if len(startDate) == 20 else '%Y-%m-%dT%H:%M:%S.%fZ'
-                endDate = requests["timeOffPeriod"]["period"]["end"]
-                endFromatString = '%Y-%m-%dT%H:%M:%SZ' if len(endDate) == 20 else '%Y-%m-%dT%H:%M:%S.%fZ'
-                startDate = toMST(startDate , startFromatString)
-                endDate = toMST(endDate, endFromatString)
-                duration = count_working_days(startDate.date(), endDate.date() , conn, cursor)
-                
-                paidTimeOff = requests["balanceDiff"]
-                balance = requests['balance']
-                while True:
-                    try:
-                        cursor.execute( # Check to see if it exists in db already 
-                            '''
-                            Select pid, startDate, end_date, duration, [status], paidTimeOff, balanceAfterRequest
-                            FROM TimeOffRequests
-                            WHERE id = ? AND workspace_id = ?
-                            ''', (requestID, wkSpaceID)
-                        )
-                        oldRequest = cursor.fetchone()
-                        if oldRequest is None: # insert into db and break while loop
-                            cursor.execute(
-                                '''
-                                INSERT INTO TimeOffRequests (id, eID, pID, startDate, end_date, duration, [status], paidTimeOff, balanceAfterRequest, workspace_id)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                ''', (requestID, userID, policyID, startDate, endDate, duration, status, paidTimeOff, balance, wkSpaceID)
-                            )
-                            logger.info(f"\tAdding Time Off Request Information...({count})")
-                            count += 1
-                            break
-                        elif oldRequest is not None and status != oldRequest[4]: # updates by raising error
-                            raise pyodbc.IntegrityError("PRIMARY KEY constraint") #the sub funciton in pushApprovals seems to be faster 
-                        else: # exists already
-                            exists += 1
-                            logger.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
-                            break
-                    except pyodbc.IntegrityError as e:
-                        if "FOREIGN KEY constraint" in str(e):
-                            logger.info(pushPolicies(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
-                            logger.info(pushUsers(wkSpaceID, conn, cursor) + ". Called From Time Off Function")
-                        elif "PRIMARY KEY constraint" in str(e):
-                            try: # check for update in db and compute if needed 
-                                startDateObject = copy.copy(startDate)
-                                endDateObject = copy.copy(endDate)
-                                # round datetime to nearest minute
-                                startDateObject += timedelta(seconds=30)
-                                endDateObject += timedelta(seconds=30)
-                                startDateObject = startDateObject.replace(second = 0, microsecond = 0)
-                                endDateObject = endDateObject.replace(second = 0, microsecond = 0) 
-                                if ( # check for an update 
-                                    (oldRequest[0] != policyID ) or (startDateObject != oldRequest[1])
-                                    or (oldRequest[2] != endDateObject) or ( int(duration) != int(oldRequest[3]) )
-                                    or (status != oldRequest[4]) 
-                                    or (round(float(paidTimeOff), 2) != round(float(oldRequest[5]), 2))
-                                    or (round(float(balance),2) != round(float(oldRequest[6]),2))
-                                ):
-                                    cursor.execute( #updates 
-                                        '''
-                                        UPDATE TimeOffRequests 
-                                        SET 
-                                            pid = ?,
-                                            startDate = ?,
-                                            end_date = ?,
-                                            duration = ?,
-                                            status = ?,
-                                            paidTimeOff = ?,
-                                            balanceAfterRequest = ?
-                                        WHERE 
-                                            id = ? AND workspace_id = ?
-                                        ''', (policyID, startDate, endDate, duration, status, paidTimeOff, balance, requestID, wkSpaceID )
-                                    )
-                                    logger.info(f"\tUpdating TimeOffRequests {oldRequest[4]} to {status}:...({requestID})")
-                                    update += 1
-                                    break
-                                else: # no updates were made - should never run 
-                                    exists += 1
-                                    logger.info(f"\tLoading..........{str(round((exists+update+count)/len(timeOff['requests']),2)*100)[:5]}%")
-                                    break
-                            except pyodbc.IntegrityError as ex:
-                                if "FOREIGN KEY constraint" in str(ex):
-                                    logger.info(pushUsers(wkSpaceID, conn, cursor), "Called by TimeOff FK_ERROR")
-                                    logger.info(pushPolicies(wkSpaceID, conn, cursor),  "Called by TimeOff FK_ERROR")
-                                else: # unknown error 
-                                    raise
-                        else: # unknown error 
-                            raise # Unkown integrity error on insert 
-            page += 1
-            gCount += count 
-            gUpdate += update
-            gExists += exists 
-            count = 0 
-            update = 0
-            exists = 0
-            timeOff = getTimeOff(wkSpaceID, page, startRange, endRange) 
-    except Exception as exc :
-        conn.rollback()  # Roll back changes if an exception occurs
-        logger.error(f"Error ({exc.__class__}): \n----------{exc.__traceback__.tb_frame.f_code.co_filename}, {exc.__traceback__.tb_frame.f_code.co_name} \n\tLine: {exc.__traceback__.tb_lineno} \n----------{str(exc)}\n")
-        return f"Operation failed. Changes rolled back. Contact administer of problem persists"
-    else:
-        conn.commit() # saving inserts 
-        deleted = 0
-        # deleteTimeOff(wkSpaceID, conn, cursor, newRequests)
-        logger.info("Committing changes...")  # Commit changes if no exceptions occurred
-                           
-        return(f"Operation Completed: TimeOffRequest table has {gCount} new records and {gExists} unchanged. {gUpdate} records updated. {deleted} deleted\n")
-''' 
+'''
 def pushAttendance(wkSpaceID, conn, cursor, startDate="2024-02-11T00:00:00Z", endDate="2024-02-17T23:59:59.999Z", page =1):
     """
     Pushes attendance data from Clockify to the database. Attendance is the hours worked (regula, overtime, total, Paid Time Off)

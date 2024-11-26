@@ -199,7 +199,7 @@ class FilesForExpense(models.Model):
         unique_together= (('expenseId', 'workspaceId'))
 
 class Holidays(models.Model):
-    id = models.CharField(max_length=50, primary_key= True)
+    id = models.CharField(max_length=50, primary_key= True, db_column='holidayID')
     date = models.DateField(blank=True, null=True)
     name = models.CharField(max_length=100, blank=False, null=False)
     class Meta: 

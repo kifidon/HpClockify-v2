@@ -104,18 +104,9 @@ async def TimesheetEvent(wkSpaceName = 'Hill Plain'):# , status = ['APPROVED', '
 async def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     logger.info('Timeoff Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
-    cursor , conn = sqlConnect()
-    attempts = 0
-    while cursor is None and conn is None and attempts < 10:
-        attempts += 1
-        logger.info(f" Retrying.....Connecting to server")
-        cursor , conn = sqlConnect()
-    if cursor is None and conn is None:
-        logger.error('cannot connect to server')
-        return 0
-    result = ClockifyPushV3.pushTimeOff(wid, conn, cursor)
+    logger.debug(f"WID: {wid}")
+    result = await ClockifyPushV3.pushTimeOff(wid)
     logger.info(result)
-    cleanUp(conn=conn, cursor=cursor)
     return result
 
 async def HolidayEvent(wkSpaceName = 'Hill Plain'):
