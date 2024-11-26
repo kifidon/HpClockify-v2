@@ -40,7 +40,7 @@ Returns:
 # @api_view(["PUT", "POST", "GET"])
 def postThreadLemSheet(inputData):
     try:
-        inputData["id"] = hash50(inputData['clientId'], datetime.now().strftime('%Y-%m-%dT%H-%M-%S'), inputData['projectId'])
+        inputData["id"] = hash50(50 ,inputData['clientId'], datetime.now().strftime('%Y-%m-%dT%H-%M-%S'), inputData['projectId'])
         #gen LemNumber
         lems = LemSheet.objects.filter(clientId = inputData['clientId'], projectId=inputData['projectId'])
         # logger.debug(type(lems))
@@ -182,7 +182,7 @@ def postThreadLemWorker(inputData: dict):
         logger.info("Not Found!")
         logger.info("Creating a new LemWorker Record")
         try:
-            inputData["_id"] = hash50(inputData['empId'], inputData["roleId"])
+            inputData["_id"] = hash50(50 ,inputData['empId'], inputData["roleId"])
             workerSerializer = LemWorkerSerializer(data=inputData)
             if workerSerializer.is_valid():
                 # save new worker role 
@@ -285,7 +285,7 @@ Raises:
 def postThreadEquipEntry(inputData: dict):
     logger = setup_server_logger()
     try:
-        inputData["_id"] = hash50(inputData["lemId"], inputData["equipId"], str(time.time())) 
+        inputData["_id"] = hash50(50 ,inputData["lemId"], inputData["equipId"], str(time.time())) 
         logger.debug(dumps(inputData, indent=4))
         threadSerializer = EquipEntrySerializer(data=inputData)
         if threadSerializer.is_valid():
@@ -369,7 +369,7 @@ def insertRoleOrEquipment(request:ASGIRequest):
         inputData = loads(request.body)
         logger.debug(reverseForOutput(inputData))
         if request.method == 'POST':
-            inputData['id'] = hash50(inputData['name'], inputData['clientId'])
+            inputData['id'] = hash50(50 ,inputData['name'], inputData['clientId'])
             if inputData['isRole']:
                 logger.info("Creating serializer for Role Table")
                 serializer = RoleSerializer(data=inputData)
@@ -460,7 +460,7 @@ def rateSheets(request: ASGIRequest = None): #maybe make async later
         if request.method == 'POST' or request.method == 'GET': 
             if inputData['isRole'] == True: # Worker rate sheet 
                 logger.info("Worker Rate sheet path")
-                inputData['_id'] = hash50(inputData['clientId'], inputData['roleId'], inputData['projectId']) #maybe include workspace in this later 
+                inputData['_id'] = hash50(50 ,inputData['clientId'], inputData['roleId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
                 try:
                     rates = WorkerRateSheet.objects.get(pk=inputData['_id'])
@@ -487,7 +487,7 @@ def rateSheets(request: ASGIRequest = None): #maybe make async later
             else: #Eqp rate sheet 
                 logger.info('Equipment Rate sheet path')
                 logger.debug(f'Hash Fields: {inputData.get('clientId', "Missing")}, {inputData.get('equipId', "Missing")}, {inputData.get('projectId', "Missing")}')
-                inputData['_id'] = hash50(inputData['clientId'], inputData['equipId'], inputData['projectId']) #maybe include workspace in this later 
+                inputData['_id'] = hash50(50 ,inputData['clientId'], inputData['equipId'], inputData['projectId']) #maybe include workspace in this later 
                 #try update 
                 try:
                     rates = EqpRateSheet.objects.get(pk=inputData['_id'])
