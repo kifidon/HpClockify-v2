@@ -76,7 +76,7 @@ SECRET_KEY = 'django-insecure-#yuv5_-_2w!a8^km2am*tcwm90($wvgj_)!q*g5^2*4(ibs6cu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hillplain-api.ngrok.app']
 
 
 # Application definition
