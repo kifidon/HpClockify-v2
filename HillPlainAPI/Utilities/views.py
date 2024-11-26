@@ -168,12 +168,17 @@ Logs the task result and stores it with a timestamp in the database.
 def taskResult(response: JsonResponse, inputData, caller: str):
     logger = setup_background_logger()
     logger.info('Saving task result')
+    timezone = pytz.timezone('America/Denver')
+    current_time = datetime.now(timezone)
+
+    # Format the time in the required format
+    formatted_time = current_time.strftime('%Y-%m-%d %H:%M:%S.%f%z')
     BackGroundTaskResult.objects.create(
         status_code = response.status_code,
         message = response.content.decode() or None,
         data = inputData,
         caller = caller,
-        time = str(time.time())
+        time = formatted_time
     )
 
 '''
