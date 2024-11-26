@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import *
 from Utilities.views import *
 from Utilities.clockify_util.QuickBackupV3 import ClientEvent, PolicyEvent, eventSelect
-from Utilities.clockify_util.ClockifyScheduledTasks import BankedTime
+from Utilities.clockify_util.ClockifyScheduledTasks import BankedTime, updateSalaryVacation
 from HillPlainAPI.Loggers import setup_server_logger
 import asyncio
 import httpx
@@ -895,3 +895,28 @@ def BankedHrs(request: ASGIRequest):
     except Exception as e:
         logger.error(f'{str(e)}')
         return JsonResponse(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_503_SERVICE_UNAVAILABLE, safe=False)
+
+@api_view(['GET', 'POST'])
+# @csrf_exempt
+def UpdateSalaryVacation(request: ASGIRequest):
+    '''
+    Function Description: 
+        Calls pull request functions from the databse to update the vacation hours ballance in clockify. 
+    Param: 
+        request(ASGIRequest): Request sent to endpoint from client 
+    
+    Returns: 
+        response(Response): contains Payroll Report File to be directly uploaded into ACC
+    '''
+    logger.info(f'{request.method}: bankedHours ')
+    try:
+        cursor, conn = sqlConnect()
+        users = list(Employeeuser.objects.filter(hourly = 0) )
+        for usr in users:
+            updateSalaryVacation(usr, cursor)
+        cleanUp(conn, cursor)
+        return JsonResponse(data='Operation Completed', status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        logger.error(f'{str(e)}')
+        return JsonResponse(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_503_SERVICE_UNAVAILABLE, safe=False)
+

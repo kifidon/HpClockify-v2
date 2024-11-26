@@ -1,6 +1,7 @@
 
 import requests
 import pyodbc
+from enum import Enum
 import asyncio 
 import httpx
 import time
@@ -24,35 +25,13 @@ def getApiKey():
     # API_KEY = 'ZjZhM2MwZmEtOTFiZi00MWE0LTk5NTMtZWUxNGJjN2FmNmQy' # Timmy Ifidon 
     return API_KEY
 
-async def getTimesheets(workspaceId, key, page = 1, status = 'APPROVED'):
+class Status(Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    # WITHDRAWN_SUBMISSION = "WITHDRAWN_SUBMISSION"
+    WITHDRAWN_APPROVAL = "WITHDRAWN_APPROVAL"
+    # REJECTED = "REJECTED"
     
-    """
-    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
-
-    Args:
-        workspaceId (str): The ID of the workspace.
-        key (str): The API key for accessing the Clockify API.
-
-    Returns:
-        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
-    """
-    try: 
-        output = []  # Initialize an empty list
-        headers = {
-            'X-Api-Key': key
-        }
-        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=10&sort-column=UPDATED_AT"    
-        response = requests.get(url, headers=headers)
-        # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
-        #     pass
-        if response.status_code == 200:
-            return response.json()  # Append JSON data to the list
-        else:
-            print(f"Error: {response.status_code}, {response.text}")
-            return []
-    except Exception as e:
-       print(f"Error: {response.status_code}, {response.text}")(f'({e.__traceback__.tb_lineno}) - {str(e)}')
-
 async def FindTimesheet(workspaceId, key, timeId, status, page, entry = False, expense = False):
     while page < 10:
         if entry and expense:
@@ -148,7 +127,84 @@ async def getDataForApproval(workspaceId, key, timeId, status='APPROVED', entryF
     logger.error(f' Max Retries reached')
     raise ConnectTimeout
 
+async def getTimeOff(workspaceId: str, startDate:str , endDate: str, page:int ):
+    """
+    Retrieves time off requests for a specific workspace within a given window.
 
+    Args:
+        workspaceId (str): The ID of the workspace.
+        startDate (str): Date in the form YYYY-mm-DD.
+
+    Returns:
+        dict or dict(): A dictionary containing time off request details, or dict() if an error occurs.
+    """
+    try:  
+        key = getApiKey()
+        startDateFormated = startDate + "T00:00:00.000000Z" 
+        endDateFormated   = endDate   + "T23:59:59.599999Z" 
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Api-Key': key
+        }
+        emp = await sync_to_async(list)(Employeeuser.objects.all())
+
+        request_body = {
+            "end": endDateFormated,
+            "page": page,
+            "page-size": 200,
+            "start": startDateFormated,
+            "statuses": ["ALL"],
+            
+            "users": [e.id for e in emp]
+        }
+        # logger.debug(dumps(request_body))
+        url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/time-off/requests'
+        response = requests.post(url=url, json=request_body, headers=headers)
+        # logger.debug(f"StatusCode: {response.text}")
+        if response.status_code == 200:
+            return response.json()
+        else: 
+            logger.error(f"Error: {response.status_code}, {response.reason}")
+            return dict()
+    except Exception as e: 
+        logger.critical(f'{str(e)} - ({e.__traceback__.tb_lineno})')
+        raise e
+  
+async def getTimesheets(workspaceId, key, page = 1):
+    
+    """
+    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
+
+    Args:
+        workspaceId (str): The ID of the workspace.
+        key (str): The API key for accessing the Clockify API.
+
+    Returns:
+        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
+    """
+    try: 
+        output = []  # Initialize an empty list
+        task = []
+        headers = {
+            'X-Api-Key': key
+        }
+        async with httpx.AsyncClient() as client:
+            for status in Status:
+                logger.debug(f'Status: {status.value}')
+                url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status.value}&page={page}&page-size=10&sort-column=UPDATED_AT"    
+                task.append(client.get(url, headers=headers))
+    
+            results = await asyncio.gather(*task)
+            for result in results:
+                if result.status_code == 200:
+                    output.extend(result.json())
+                else:
+                    logger.error(f" {result.status_code}, {result.text}")
+                    raise ConnectionError
+            return output
+    except Exception as e:
+       logger.error(f'({e.__traceback__.tb_lineno}) in getTimesheet- {str(e)}')
+       raise e
 
 
 def getWorkspaces(key):
@@ -211,7 +267,7 @@ def getProjects(workspaceId, key, page =1):
     headers = {
         'X-Api-Key': key
     }
-    url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/projects?page={page}&archived=false'
+    url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/projects?page={page}&archived=false&page-size=500'
     response = requests.get(url, headers= headers)
     if response.status_code == 200:
         projects = response.json()
@@ -265,49 +321,7 @@ def getPolocies(workspaceId, key):
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
 
-async def getTimeOff(workspaceId: str, startDate:str , endDate: str):
-    """
-    Retrieves time off requests for a specific workspace within a given window.
-
-    Args:
-        workspaceId (str): The ID of the workspace.
-        startDate (str): Date in the form YYYY-mm-DD.
-
-    Returns:
-        dict or dict(): A dictionary containing time off request details, or dict() if an error occurs.
-    """
-    try:  
-        key = getApiKey()
-        startDateFormated = startDate + "T00:00:00.000000Z" 
-        endDateFormated   = endDate   + "T23:59:59.599999Z" 
-        headers = {
-            'Content-Type': 'application/json',
-            'X-Api-Key': key
-        }
-        emp = await sync_to_async(list)(Employeeuser.objects.all())
-
-        request_body = {
-            "end": endDateFormated,
-            "page": 1,
-            "page-size": 50,
-            "start": startDateFormated,
-            "statuses": ["ALL"],
-            
-            "users": [e.id for e in emp]
-        }
-        logger.debug(dumps(request_body))
-        url = f'https://api.clockify.me/api/v1/workspaces/{workspaceId}/time-off/requests'
-        response = requests.post(url=url, json=request_body, headers=headers)
-        logger.debug(f"StatusCode: {response.text}")
-        if response.status_code == 200:
-            return response.json()
-        else: 
-            logger.error(f"Error: {response.status_code}, {response.reason}")
-            return dict()
-    except Exception as e: 
-        logger.critical(f'{str(e)} - ({e.__traceback__.tb_lineno})')
-        raise e
-    
+  
 def getHolidays(workspaceId ):
     key = getApiKey()
     headers = {
@@ -392,35 +406,6 @@ def getStaleApproval(workspaceId, key, page = 1):
         print(f"Error: {response.status_code}, {response.text}")
         return dict()
 '''
-async def getApprovedRequests(workspaceId, key, page = 1, status = 'APPROVED'):
-    
-    """
-    Retrieves the requests (Time Sheet) for a specific workspace as well as the approval status of the request 
-
-    Args:
-        workspaceId (str): The ID of the workspace.
-        key (str): The API key for accessing the Clockify API.
-
-    Returns:
-        dict or dict(): A dictionary containing approved request details, or dict() if an error occurs.
-    """
-    try: 
-        output = []  # Initialize an empty list
-        headers = {
-            'X-Api-Key': key
-        }
-        url = f"https://api.clockify.me/api/v1/workspaces/{workspaceId}/approval-requests?status={status}&page={page}&page-size=10&sort-column=UPDATED_AT"    
-        response = requests.get(url, headers=headers)
-        # if response.json()['approvalRequest']['owner']['userId'] == '660431c45599d034112545ed':
-        #     pass
-        if response.status_code == 200:
-            return response.json()  # Append JSON data to the list
-        else:
-                print(f"Error: {response.status_code}, {response.text}")
-                output.append({})
-        return output
-    except Exception as e:
-        logger.error(f'({e.__traceback__.tb_lineno}) - {str(e)}')
 
 def getCategories(workspaceId, page):
     logger.info(f' Begining Clockify data pull')

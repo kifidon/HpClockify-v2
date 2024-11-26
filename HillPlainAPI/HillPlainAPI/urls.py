@@ -50,7 +50,7 @@ urlpatterns = [
     # path('timeSheets', views.timesheets),
     
     path('HpClockifyApi/bankedHours', BankedHrs),
-    # path('HpClockifyApi/updateSalaryVacation', views.accuralVacationSalary),
+    path('HpClockifyApi/updateSalaryVacation', UpdateSalaryVacation),
 
 #Hill Plain internal Clockify API
     path('HpClockifyApi/TimeSheets', TimesheetsView),

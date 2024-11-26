@@ -10,19 +10,9 @@ logger = setup_server_logger('DEBUG')
 async def UserEvent(wkSpaceName = 'Hill Plain'):
     logger.info('User Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
-    cursor , conn = sqlConnect()
-    attempts = 0
-    while cursor is None and conn is None and attempts < 10:
-        attempts += 1
-        logger.info(f" Retrying.....Connecting to server")
-        cursor , conn = sqlConnect() 
-    if cursor is None and conn is None:
-        logger.error('cannot connect to server')
-        return 0
-    logger.info( ClockifyPushV3.pushUsers(wid, conn, cursor))
-
-    cleanUp(conn=conn, cursor=cursor)
-    return 1
+    users = sync_to_async(ClockifyPushV3.pushUsers,thread_sensitive=True )
+    result = await users(wid)
+    return result
 
 async def ClientEvent(wkSpaceName = 'Hill Plain'):
     logger.info('Client Event Called')
@@ -46,19 +36,9 @@ async def ClientEvent(wkSpaceName = 'Hill Plain'):
 async def ProjectEvent(wkSpaceName = 'Hill Plain'):
     logger.info('Project Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
-    cursor , conn = sqlConnect()
-    attempts = 0
-    while cursor is None and conn is None and attempts < 10:
-        attempts += 1
-        logger.info(f" Retrying.....Connecting to server")
-        cursor , conn = sqlConnect()
-    if cursor is None and conn is None:
-        logger.error('cannot connect to server')
-        return 0
     projects = sync_to_async(ClockifyPushV3.pushProjects, thread_sensitive=True)
-    result = await projects(wid, conn, cursor)
+    result = await projects(wid)
     logger.info(result)
-    cleanUp(conn=conn, cursor=cursor)
     return result
 
 async def PolicyEvent(wkSpaceName = 'Hill Plain'):
@@ -82,18 +62,7 @@ async def PolicyEvent(wkSpaceName = 'Hill Plain'):
 async def TimesheetEvent(wkSpaceName = 'Hill Plain'):# , status = ['APPROVED', 'PENDING', 'WITHDRAWN_APPROVAL']):
     logger.info('Timesheet Event Called')
     wid = ClockifyPushV3.getWID(wkSpaceName)
-    # cursor , conn = sqlConnect()
     attempts = 0
-    # while cursor is None and conn is None and attempts < 10:
-    #     attempts += 1
-    #     logger.info(f" Retrying.....Connecting to server")
-    #     cursor , conn = sqlConnect()
-    # if cursor is None and conn is None:
-    #     logger.error('cannot connect to server')
-    #     return 0
-    # output = []
-    # for stat in status: 
-    # logger.info(f'Updating {stat}')
     result = await ClockifyPushV3.pushTimesheets(wid, 1)
     logger.debug(f"pushTimesheets Result: {result}")
     logger.info(result)
@@ -106,7 +75,7 @@ async def TimeOffEvent(wkSpaceName = 'Hill Plain'):
     wid = ClockifyPushV3.getWID(wkSpaceName)
     logger.debug(f"WID: {wid}")
     result = await ClockifyPushV3.pushTimeOff(wid)
-    logger.info(result)
+    logger.debug(result)
     return result
 
 async def HolidayEvent(wkSpaceName = 'Hill Plain'):
@@ -127,31 +96,21 @@ async def HolidayEvent(wkSpaceName = 'Hill Plain'):
     cleanUp(conn=conn, cursor=cursor)
     return 1
 
-async def UserGroupEvent(wkSpaceName = 'Hill Plain'):
-    logger.info('Called')
-    wid = ClockifyPushV3.getWID(wkSpaceName)
-    cursor , conn = sqlConnect()
-    attempts = 0
-    while cursor is None and conn is None and attempts < 10:
-        attempts += 1
-        logger.info(f" Retrying.....Connecting to server")
-        cursor , conn = sqlConnect()
-    if cursor is None and conn is None:
-        logger.error('cannot connect to server')
-        return 0
-    usergroups = sync_to_async(ClockifyPushV3.pushUserGroups, thread_sensitive= True)
-    logger.info(await usergroups(wid, conn, cursor))
-    cleanUp(conn=conn, cursor=cursor)
-    return 1
+async def CalendarEvent():
+    cursor, conn = sqlConnect()
+    logger.info(f"Calendar event Called")
+    calendar = sync_to_async(ClockifyPushV3.updateCalendar) 
+    result = await calendar(str(datetime.datetime.now().year + 1), conn, cursor)
+    return result
 
 async def main():
     result = await asyncio.gather(
     (ClientEvent()),
     (ProjectEvent()),
     (PolicyEvent()),
-    # (HolidayEvent()),
-    # (UserGroupEvent()),
-    (TimeOffEvent())
+    (TimeOffEvent()), 
+    (HolidayEvent()),
+    (CalendarEvent())
     ,return_exceptions= True)
     return result
 
@@ -186,13 +145,15 @@ async def eventSelect(event = None):
             'timesheet': TimesheetEvent(wkSpaceName = 'Hill Plain'),
             'timeoff': TimeOffEvent(wkSpaceName = 'Hill Plain'),
             'holiday': HolidayEvent(wkSpaceName = 'Hill Plain'),
-            'userGroup': UserGroupEvent(wkSpaceName = 'Hill Plain'),
         }
         results = await asyncio.gather(events.get(event, main()), return_exceptions= True)
+        for result in results: 
+            if isinstance(result, Exception) and len(results) == 1:
+                raise result
         logger.debug(f'Results Data {results}')
         logger.debug(f'Results Type {type(results)}')
         return results
     except Exception as e:
-        logger.error(({e.__traceback__.tb_lineno}) - {str(e)})
+        logger.error(f"{e.__traceback__.tb_lineno} - {str(e)}")
         raise e
         
