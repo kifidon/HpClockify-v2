@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import *
 
 class LemSheetSerializer(serializers.ModelSerializer):
-    lem_sheet_date = serializers.DateField(input_formats=['%m/%d/%Y', '%Y-%m-%d'])
+    lem_sheet_date = serializers.DateField(input_formats=['%d/%m/%Y', '%Y-%m-%d'])
     class Meta:
         model = LemSheet
         fields = '__all__'
