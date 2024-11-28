@@ -7,3 +7,7 @@ Tasks to complete
 6. perminant deployment 
 7. test programs 
 8. Test Deadlock on Backup function when error is raised on Entry 
+
+
+
+python manage.py test Clockify.tests.ProjectViewTestCase --keepdb

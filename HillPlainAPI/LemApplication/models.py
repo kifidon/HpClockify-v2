@@ -106,7 +106,7 @@ class EqpRateSheet(models.Model):
         managed = False
         db_table = 'EqpRateSheet'
         constraints = [
-            models.UniqueConstraint(fields=['clientId', 'equipId', 'workspaceId', 'proejctId'], name='unique_client_equip')
+            models.UniqueConstraint(fields=['clientId', 'equipId', 'workspaceId', 'projectId'], name='unique_client_equip')
         ]
 
 class ClientRep(models.Model):

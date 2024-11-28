@@ -58,7 +58,7 @@ urlpatterns = [
     path('HpClockifyApi/Users', EmployeeUsersView),
     path('HpClockifyApi/TimeOff', TimeOffRequestsView),
     path('HpClockifyApi/Policies', TimeOffPoliciesView),
-    path('HpClockifyApi/Projects', ProjectsView),
+    path('HpClockifyApi/Projects', ProjectsView, name='projects'),
     path('HpClockifyApi/Entry', EntryView),
     # path('HpClockifyApi/newExpense', views.newExpense),
     # path('HpClockifyApi/deleteExpense', views.deleteExpense),

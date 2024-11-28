@@ -130,7 +130,7 @@ class Tagsfor(models.Model):
     class Meta:
         managed = False
         db_table = 'TagsFor'
-        unique_together = (('id', 'entryid', 'workspace'),)
+        unique_together = (('id', 'entryid', 'workspaceId'),)
 
     def __str__(self):
         return self.name or ""
