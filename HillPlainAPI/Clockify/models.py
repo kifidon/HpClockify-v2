@@ -94,7 +94,7 @@ class Project(models.Model):
     class Meta:
         managed = False
         db_table = 'Project'
-        unique_together = (('id', 'workspace', 'workspace'),)
+        unique_together = (('id', 'workspaceId'),)
 
     def __str__(self):
         return self.name or ""
