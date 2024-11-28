@@ -908,15 +908,16 @@ def UpdateSalaryVacation(request: ASGIRequest):
     Returns: 
         response(Response): contains Payroll Report File to be directly uploaded into ACC
     '''
-    logger.info(f'{request.method}: bankedHours ')
+    logger.info(f'{request.method}: Update Salary ')
     try:
         cursor, conn = sqlConnect()
-        users = list(Employeeuser.objects.filter(hourly = 0) )
+        users = list(Employeeuser.objects.filter(hourly=0))
         for usr in users:
-            updateSalaryVacation(usr, cursor)
+            logger.info(f"{usr.name}")
+            updateSalaryVacation(usr.id, cursor)
         cleanUp(conn, cursor)
         return JsonResponse(data='Operation Completed', status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        logger.error(f'{str(e)}')
+        logger.error(f'({e.__traceback__.tb_lineno}){str(e)}')
         return JsonResponse(data='Error: Check Logs @ https://hpclockifyapi.azurewebsites.net/', status=status.HTTP_503_SERVICE_UNAVAILABLE, safe=False)
 

@@ -215,29 +215,35 @@ def updateSalaryVacation(userId, cursor):
         Left join totalVacationSalary as tv on tv.id= ta.id 
             where ta.id = '{userId}'
     '''
-    cursor.execute(query)
-    balance = cursor.fetchone()
-    headers = {
-            'X-Api-Key': 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3',
-            'Content-Type': 'application/json'
+    logger = setup_background_logger()
+    try:
+        cursor.execute(query)
+        balance = cursor.fetchone()
+        if balance is None: 
+            return False
+        headers = {
+                'X-Api-Key': 'YWUzMTBiZTYtNjUzNi00MzJmLWFjNmUtYmZlMjM1Y2U5MDY3',
+                'Content-Type': 'application/json'
+            }
+        url = f'https://pto.api.clockify.me/v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65dcba39a37a682370014ad8'
+
+        payload = {
+            "note": "Adding Accrued time for this week.",
+            "userIds": [
+                userId
+            ],
+            "value": 3.08 + float(balance[0])
         }
-    url = f'https://pto.api.clockify.me/v1/workspaces/65c249bfedeea53ae19d7dad/balance/policy/65dcba39a37a682370014ad8'
-
-    payload = {
-        "note": "Adding Accrued time for this week.",
-        "userIds": [
-            userId
-        ],
-        "value": 3.08 + float(balance[0])
-    }
-    result = patch(url=url, headers= headers, json=payload)
-    if result.status_code == 204:
-        return True
-    else: 
-        logger = setup_background_logger()
-        logger.error(result.reason)
-        return False
-
+        logger.info(reverseForOutput(payload))
+        result = patch(url=url, headers= headers, json=payload)
+        if result.status_code == 204:
+            return True
+        else: 
+            logger.error(result.reason)
+            return False
+    except Exception as e: 
+        logger.error(f"{e.__traceback__.tb_lineno} - {str(e)}")
+        raise e 
 '''
 Updates banked time balances for users by retrieving current balances and checking 
 for discrepancies with Clockify. Updates balances as needed through Clockify API.
