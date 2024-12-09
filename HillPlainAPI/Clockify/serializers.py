@@ -5,6 +5,8 @@ from rest_framework.exceptions import ValidationError
 from Utilities.views import count_working_daysV2, toMST, timeDuration
 from json import dumps
 from datetime import date, datetime, timedelta
+from dateutil import parser
+
 
 class EmployeeUserSerializer(serializers.ModelSerializer):
     '''
@@ -70,16 +72,17 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()  # validate this later 
     end_date = serializers.SerializerMethodField()  # validate this later 
-    Truck = serializers.SerializerMethodField() 
+    Truck = serializers.SerializerMethodField()
     hourly = serializers.SerializerMethodField()
     manager = serializers.SerializerMethodField()
     truckDetails = serializers.SerializerMethodField()
+
     def get_status(self, obj):
         status = obj['status']
-        return status 
-    
+        return status
+
     def get_hasTruck(self, obj):
-        logger = setup_background_logger() 
+        logger = setup_background_logger()
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
@@ -88,86 +91,86 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
                 return 1
             else:
                 return 0
-        except Exception as e: 
+        except Exception as e:
             logger.debug(type(e))
-            
+
             return 0
-    
+
     def get_role(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Role']
-        except Exception: 
+        except Exception:
             return 'No Role Specified'
-    
-    def get_start_date(self, obj): 
+
+    def get_start_date(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Start Date']
-        except Exception: 
+        except Exception:
             return date.today().strftime('%Y-%m-%d')
-    
-    def get_end_date(self, obj): 
+
+    def get_end_date(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['End Date']
-        except Exception: 
+        except Exception:
             return date.today().strftime('%Y-%m-%d')
-    
-    def get_hourly(self, obj): 
+
+    def get_hourly(self, obj):
         logger = setup_background_logger()
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Rate Type']
-        except Exception as e: 
+        except Exception as e:
             logger.error(f'({str(e)})')
             return 5
-    
+
     def get_manager(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Reporting Manager']
-        except Exception: 
+        except Exception:
             return 'Missing Manager Information'
-    
+
     def get_truckDetails(self, obj):
         field = dict()
         for custom in obj['userCustomFields']:
             field[custom['name']] = custom['value']
         try:
             return field['Truck Details']
-        except Exception: 
+        except Exception:
             return 'Missing Details'
 
     def create(self, validated_data):
-        logger = setup_background_logger() 
+        logger = setup_background_logger()
         try:
             logger.debug(self.initial_data)
             validated_data['status'] = self.get_status(self.initial_data)
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
             validated_data['role'] = self.get_role(self.initial_data)
-            validated_data['start_date'] = self.get_start_date(self.initial_data) 
-            validated_data['end_date'] = self.get_end_date(self.initial_data) 
-            validated_data['hourly'] = self.get_hourly(self.initial_data) 
-            validated_data['manager'] = self.get_manager(self.initial_data) 
-            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data) 
-            logger.info(dumps(validated_data, indent = 4))
+            validated_data['start_date'] = self.get_start_date(self.initial_data)
+            validated_data['end_date'] = self.get_end_date(self.initial_data)
+            validated_data['hourly'] = self.get_hourly(self.initial_data)
+            validated_data['manager'] = self.get_manager(self.initial_data)
+            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data)
+            logger.info(dumps(validated_data, indent=4))
             return super().create(validated_data=validated_data)
-        except Exception as e: 
+        except Exception as e:
             logger.error(f'Problem inserting User Data {e.__traceback__.tb_lineno}: ({str(e)})')
 
     def update(self, instance, validated_data):
-        logger = setup_background_logger() 
+        logger = setup_background_logger()
         logger.debug(self.initial_data)
         try:
             validated_data['status'] = self.get_status(self.initial_data)
@@ -175,19 +178,21 @@ class EmployeeUserSerializer(serializers.ModelSerializer):
             validated_data['start_date'] = self.get_start_date(self.initial_data)
             validated_data['end_date'] = self.get_end_date(self.initial_data)
             validated_data['Truck'] = self.get_hasTruck(self.initial_data)
-            validated_data['hourly'] = self.get_hourly(self.initial_data) 
+            validated_data['hourly'] = self.get_hourly(self.initial_data)
             validated_data['manager'] = self.get_manager(self.initial_data)
-            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data)  
-            logger.debug(dumps(validated_data, indent = 4))
-            updated = super().update(instance= instance, validated_data=validated_data)
-            updated.save(force_update= True )
-            return updated 
-        except Exception as e: 
+            validated_data['truckDetails'] = self.get_truckDetails(self.initial_data)
+            logger.debug(dumps(validated_data, indent=4))
+            updated = super().update(instance=instance, validated_data=validated_data)
+            updated.save(force_update=True)
+            return updated
+        except Exception as e:
             logger.error(f'Problem Updating User Data {e.__traceback__.tb_lineno}: ({str(e)})')
             raise e
+
     class Meta:
         model = Employeeuser
         fields = '__all__'
+
 
 class TimesheetSerializer(serializers.Serializer):
     '''
@@ -224,16 +229,17 @@ class TimesheetSerializer(serializers.Serializer):
     workspaceId = serializers.CharField()
     dateRange = serializers.DictField()
     status = serializers.DictField()
-   
+
     def create(self, validated_data):
-       
+
         timesheet = Timesheet.objects.create(
-           id = validated_data['id'],
-           workspace = Workspace.objects.get(id=validated_data['workspaceId']),
-           emp = Employeeuser.objects.get(id=validated_data.get('owner').get('userId')),
-           start_time = datetime.strptime(validated_data.get('dateRange').get('start'), '%Y-%m-%dT%H:%M:%SZ').date(),
-           end_time = datetime.strptime(validated_data.get('dateRange').get('end'),'%Y-%m-%dT%H:%M:%SZ').date() - timedelta(days= 1) ,
-           status = validated_data.get('status').get('state')
+            id=validated_data['id'],
+            workspace=Workspace.objects.get(id=validated_data['workspaceId']),
+            emp=Employeeuser.objects.get(id=validated_data.get('owner').get('userId')),
+            start_time=datetime.strptime(validated_data.get('dateRange').get('start'), '%Y-%m-%dT%H:%M:%SZ').date(),
+            end_time=datetime.strptime(validated_data.get('dateRange').get('end'),
+                                       '%Y-%m-%dT%H:%M:%SZ').date() - timedelta(days=1),
+            status=validated_data.get('status').get('state')
         )
         return timesheet
 
@@ -242,17 +248,20 @@ class TimesheetSerializer(serializers.Serializer):
             instance.id = instance.id
             # print("\n", validated_data, '\n', vars(instance) )
             instance.workspace = Workspace.objects.get(id=validated_data['workspaceId']) or instance.workspace
-            instance.emp = Employeeuser.objects.get(id = validated_data.get('owner').get('userId')) or instance.emp
-            instance.start_time = datetime.strptime(validated_data.get('dateRange').get('start'), '%Y-%m-%dT%H:%M:%SZ').date() or instance.start_time
-            instance.end_time = datetime.strptime(validated_data.get('dateRange').get('end'),'%Y-%m-%dT%H:%M:%SZ').date() - timedelta(days= 1)  or instance.end_time
+            instance.emp = Employeeuser.objects.get(id=validated_data.get('owner').get('userId')) or instance.emp
+            instance.start_time = datetime.strptime(validated_data.get('dateRange').get('start'),
+                                                    '%Y-%m-%dT%H:%M:%SZ').date() or instance.start_time
+            instance.end_time = datetime.strptime(validated_data.get('dateRange').get('end'),
+                                                  '%Y-%m-%dT%H:%M:%SZ').date() - timedelta(days=1) or instance.end_time
             instance.status = validated_data.get('status').get('state') or instance.status
             instance.save(force_update=True)
         except Exception as e:
             print(e.__traceback__.tb_lineno)
-            raise e 
+            raise e
         return instance
 
-class EntrySerializer(serializers.Serializer): 
+
+class EntrySerializer(serializers.Serializer):
     '''
     Input is of the form: 
     {
@@ -272,8 +281,8 @@ class EntrySerializer(serializers.Serializer):
     }
     '''
     id = serializers.CharField()
-    description = serializers.CharField(allow_blank = True)
-    timesheetId = serializers.CharField(allow_null = True, allow_blank=True, required=False)
+    description = serializers.CharField(allow_blank=True)
+    timesheetId = serializers.CharField(allow_null=True, allow_blank=True, required=False)
     billable = serializers.BooleanField()
     project = serializers.DictField()
     hourlyRate = serializers.DictField(allow_null=True)
@@ -287,36 +296,46 @@ class EntrySerializer(serializers.Serializer):
         try:
             logger.info('Create Entry Called')
             logger.debug(validated_data)
-            try: 
-                timesheet = Timesheet.objects.get(id=validated_data['timesheetId']) 
+            try:
+                timesheet = Timesheet.objects.get(id=validated_data['timesheetId'])
             except Exception as e:
-                timesheet = None 
+                timesheet = None
             if validated_data['billable'] == True:
                 if validated_data.get('hourlyRate') is None and timesheet is not None:
                     logger.error('No Rate on billable Entry')
                     raise ValidationError()
                 elif validated_data.get('hourlyRate') is None and timesheet is None:
                     Rate = 0
-                else: Rate = validated_data.get('hourlyRate').get('amount')
-            else: Rate = 0
+                else:
+                    Rate = validated_data.get('hourlyRate').get('amount')
+            else:
+                Rate = 0
             logger.debug(validated_data['billable'])
+            if isinstance(validated_data.get('timeInterval').get('start'), str):
+                start_time = toMST(
+                    parser.parse(validated_data.get('timeInterval').get('start'), '%Y-%m-%dT%H:%M:%S'), True)
+            if isinstance(validated_data.get('timeInterval').get('end'), str):
+                end_time = toMST(parser.parse(validated_data.get('timeInterval').get('end'), '%Y-%m-%dT%H:%M:%S'),
+                                 True)
+
             entry = Entry.objects.create(
-                id= validated_data['id'],
-                timesheetId = timesheet,
-                duration = timeDuration(validated_data.get('timeInterval').get('duration')),
-                description = validated_data.get('description'),
-                billable = validated_data['billable'] ,
-                project = Project.objects.get(id=validated_data.get('project').get('id')),
-                hourlyRate = Rate,
-                start = toMST(validated_data.get('timeInterval').get('start'),True),
-                end = toMST(validated_data.get('timeInterval').get('end'),True),
-                workspaceId = Workspace.objects.get(id=validated_data.get('workspaceId')) ,
-                task = validated_data.get('task').get('name') or None
+                id=validated_data['id'],
+                timesheetId=timesheet,
+                duration=timeDuration(validated_data.get('timeInterval').get('duration')),
+                description=validated_data.get('description'),
+                billable=validated_data['billable'],
+                project=Project.objects.get(id=validated_data.get('project').get('id')),
+                hourlyRate=Rate,
+                start=start_time,
+                end=end_time,
+                workspaceId=Workspace.objects.get(id=validated_data.get('workspaceId')),
+                task=validated_data.get('task').get('name') or None
             )
             return entry
         except Exception as e:
             logger.error(f'{e.__traceback__.tb_lineno} - {str(e)}')
             raise ValidationError(str(e))
+
     def update(self, instance: Entry, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Entry Called')
@@ -325,7 +344,7 @@ class EntrySerializer(serializers.Serializer):
             logger.debug(f"Billlable -({validated_data['billable']})")
             # instance.id = instance.id
             try:
-                instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId']) 
+                instance.timesheetId = Timesheet.objects.get(id=validated_data['timesheetId'])
                 approved = True
             except Exception as e:
                 instance.timesheetId
@@ -335,20 +354,23 @@ class EntrySerializer(serializers.Serializer):
             instance.description = validated_data.get('description') or instance.description
             instance.billable = validated_data['billable'] if validated_data['billable'] != None else instance.billable
             instance.project = Project.objects.get(id=validated_data.get('project').get('id')) or instance.project
-            if validated_data.get('hourlyRate') is None and validated_data.get('billable') == True and approved:  
-                logger.error('Silent Failure - Updating billable entry with Null rate is not allowed.')   
+            if validated_data.get('hourlyRate') is None and validated_data.get('billable') == True and approved:
+                logger.error('Silent Failure - Updating billable entry with Null rate is not allowed.')
                 raise Exception('Billable entry is missing Rate')
-            elif validated_data.get('hourlyRate') is not None: instance.hourlyRate = validated_data.get('hourlyRate').get('amount') 
-            else: instance.hourlyRate = 0
+            elif validated_data.get('hourlyRate') is not None:
+                instance.hourlyRate = validated_data.get('hourlyRate').get('amount')
+            else:
+                instance.hourlyRate = 0
             instance.task = validated_data.get('task').get('name') or None
-            instance.start = toMST(validated_data.get('timeInterval').get('start'),True) or instance.start
-            instance.end = toMST(validated_data.get('timeInterval').get('end'),True) or instance.end
+            instance.start = toMST(validated_data.get('timeInterval').get('start'), True) or instance.start
+            instance.end = toMST(validated_data.get('timeInterval').get('end'), True) or instance.end
             # instance.workspaceId = Workspace.objects.get(id= validated_data.get('workspaceId')) or instance.workspaceId
             instance.save(force_update=True)
             return instance
         except Exception as e:
-            logger.error(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent = 4)}')
+            logger.error(f'UnknownError: {e.__traceback__.tb_lineno} {dumps(str(e), indent=4)}')
             raise e
+
 
 class TagsForSerializer(serializers.ModelSerializer):
     '''
@@ -361,14 +383,13 @@ class TagsForSerializer(serializers.ModelSerializer):
         "workspaceId": "64a687e29ae1f428e7ebe303"
     }
     '''
+
     # entryid = serializers.SerializerMethodField(method_name='get_entryid')
-    
+
     class Meta:
-        model= Tagsfor
+        model = Tagsfor
         fields = "__all__"
 
-    
-    
     # def create(self,validated_data:dict):
     #     try: 
     #         logger = setup_background_logger('DEBUG')
@@ -387,13 +408,13 @@ class TagsForSerializer(serializers.ModelSerializer):
     #     except Exception as e:
     #         logger.error(f'Error Caught ({e.__traceback__.tb_lineno}): {str(e)}')
     #         raise e 
-    
+
     def update(self, instance, validated_data):
         logger = setup_background_logger('DEBUG')
         logger.info('Update Tag Called')
         try:
             instance.name = validated_data.get('name', instance.name)
-            
+
             # Ensuring that primary key fields are not changed
             # instance.id = instance.id
             # instance.workspace = instance.workspace
@@ -406,7 +427,8 @@ class TagsForSerializer(serializers.ModelSerializer):
             logger.warning(f'UnknownError: {dumps(str(e), indent=4)}')
             raise e
 
-class CategorySerializer(serializers.ModelSerializer): 
+
+class CategorySerializer(serializers.ModelSerializer):
     '''
     Input is of the form: 
         {
@@ -419,9 +441,11 @@ class CategorySerializer(serializers.ModelSerializer):
             "workspaceId": "64a687e29ae1f428e7ebe303"
         }
     '''
-    class Meta: 
+
+    class Meta:
         model = Category
-        fields = ['id','hasUnitPrice', 'archived', 'name', 'priceInCents', 'unit', 'workspaceId']
+        fields = ['id', 'hasUnitPrice', 'archived', 'name', 'priceInCents', 'unit', 'workspaceId']
+
 
 class ExpenseSerializer(serializers.ModelSerializer):
     '''
@@ -441,12 +465,13 @@ class ExpenseSerializer(serializers.ModelSerializer):
         }
     '''
     date = serializers.DateField(input_formats=['%m/%d/%Y'])
-    
+
     class Meta:
         model = Expense
         fields = "__all__"
-        
-class TimeOffSerializer(serializers.ModelSerializer): 
+
+
+class TimeOffSerializer(serializers.ModelSerializer):
     '''
     Input is of the form: 
         {
@@ -482,25 +507,25 @@ class TimeOffSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     start = serializers.SerializerMethodField()
     end = serializers.SerializerMethodField()
-    
+
     def validate_status(self, value):
         logger = setup_background_logger()  # Assuming setup_background_logger is defined elsewhere
-        try: 
-            if value.get('statusType'): 
+        try:
+            if value.get('statusType'):
                 return value
             else:
                 raise serializers.ValidationError("Missing 'statusType' in status")
         except KeyError as e:
             logger.info(f'Key Error: {e}')
             raise serializers.ValidationError(f"Key Error: {e}")
-        except Exception as e: 
+        except Exception as e:
             logger.error(f'Error during status validation: {e}')
             raise serializers.ValidationError(f"Error during status validation: {e}")
-            
+
     def create(self, validated_data):
         logger = setup_background_logger()
-        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'),True)
-        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'),True)
+        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'), True)
+        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'), True)
         status = self.initial_data.get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
@@ -508,17 +533,17 @@ class TimeOffSerializer(serializers.ModelSerializer):
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
-            validated_data['status'] = status 
+            validated_data['status'] = status
             validated_data['duration'] = duration
         # handle FK objects 
         validated_data['userId'] = Employeeuser.objects.get(id=validated_data['userId'].id)
         validated_data['workspaceId'] = Workspace.objects.get(pk=validated_data['workspaceId'].id)
         return super().create(validated_data=validated_data)
 
-    def update(self, instance, validated_data): 
+    def update(self, instance, validated_data):
         logger = setup_background_logger()
-        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'),True)
-        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'),True)
+        start = toMST(self.initial_data.get('timeOffPeriod').get('period').get('start'), True)
+        end = toMST(self.initial_data.get('timeOffPeriod').get('period').get('end'), True)
         status = self.initial_data.get('status').get('statusType')
         excludeDays = self.initial_data.get('excludeDays')
         duration = count_working_daysV2(start, end, excludeDays)
@@ -526,26 +551,26 @@ class TimeOffSerializer(serializers.ModelSerializer):
         if start and end and status and duration:
             validated_data['start'] = start
             validated_data['end'] = end
-            validated_data['status'] = status 
+            validated_data['status'] = status
             validated_data['duration'] = duration
         # handle FK objects 
         validated_data['userId'] = Employeeuser.objects.get(id=validated_data['userId'].id)
         validated_data['workspaceId'] = Workspace.objects.get(id=validated_data['workspaceId'].id)
-        updated_instance =  super().update(instance=instance, validated_data=validated_data)
+        updated_instance = super().update(instance=instance, validated_data=validated_data)
         # Then, save the instance with force_update=True
         updated_instance.save(force_update=True)
         return updated_instance
-        
-    
-    class Meta: 
+
+    class Meta:
         model = TimeOffRequests
         fields = '__all__'
 
-class FileExpenseSerializer(serializers.ModelSerializer):
 
-    class Meta: 
+class FileExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
         model = FilesForExpense
         fields = "__all__"
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     '''
@@ -611,11 +636,12 @@ class ProjectSerializer(serializers.ModelSerializer):
         }
     }
     '''
-    title = serializers.SerializerMethodField(required = False)
-    code = serializers.SerializerMethodField(required = False)
+    title = serializers.SerializerMethodField(required=False)
+    code = serializers.SerializerMethodField(required=False)
+
     def get_code(self, obj: str):
         logger = setup_background_logger()
-        try: 
+        try:
             code = obj.split(' - ')
             if len(code) != 2:
                 raise ValueError
@@ -623,35 +649,32 @@ class ProjectSerializer(serializers.ModelSerializer):
         except ValueError as v:
             logger.warning('Project must have format XXX-XXX - Project Name ')
             return 'INVALID NAME FORMAT'
-            
-        
-    
+
     def get_title(self, obj: str):
         logger = setup_background_logger()
         try:
             title = obj.split(' - ')
-            if len(title) != 2: 
-                raise(ValueError)
+            if len(title) != 2:
+                raise (ValueError)
             return str(title[1])
         except ValueError as v:
             logger.warning('Project must have format XXX-XXX - Project Name ')
             return 'INVALID NAME FORMAT'
 
-    
     class Meta:
         model = Project
-        fields = '__all__'  
+        fields = '__all__'
 
     def create(self, validated_data):
         obj = validated_data.get('name', '')
         validated_data['title'] = self.get_title(obj)
         validated_data['code'] = self.get_code(obj)
         return super().create(validated_data)
-    
-    def update(self, instance,  validated_data):
-            obj = validated_data.get('name', '')
-            validated_data['title'] = self.get_title(obj)
-            validated_data['code'] = self.get_code(obj)
-            updated = super().update(instance= instance, validated_data=validated_data)
-            updated.save(force_update= True )
-            return updated
+
+    def update(self, instance, validated_data):
+        obj = validated_data.get('name', '')
+        validated_data['title'] = self.get_title(obj)
+        validated_data['code'] = self.get_code(obj)
+        updated = super().update(instance=instance, validated_data=validated_data)
+        updated.save(force_update=True)
+        return updated
